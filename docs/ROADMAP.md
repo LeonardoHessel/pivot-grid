@@ -29,6 +29,14 @@
 - [x] Testes de medição no CI (tempo do engine)
 - [x] Publicação da demo (GitHub Pages)
 
+## Integração no consumidor
+
+- [ ] App em Angular 18+
+- [ ] Instalar --save-exact @leonardohessel/pivot-grid@0.2.0`n- [ ] Trocar a tela de Giro por CDP
+- [ ] Validar paridade (matriz, totais, regra sobre goalPercentage, export XLSX)
+- [ ] Remover o pacote anterior e o registro de licença
+- [ ] Limitações fora do gate: coluna de rótulos não fixa e teclado parcial
+
 ## v0.3.0 — Qualidade
 
 - [ ] Cobertura core ≥ 90%, componente ≥ 80%
@@ -54,4 +62,5 @@
 - [ ] Uso pleno das APIs novas
 - [ ] SSR/hydration
 - [ ] Modo server-side
+
 

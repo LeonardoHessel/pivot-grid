@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** v0.2.0 (CSV + XLSX, benchmark e demo).
+> **Status:** v0.2.0 publicada no npm (latest), com CSV, XLSX, benchmark e demo.
 
 ## Funcionalidades
 
@@ -38,6 +38,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | [API](docs/API.md) | Tipos, inputs, outputs, métodos, tema e erros |
 | [Engine](docs/ENGINE.md) | Algoritmos, complexidade e casos de borda |
 | [Roadmap](docs/ROADMAP.md) | Versões e entregas |
+| [Integração](docs/INTEGRATION.md) | Checklist de adoção no app consumidor |
 | [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, commits e release |
 
 ## Uso
@@ -100,6 +101,7 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
 
 
 

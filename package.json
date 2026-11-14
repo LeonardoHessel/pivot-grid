@@ -40,5 +40,21 @@
     "ng-packagr": "^18.2.0",
     "typescript": "~5.5.2"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "description": "Componente de **tabela dinâmica (pivot)** para Angular: linhas multi-nível, colunas dinâmicas, agregação, totais, formatação condicional e exportação.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeonardoHessel/pivot-grid.git"
+  },
+  "keywords": [],
+  "author": "",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/LeonardoHessel/pivot-grid/issues"
+  },
+  "homepage": "https://github.com/LeonardoHessel/pivot-grid#readme"
 }
