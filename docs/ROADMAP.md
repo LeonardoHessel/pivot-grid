@@ -35,15 +35,22 @@
 - [x] Testes de medição no CI (tempo do engine)
 - [x] Publicação da demo (GitHub Pages)
 
-## Integração no consumidor
+## Integração no consumidor — concluída
 
-- [ ] App em Angular 18+
-- [ ] Instalar --save-exact @leonardohessel/pivot-grid@0.2.0`n- [ ] Trocar a tela de Giro por CDP
-- [ ] Validar paridade (matriz, totais, regra sobre goalPercentage, export XLSX)
-- [ ] Remover o pacote anterior e o registro de licença
-- [ ] Limitações fora do gate: coluna de rótulos não fixa e teclado parcial
+- [x] App em Angular 18+ (consumidor validado em Angular 19)
+- [x] Instalar `--save-exact @leonardohessel/pivot-grid@0.2.0`
+- [x] Trocar a tela de Giro por CDP
+- [x] Validar paridade: matriz, totais, regra sobre `goalPercentage`
+      (inclusive totais), `-`, pt-BR e export XLSX
+- [x] Remover o pacote anterior e o registro de licença
+- [x] Build de produção do consumidor: 2,29 MB (496 kB gzip); zip de deploy regenerado
+- Limitações conhecidas fora do gate: coluna de rótulos não fixa e teclado parcial
 
 ## v0.3.0 — Qualidade e breaking changes
+
+- [x] Remover `CsvExportOptions.mode` (breaking em 0.x)
+- [x] README do pacote reescrito
+- [ ] Publicar 0.3.0 (sem urgência; somente após a janela de integração)
 
 - [x] Remover CsvExportOptions.mode (breaking em 0.x)
 - [x] README do pacote reescrito
@@ -72,6 +79,7 @@
 - [ ] Uso pleno das APIs novas
 - [ ] SSR/hydration
 - [ ] Modo server-side
+
 
 
 

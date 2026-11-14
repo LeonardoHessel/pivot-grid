@@ -8,6 +8,15 @@
   (nem patch, nem prerelease).
 - Consumidores instalam com versão exata (`--save-exact`), nunca por URL de git.
 
+## Integração concluída (consumidor)
+
+- Consumidor validado em **Angular 19**, com o pacote 0.2.0.
+- Gate aprovado: matriz, totais, regra sobre goalPercentage (inclusive nos
+  totais), -, pt-BR, export XLSX e ausência de banner de licença.
+- Build de produção do consumidor: **2,29 MB (496 kB gzip)**; zip de deploy
+  regenerado.
+- @syncfusion/* removido após o gate.
+
 ## Próximo release funcional: 0.3.0
 
 Mudanças já presentes no `main` e que **não** serão publicadas antes da 0.3.0:
@@ -38,3 +47,4 @@ Fora desse caso, nenhuma versão é publicada durante a integração.
 
 Publish manual não faz parte do processo. Tags de versões já publicadas
 (`v0.1.0`, `v0.2.0`) não devem ser reutilizadas.
+

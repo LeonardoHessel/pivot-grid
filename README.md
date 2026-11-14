@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** v0.2.0 publicada no npm (latest), com CSV, XLSX, benchmark e demo.
+> **Status:** v0.2.0 congelada como baseline; integração validada em consumidor Angular 19. A 0.3.0 (breaking + README) fica para depois.
 
 ## Funcionalidades
 
@@ -102,6 +102,7 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
 
 
 
