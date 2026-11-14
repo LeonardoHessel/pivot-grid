@@ -1,6 +1,7 @@
 import {
   Aggregator,
   ConditionalRule,
+  PivotAuxiliaryValue,
   PivotCell,
   PivotConfig,
   PivotData,
@@ -102,11 +103,14 @@ function normalizeConfig(config: PivotConfig): Normalized {
     });
   }
 
+  const auxiliaryValues = (config.auxiliaryValues ?? []).map((auxiliary) => ({ ...auxiliary }));
+
   const normalized: PivotConfig = {
     ...config,
     rows,
     columns,
     values,
+    auxiliaryValues,
     locale,
     emptyText,
     defaultExpandDepth: config.defaultExpandDepth ?? 1,
@@ -236,6 +240,26 @@ function computeStates(
   return state;
 }
 
+function aggregateAuxiliary(
+  auxiliary: PivotAuxiliaryValue[] | undefined,
+  data: PivotData,
+  indexes: readonly number[],
+): Record<string, number | null> | undefined {
+  if (!auxiliary || auxiliary.length === 0) {
+    return undefined;
+  }
+  const result: Record<string, number | null> = {};
+  for (const entry of auxiliary) {
+    const aggregator: Aggregator = entry.aggregator ?? 'sum';
+    const state = createState(aggregator);
+    for (const index of indexes) {
+      addRecord(state, aggregator, getPath(data[index] ?? {}, entry.field));
+    }
+    result[entry.field] = finalize(state, aggregator);
+  }
+  return result;
+}
+
 function sortNodes(
   nodes: InternalNode[],
   sort: PivotSort | undefined,
@@ -324,10 +348,12 @@ function matchesRule(cell: PivotCell, rule: ConditionalRule): boolean {
   if (rule.field && rule.field !== cell.field) {
     return false;
   }
-  if (cell.value === null) {
+  const value = rule.measure
+    ? cell.auxiliary?.[rule.measure] ?? null
+    : cell.value;
+  if (value === null) {
     return false;
   }
-  const value = cell.value;
   const expected = rule.value;
   switch (rule.operator) {
     case '>':
@@ -530,6 +556,7 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
         field: valueField,
         value,
         counts: state.records,
+        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, intersection),
         formatted: formatValue(value, valueConfig, locale, emptyText),
       };
       applyRules(cell, normalized.config.conditionalRules, false, diagnostics);
@@ -548,6 +575,7 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
         field: valueField,
         value,
         counts: state.records,
+        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, rowLeaf.records),
         formatted: formatValue(value, valueConfig, locale, emptyText),
       };
       applyRules(cell, normalized.config.conditionalRules, true, diagnostics);
@@ -566,6 +594,7 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
         field: valueField,
         value,
         counts: state.records,
+        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, columnLeaf.records),
         formatted: formatValue(value, valueConfig, locale, emptyText),
       };
       applyRules(cell, normalized.config.conditionalRules, true, diagnostics);
@@ -586,6 +615,7 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
       field: valueField,
       value,
       counts: state.records,
+      auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, data.map((_record, index) => index)),
       formatted: formatValue(value, valueConfig, locale, emptyText),
     };
     applyRules(grandTotal, normalized.config.conditionalRules, true, diagnostics);
@@ -618,3 +648,5 @@ export class PivotError extends Error {
     this.name = 'PivotError';
   }
 }
+
+

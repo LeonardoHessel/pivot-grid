@@ -215,5 +215,35 @@ describe('buildPivot', () => {
       buildPivot(data, config({ strict: true, values: [{ field: 'amount' }, { field: 'amount' }] })),
     ).toThrowError(PivotError);
   });
+
+  it('aggregates auxiliary measures and evaluates rules against them', () => {
+    const rows = [
+      { group: 'A', month: '2026-01', amount: 100, goal: 0.8 },
+      { group: 'A', month: '2026-01', amount: 100, goal: 0.6 },
+      { group: 'B', month: '2026-01', amount: 50, goal: 1.4 },
+    ];
+    const result = buildPivot(rows, config({
+      rows: [{ field: 'group' }],
+      columns: [{ field: 'month' }],
+      values: [{ field: 'amount' }],
+      auxiliaryValues: [{ field: 'goal', aggregator: 'avg' }],
+      conditionalRules: [
+        { measure: 'goal', operator: '<=', value: 1, className: 'good', applyToTotals: true },
+      ],
+    }));
+
+    const cellA = result.cells.get(cellKey('A', '2026-01', 'amount'));
+    expect(cellA?.value).toBe(200);
+    expect(cellA?.auxiliary?.['goal']).toBe(0.7);
+    expect(cellA?.className).toBe('good');
+
+    const cellB = result.cells.get(cellKey('B', '2026-01', 'amount'));
+    expect(cellB?.auxiliary?.['goal']).toBe(1.4);
+    expect(cellB?.className).toBeUndefined();
+
+    expect(result.grandTotal?.auxiliary?.['goal']).toBeCloseTo(0.9333, 3);
+    expect(result.grandTotal?.className).toBe('good');
+  });
 });
+
 

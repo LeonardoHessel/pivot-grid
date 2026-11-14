@@ -28,6 +28,11 @@ export interface PivotField {
   formatter?: (value: unknown) => string;
 }
 
+export interface PivotAuxiliaryValue {
+  field: string;
+  aggregator?: Aggregator;
+}
+
 export interface PivotValueField {
   field: string;
   caption?: string;
@@ -59,6 +64,8 @@ export interface ConditionalRule {
   style?: Record<string, string>;
   className?: string;
   applyToTotals?: boolean;
+  /** When set, the rule compares this auxiliary measure instead of the cell value. */
+  measure?: string;
   predicate?: (cell: PivotCell) => boolean;
 }
 
@@ -79,6 +86,8 @@ export interface PivotConfig {
     columns?: PivotSort;
   };
   conditionalRules?: ConditionalRule[];
+  /** Measures aggregated per cell but not rendered (used by rules). */
+  auxiliaryValues?: PivotAuxiliaryValue[];
   strict?: boolean;
 }
 
@@ -101,6 +110,8 @@ export interface PivotCell {
   value: number | null;
   formatted: string;
   counts: number;
+  /** Auxiliary measures aggregated for the same rows/columns. */
+  auxiliary?: Record<string, number | null>;
   className?: string;
   style?: Record<string, string>;
 }
@@ -159,3 +170,4 @@ export interface CsvExportOptions {
   mode?: 'visible' | 'full';
   includeTotals?: boolean;
 }
+
