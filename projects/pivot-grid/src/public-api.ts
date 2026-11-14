@@ -3,4 +3,5 @@
  */
 
 export * from './lib/pivot-grid.component';
+export * from './lib/types';
 

@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** especificação concluída; implementação do MVP (v0.1) em andamento.
+> **Status:** engine (core) implementado e testado; componente Angular em implementação.
 
 ## Funcionalidades
 
@@ -91,3 +91,4 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+

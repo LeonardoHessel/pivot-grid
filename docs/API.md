@@ -43,7 +43,7 @@ export interface PivotValueField {
   field: string;
   caption?: string;
   aggregator?: Aggregator;             // default 'sum'
-  format?: string | Intl.NumberFormatOptions | ((value: number) => string);
+  format?: Intl.NumberFormatOptions | ((value: number) => string);
   emptyText?: string;
 }
 
@@ -325,3 +325,4 @@ export interface PivotLabels {
 | `rule-error` | Exceção em `predicate` | Regra ignorada |
 
 Com `strict: true` (dev), os códigos acima lançam `PivotError`.
+

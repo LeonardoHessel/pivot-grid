@@ -34,6 +34,9 @@ projects/demo/         # aplicação de demonstração
 docs/                  # especificação e guias
 ```
 
+> **Tipos duplicados:** `core/src/types.ts` e `src/lib/types.ts` devem permanecer
+> idênticos (o ng-packagr não suporta import entre entry points).
+
 ## Padrões de código
 
 - TypeScript `strict`; sem `any` em API pública.
@@ -78,3 +81,4 @@ Escopos: `core`, `component`, `docs`, `demo`, `ci`.
 ## Licença
 
 Ao contribuir, você concorda que a contribuição é licenciada sob MIT.
+
