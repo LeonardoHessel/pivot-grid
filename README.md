@@ -23,6 +23,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | Formatação condicional + medidas auxiliares | ✅ implementado |
 | Renderer Angular + expandir/colapsar | ✅ implementado |
 | `height`/`width` + scroll + header sticky | ✅ implementado |
+| Coluna de rótulos fixa + teclado (setas/Home/End/PageUp/Down) | ✅ main (0.3.0) |
 | Rótulos pt-BR (`labels`) | ✅ implementado |
 | Exportação CSV nativa | ✅ implementado |
 | Exportação Excel (XLSX mínimo) | ✅ implementado |
@@ -102,6 +103,7 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
 
 
 

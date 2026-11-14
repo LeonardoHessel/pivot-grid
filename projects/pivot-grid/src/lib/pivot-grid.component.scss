@@ -158,3 +158,20 @@
   --pg-cell-padding-y: 10px;
   --pg-font-size: 14px;
 }
+
+.pg-sticky-col {
+  position: sticky;
+  z-index: 2;
+  background: #fff;
+}
+
+.pg-header-row .pg-sticky-col {
+  z-index: 5;
+  background: var(--pg-color-header-bg, #f9fafb);
+}
+
+.pg-cell:focus-visible {
+  outline: 2px solid var(--pg-focus-ring, #2563eb);
+  outline-offset: -2px;
+}
+

@@ -4,6 +4,8 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
+  inject,
   input,
   output,
   signal,
@@ -74,6 +76,7 @@ export class PivotGridComponent {
   readonly state = input<PivotState | null>(null);
   readonly loading = input(false);
   readonly stickyHeaders = input(true);
+  readonly stickyRowHeaders = input(true);
   readonly density = input<'compact' | 'default' | 'comfortable'>('default');
   readonly labels = input<Partial<PivotLabels>>({});
   readonly width = input<string | number>('100%');
@@ -86,6 +89,7 @@ export class PivotGridComponent {
   readonly stateChange = output<PivotState>();
   readonly exportComplete = output<{ format: 'csv' | 'xlsx'; filename: string }>();
 
+  private readonly host = inject(ElementRef<HTMLElement>);
   private readonly internalExpanded = signal<Record<string, boolean>>({});
 
   constructor() {
@@ -111,6 +115,24 @@ export class PivotGridComponent {
   });
 
   readonly rowFieldCount = computed(() => Math.max(1, this.config().rows.length));
+
+  readonly rowHeaderWidths = computed<number[]>(() =>
+    this.config().rows.map((row) => (typeof row.width === 'number' ? row.width : 160)),
+  );
+
+  readonly rowHeaderLefts = computed<number[]>(() => {
+    const lefts: number[] = [];
+    let left = 0;
+    for (const width of this.rowHeaderWidths()) {
+      lefts.push(left);
+      left += width;
+    }
+    return lefts;
+  });
+
+  readonly rowHeaderTotalWidth = computed(() =>
+    this.rowHeaderWidths().reduce((total, width) => total + width, 0),
+  );
   readonly columnDepth = computed(() => this.config().columns.length);
   readonly headerRowCount = computed(() => this.columnDepth() + 1);
   readonly showRowTotals = computed(() => Boolean(this.config().showRowTotals));
@@ -303,6 +325,70 @@ export class PivotGridComponent {
   setState(state: PivotState): void {
     this.internalExpanded.set(state.expanded ?? {});
     this.stateChange.emit(this.getState());
+  }
+
+  onKeydown(event: KeyboardEvent): void {
+    const cell = (event.target as HTMLElement | null)?.closest<HTMLElement>('td[data-r]');
+    if (!cell) {
+      return;
+    }
+    const row = Number(cell.dataset['r']);
+    const column = Number(cell.dataset['c']);
+    const maxRow = this.entries().length - 1;
+    const maxColumn = this.result().columns.length - 1;
+    let nextRow = row;
+    let nextColumn = column;
+
+    switch (event.key) {
+      case 'ArrowRight':
+        nextColumn = Math.min(maxColumn, column + 1);
+        break;
+      case 'ArrowLeft':
+        nextColumn = Math.max(0, column - 1);
+        break;
+      case 'ArrowDown':
+        nextRow = Math.min(maxRow, row + 1);
+        break;
+      case 'ArrowUp':
+        nextRow = Math.max(0, row - 1);
+        break;
+      case 'Home':
+        nextColumn = 0;
+        break;
+      case 'End':
+        nextColumn = maxColumn;
+        break;
+      case 'PageDown':
+        nextRow = Math.min(maxRow, row + 10);
+        break;
+      case 'PageUp':
+        nextRow = Math.max(0, row - 10);
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.focusCell(nextRow, nextColumn);
+  }
+
+  private focusCell(row: number, column: number): void {
+    const table = this.host.nativeElement.querySelector('table') as HTMLElement | null;
+    if (!table) {
+      return;
+    }
+    const target = table.querySelector(
+      `td[data-r="${row}"][data-c="${column}"]`,
+    ) as HTMLElement | null;
+    if (!target) {
+      return;
+    }
+    const cells = table.querySelectorAll('td[tabindex]') as NodeListOf<HTMLElement>;
+    cells.forEach((cell: HTMLElement) => {
+      cell.setAttribute('tabindex', '-1');
+    });
+    target.setAttribute('tabindex', '0');
+    target.focus();
   }
 
   onCellClick(

@@ -48,9 +48,23 @@
 
 ## v0.3.0 — Qualidade e breaking changes
 
-- [x] Remover `CsvExportOptions.mode` (breaking em 0.x)
+- [x] Colunas de rótulos sticky (stickyRowHeaders)
+- [x] Teclado nas células (setas, Home/End, PageUp/Down)
 - [x] README do pacote reescrito
+- [ ] Remover CsvExportOptions.mode (breaking em 0.x)
 - [ ] Publicar 0.3.0 (sem urgência; somente após a janela de integração)
+
+## v1.0 — Angular 18–20
+
+- [ ] Matriz de CI com Angular 18, 19 e 20
+- [ ] Orçamento de performance e acessibilidade
+- [ ] API congelada e guias de migração
+
+## v2.0 — Angular 21+
+
+- [ ] Base Angular >=21, zoneless
+- [ ] SSR/hydration e APIs modernas
+- [ ] Possível modo server-side
 
 - [x] Remover CsvExportOptions.mode (breaking em 0.x)
 - [x] README do pacote reescrito
@@ -79,6 +93,7 @@
 - [ ] Uso pleno das APIs novas
 - [ ] SSR/hydration
 - [ ] Modo server-side
+
 
 
 

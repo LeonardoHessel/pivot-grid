@@ -104,10 +104,42 @@ describe('PivotGridComponent', () => {
     expect(URL.createObjectURL).toHaveBeenCalled();
   });
 
+  it('keeps row header columns sticky with configurable widths', () => {
+    const fixture = create({
+      ...config,
+      rows: [
+        { field: 'region', caption: 'Região', width: 120 },
+        { field: 'city', caption: 'Cidade', width: 180 },
+      ],
+    });
+    const element: HTMLElement = fixture.nativeElement;
+    const secondLevel = element.querySelectorAll<HTMLElement>('th.pg-level-1');
+
+    expect(secondLevel.length).toBeGreaterThan(0);
+    expect(secondLevel[0].classList).toContain('pg-sticky-col');
+    expect(secondLevel[0].style.left).toBe('120px');
+    expect(secondLevel[0].style.width).toBe('180px');
+  });
+
+  it('moves focus with arrow keys between data cells', () => {
+    const fixture = create();
+    const element: HTMLElement = fixture.nativeElement;
+    const first = element.querySelector<HTMLElement>('td[data-r="0"][data-c="0"]');
+    const second = element.querySelector<HTMLElement>('td[data-r="0"][data-c="1"]');
+
+    expect(first?.getAttribute('tabindex')).toBe('0');
+    first?.focus();
+    first?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(document.activeElement).toBe(second);
+    expect(second?.getAttribute('tabindex')).toBe('0');
+  });
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
 
 

@@ -170,7 +170,8 @@ export class PivotGridComponent {}
 | `loading` | `boolean` | não | `false` | Overlay de carregamento |
 | `width` | `number \| string` | não | `'100%'` | Largura do container; scroll horizontal interno |
 | `height` | `number \| string` | não | `'100%'` | Altura fixa com scroll vertical interno |
-| `stickyHeaders` | `boolean` | não | `true` | Cabeçalho fixo no scroll |
+| `stickyHeaders` | `boolean` | não | `true` | Cabeçalho de colunas fixo no scroll |
+| `stickyRowHeaders` | `boolean` | não | `true` | Coluna de rótulos fixa no scroll horizontal |
 | `density` | `'compact' \| 'default' \| 'comfortable'` | não | `'default'` | Densidade visual |
 | `labels` | `Partial<PivotLabels>` | não | `{}` | Textos/i18n |
 
@@ -361,6 +362,7 @@ export interface PivotLabels {
 | `rule-error` | Exceção em `predicate` | Regra ignorada |
 
 Com `strict: true` (dev), os códigos acima lançam `PivotError`.
+
 
 
 

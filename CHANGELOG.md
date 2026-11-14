@@ -10,6 +10,13 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 > `latest` no npm. Nada é publicado durante a janela de integração. Ver
 > [`docs/RELEASES.md`](docs/RELEASES.md).
 
+### Added
+
+- Colunas de rótulos (row headers) **sticky** no scroll horizontal, com
+  largura configurável por `PivotField.width` (default 160px).
+- Navegação por teclado nas células de dados: setas, Home/End e
+  PageUp/PageDown, com foco visível e `tabindex` móvel.
+
 ### Changed
 
 - README do pacote reescrito: quick start com `auxiliaryValues`/`rule.measure`,
@@ -51,3 +58,4 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 - Exportação **CSV** nativa com proteção contra injeção de fórmula.
 - Testes: engine (18) e componente (5).
 - Licença MIT, `publishConfig.access = public` e workflow de publish por tag.
+

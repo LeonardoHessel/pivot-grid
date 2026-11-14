@@ -18,6 +18,7 @@
       <table
         class="pg-table"
         role="grid"
+        (keydown)="onKeydown($event)"
         [attr.aria-rowcount]="entries().length + 1"
         [attr.aria-colcount]="result().columns.length + rowFieldCount() + (showRowTotals() ? 1 : 0)"
       >
@@ -27,6 +28,9 @@
               @if ($index === 0) {
                 <th
                   class="pg-corner"
+                  [class.pg-sticky-col]="stickyRowHeaders()"
+                  [style.left.px]="0"
+                  [style.width.px]="rowHeaderTotalWidth()"
                   [attr.rowspan]="headerRowCount()"
                   [attr.colspan]="rowFieldCount()"
                   scope="col"
@@ -54,6 +58,9 @@
             @if (columnDepth() === 0) {
               <th
                 class="pg-corner"
+                [class.pg-sticky-col]="stickyRowHeaders()"
+                [style.left.px]="0"
+                [style.width.px]="rowHeaderTotalWidth()"
                 [attr.colspan]="rowFieldCount()"
                 scope="col"
               ></th>
@@ -80,6 +87,9 @@
                 @if (cell && cell.render) {
                   <th
                     class="pg-rowheader pg-level-{{ cell.node.level }}"
+                    [class.pg-sticky-col]="stickyRowHeaders()"
+                    [style.left.px]="stickyRowHeaders() ? rowHeaderLefts()[level] : null"
+                    [style.width.px]="rowHeaderWidths()[level]"
                     [attr.rowspan]="cell.rowspan"
                     [attr.colspan]="cell.colspan"
                     scope="row"
@@ -104,9 +114,14 @@
                 }
               }
 
-              @for (column of result().columns; track column.key) {
+              @for (column of result().columns; track column.key; let columnIndex = $index) {
                 <td
                   class="pg-cell"
+                  [attr.data-r]="rowIndex"
+                  [attr.data-c]="columnIndex"
+                  [attr.tabindex]="rowIndex === 0 && columnIndex === 0 ? 0 : -1"
+                  [attr.aria-colindex]="rowFieldCount() + columnIndex + 1"
+                  [attr.aria-rowindex]="rowIndex + 2"
                   [ngClass]="cellFor(entry, column)?.className"
                   [style]="cellFor(entry, column)?.style"
                   (click)="onCellClick(entry, column, cellFor(entry, column), $event)"
@@ -165,3 +180,4 @@
     </div>
   }
 </div>
+
