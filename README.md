@@ -40,6 +40,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | [Roadmap](docs/ROADMAP.md) | Versões e entregas |
 | [Integração](docs/INTEGRATION.md) | Checklist de adoção no app consumidor |
 | [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, commits e release |
+| [Releases](docs/RELEASES.md) | Política de versões e congelamento da 0.2.0 |
 
 ## Uso
 
@@ -101,6 +102,7 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
 
 
 

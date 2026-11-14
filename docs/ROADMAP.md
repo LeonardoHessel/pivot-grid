@@ -8,6 +8,12 @@
 - v1.0+: quebra apenas em major.
 - Faixa suportada na v1: Angular `>=18 <21`.
 
+## Congelamento atual
+
+- **0.2.0** é a baseline da integração e permanece latest no npm.
+- Nenhuma publicação durante a janela de integração.
+- Mudanças pendentes entram na **0.3.0** (ver CHANGELOG.md e RELEASES.md).
+
 ## v0.1.0 — Renderer
 
 - [x] Componente `pg-pivot-grid` consumindo o engine
@@ -37,7 +43,11 @@
 - [ ] Remover o pacote anterior e o registro de licença
 - [ ] Limitações fora do gate: coluna de rótulos não fixa e teclado parcial
 
-## v0.3.0 — Qualidade
+## v0.3.0 — Qualidade e breaking changes
+
+- [x] Remover CsvExportOptions.mode (breaking em 0.x)
+- [x] README do pacote reescrito
+- [ ] Publicar 0.3.0 somente após a integração
 
 - [ ] Cobertura core ≥ 90%, componente ≥ 80%
 - [ ] Acessibilidade completa (teclado, `aria-sort`, foco)
@@ -62,5 +72,6 @@
 - [ ] Uso pleno das APIs novas
 - [ ] SSR/hydration
 - [ ] Modo server-side
+
 
 
