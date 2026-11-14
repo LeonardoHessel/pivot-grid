@@ -174,7 +174,6 @@ export interface CsvExportOptions {
   filename?: string;
   delimiter?: string;
   bom?: boolean;
-  mode?: 'visible' | 'full';
   includeTotals?: boolean;
 }
 
@@ -200,5 +199,6 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
 
 

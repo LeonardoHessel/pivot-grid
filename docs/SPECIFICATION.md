@@ -258,8 +258,8 @@ interface ConditionalRule {
   `@`, TAB ou CR são prefixadas com `'`.
 - **Excel**: writer XLSX mínimo embutido (ZIP + XML, sem dependência), com
   cabeçalho em negrito e painel congelado.
-- `exportMode`: `'visible'` (apenas expandido) ou `'full'` (default: matriz
-  completa).
+- Exportacao sempre da matriz completa; `exportMode` (visible/full) esta no
+  roadmap v1.1.
 - Exportação inclui cabeçalhos multi-nível achatados e totais visíveis.
 
 ### 8.12 Estado
@@ -415,6 +415,7 @@ Detalhes em [`API.md`](./API.md).
 | 5 | Server-side | v2 |
 | 6 | Medidas auxiliares | `auxiliaryValues` + `rule.measure` (implementado) |
 | 7 | Distribuição | npm com versão pinada; publish por tag |
+
 
 
 

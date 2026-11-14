@@ -226,9 +226,9 @@ export interface PivotExpandEvent {
 ### 4.4 Exemplo completo
 
 ```ts
-import { Component, signal } from '@angular/core';
+import { Component, viewChild } from '@angular/core';
 import {
-  PivotGridComponent, PivotConfig, PivotState,
+  PivotGridComponent, PivotConfig, PivotLabels, PivotState,
 } from '@leonardohessel/pivot-grid';
 
 @Component({
@@ -237,36 +237,63 @@ import {
   imports: [PivotGridComponent],
   template: `
     <pg-pivot-grid
-      [data]="rows()"
+      #grid
+      [data]="rows"
       [config]="config"
-      [state]="state()"
-      (stateChange)="state.set($event)"
-      (cellClick)="onCell($event)">
+      [labels]="labels"
+      [state]="state"
+      height="600px"
+      width="100%"
+      (stateChange)="state = $event">
     </pg-pivot-grid>
+
+    <button (click)="grid.exportCsv()">CSV</button>
+    <button (click)="grid.exportExcel()">Excel</button>
   `,
 })
 export class ReportComponent {
-  readonly rows = signal<readonly Record<string, unknown>[]>([
-    { region: 'Sul', month: '2026-01', amount: 120 },
-    { region: 'Sul', month: '2026-02', amount: 80 },
-    { region: 'Norte', month: '2026-01', amount: 50 },
-  ]);
+  readonly rows = [
+    { region: 'Sul', city: 'A', year: '2026', month: '2026-01', amount: 120, goal: 0.8 },
+    { region: 'Sul', city: 'B', year: '2026', month: '2026-02', amount: 80, goal: 1.2 },
+  ];
 
-  readonly state = signal<PivotState | null>(null);
+  state: PivotState | null = null;
 
-  readonly config: PivotConfig = {
-    rows: [{ field: 'region', caption: 'Região' }],
-    columns: [{ field: 'month', caption: 'Mês' }],
-    values: [{ field: 'amount', caption: 'Total', aggregator: 'sum' }],
-    showColumnTotals: true,
-    showGrandTotal: true,
-    defaultExpandDepth: 'all',
-    locale: 'pt-BR',
+  readonly labels: Partial<PivotLabels> = {
+    grandTotal: 'Total geral',
+    rowTotal: 'Total',
+    columnTotal: 'Total',
+    empty: '-',
+    noData: 'Sem dados',
   };
 
-  onCell(event: PivotCellEvent): void {
-    console.log(event.rowPath, event.value);
-  }
+  readonly config: PivotConfig = {
+    rows: [
+      { field: 'region', caption: 'Região' },
+      { field: 'city', caption: 'Cidade' },
+    ],
+    columns: [
+      { field: 'year', caption: 'Ano' },
+      { field: 'month', caption: 'Mês' },
+    ],
+    values: [{ field: 'amount', caption: 'Quantidade', aggregator: 'sum' }],
+    auxiliaryValues: [{ field: 'goal', aggregator: 'avg' }],
+    conditionalRules: [
+      {
+        measure: 'goal',
+        operator: '<=',
+        value: 1,
+        style: { backgroundColor: '#dcfce7', color: '#166534' },
+        applyToTotals: true,
+      },
+    ],
+    showRowTotals: true,
+    showColumnTotals: true,
+    showGrandTotal: true,
+    defaultExpandDepth: 1,
+    emptyText: '-',
+    locale: 'pt-BR',
+  };
 }
 ```
 
@@ -277,7 +304,6 @@ export interface CsvExportOptions {
   filename?: string;          // default 'pivot.csv'
   delimiter?: string;         // default ','
   bom?: boolean;              // default true
-  mode?: 'visible' | 'full';  // default 'full'
   includeTotals?: boolean;    // default true
 }
 
@@ -335,6 +361,7 @@ export interface PivotLabels {
 | `rule-error` | Exceção em `predicate` | Regra ignorada |
 
 Com `strict: true` (dev), os códigos acima lançam `PivotError`.
+
 
 
 
