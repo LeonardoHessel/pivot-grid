@@ -10,14 +10,9 @@ import {
   PivotNode,
   PivotResult,
   PivotSort,
+  PivotValueField,
 } from './types';
-import {
-  AggState,
-  addRecord,
-  createState,
-  finalize,
-  mergeStates,
-} from './aggregate';
+import { AggState, addRecord, createState, finalize } from './aggregate';
 import {
   compareCaptions,
   defaultLocale,
@@ -36,7 +31,6 @@ interface InternalNode {
   level: number;
   children: Map<string, InternalNode>;
   records: number[];
-  state: AggState | null;
   expanded: boolean;
   aggregates: Record<string, number | null>;
 }
@@ -71,12 +65,6 @@ function normalizeConfig(config: PivotConfig): Normalized {
       code: 'invalid-config',
       message: 'config.values must contain at least one value field.',
     });
-  } else if (values.length > 1) {
-    diagnostics.push({
-      code: 'multiple-values-unsupported',
-      message: 'Only one value field is supported in v1; using the first one.',
-      field: values[1]?.field,
-    });
   }
 
   const findDuplicate = (fields: PivotField[]): string | null => {
@@ -103,14 +91,11 @@ function normalizeConfig(config: PivotConfig): Normalized {
     });
   }
 
-  const auxiliaryValues = (config.auxiliaryValues ?? []).map((auxiliary) => ({ ...auxiliary }));
-
   const normalized: PivotConfig = {
     ...config,
     rows,
     columns,
     values,
-    auxiliaryValues,
     locale,
     emptyText,
     defaultExpandDepth: config.defaultExpandDepth ?? 1,
@@ -150,7 +135,6 @@ function buildTree(
       level: 0,
       children: new Map(),
       records: data.map((_record, index) => index),
-      state: null,
       expanded: false,
       aggregates: {},
     };
@@ -192,7 +176,6 @@ function buildTree(
           level,
           children: new Map(),
           records: [],
-          state: null,
           expanded: isExpandedByDefault(level, depth),
           aggregates: {},
         };
@@ -219,65 +202,53 @@ function buildTree(
   return { roots, leaves };
 }
 
-function computeStates(
-  node: InternalNode,
-  data: PivotData,
-  valueField: string,
-  aggregator: Aggregator,
-): AggState {
-  const state = createState(aggregator);
-  if (node.children.size === 0) {
-    for (const index of node.records) {
-      addRecord(state, aggregator, getPath(data[index] ?? {}, valueField));
-    }
-  } else {
-    for (const child of node.children.values()) {
-      mergeStates(state, computeStates(child, data, valueField, aggregator));
-    }
-  }
-  node.state = state;
-  node.aggregates = { [valueField]: finalize(state, aggregator) };
-  return state;
-}
-
-function aggregateAuxiliary(
-  auxiliary: PivotAuxiliaryValue[] | undefined,
+function aggregateRecords(
   data: PivotData,
   indexes: readonly number[],
-): Record<string, number | null> | undefined {
-  if (!auxiliary || auxiliary.length === 0) {
-    return undefined;
-  }
-  const result: Record<string, number | null> = {};
-  for (const entry of auxiliary) {
-    const aggregator: Aggregator = entry.aggregator ?? 'sum';
+  values: PivotValueField[],
+): Record<string, number | null> {
+  const aggregates: Record<string, number | null> = {};
+  for (const value of values) {
+    const aggregator: Aggregator = value.aggregator ?? 'sum';
     const state = createState(aggregator);
     for (const index of indexes) {
-      addRecord(state, aggregator, getPath(data[index] ?? {}, entry.field));
+      addRecord(state, aggregator, getPath(data[index] ?? {}, value.field));
     }
-    result[entry.field] = finalize(state, aggregator);
+    aggregates[value.field] = finalize(state, aggregator);
   }
-  return result;
+  return aggregates;
+}
+
+function computeAggregates(
+  node: InternalNode,
+  data: PivotData,
+  values: PivotValueField[],
+): void {
+  node.aggregates = aggregateRecords(data, node.records, values);
+  for (const child of node.children.values()) {
+    computeAggregates(child, data, values);
+  }
 }
 
 function sortNodes(
   nodes: InternalNode[],
   sort: PivotSort | undefined,
   locale: string,
-  valueField: string,
+  values: PivotValueField[],
 ): void {
   if (!sort) {
     return;
   }
   const sign = (sort.direction ?? 'asc') === 'desc' ? -1 : 1;
   const byValue = sort.by === 'value';
+  const sortField = sort.field ?? values[0]?.field ?? '';
 
   const decorated = nodes.map((node, index) => ({ node, index }));
   decorated.sort((left, right) => {
     let result: number;
     if (byValue) {
-      const leftValue = left.node.aggregates[valueField] ?? null;
-      const rightValue = right.node.aggregates[valueField] ?? null;
+      const leftValue = left.node.aggregates[sortField] ?? null;
+      const rightValue = right.node.aggregates[sortField] ?? null;
       if (leftValue === null && rightValue === null) {
         result = 0;
       } else if (leftValue === null) {
@@ -300,11 +271,11 @@ function sortTree(
   nodes: InternalNode[],
   sort: PivotSort | undefined,
   locale: string,
-  valueField: string,
+  values: PivotValueField[],
 ): void {
-  sortNodes(nodes, sort, locale, valueField);
+  sortNodes(nodes, sort, locale, values);
   for (const node of nodes) {
-    sortTree(Array.from(node.children.values()), sort, locale, valueField);
+    sortTree(Array.from(node.children.values()), sort, locale, values);
   }
 }
 
@@ -327,7 +298,7 @@ function collectLeaves(nodes: InternalNode[]): InternalNode[] {
 
 function formatValue(
   value: number | null,
-  valueField: { format?: Intl.NumberFormatOptions | ((value: number) => string); emptyText?: string },
+  valueField: PivotValueField,
   locale: string,
   emptyText: string,
 ): string {
@@ -420,6 +391,26 @@ function applyRules(
   }
 }
 
+function aggregateAuxiliary(
+  auxiliary: PivotAuxiliaryValue[] | undefined,
+  data: PivotData,
+  indexes: readonly number[],
+): Record<string, number | null> | undefined {
+  if (!auxiliary || auxiliary.length === 0) {
+    return undefined;
+  }
+  const result: Record<string, number | null> = {};
+  for (const entry of auxiliary) {
+    const aggregator: Aggregator = entry.aggregator ?? 'sum';
+    const state = createState(aggregator);
+    for (const index of indexes) {
+      addRecord(state, aggregator, getPath(data[index] ?? {}, entry.field));
+    }
+    result[entry.field] = finalize(state, aggregator);
+  }
+  return result;
+}
+
 function toPublicNode(node: InternalNode): PivotNode {
   return {
     key: node.key,
@@ -447,6 +438,7 @@ const emptyResult = (
   rowTotals: new Map(),
   columnTotals: new Map(),
   grandTotal: null,
+  grandTotals: new Map(),
   diagnostics,
   config,
 });
@@ -456,42 +448,45 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
   const { locale, emptyText, diagnostics } = normalized;
 
   if (!normalized.valid) {
+    if (normalized.config.strict && diagnostics.length > 0) {
+      throw new PivotError(diagnostics);
+    }
     return emptyResult(normalized.config, diagnostics);
   }
 
-  const valueConfig = normalized.config.values[0];
-  const aggregator: Aggregator = valueConfig.aggregator ?? 'sum';
-  const valueField = valueConfig.field;
+  const values = normalized.config.values;
 
-  let invalidCount = 0;
-  let missingValueField = false;
-  for (const record of data) {
-    const raw = getPath(record, valueField);
-    if (raw === undefined) {
-      missingValueField = true;
-      continue;
+  for (const value of values) {
+    let invalidCount = 0;
+    let missingValueField = false;
+    for (const record of data) {
+      const raw = getPath(record, value.field);
+      if (raw === undefined) {
+        missingValueField = true;
+        continue;
+      }
+      if (raw === null || raw === '') {
+        continue;
+      }
+      if (toNumber(raw) === null) {
+        invalidCount += 1;
+      }
     }
-    if (raw === null || raw === '') {
-      continue;
+    if (missingValueField) {
+      diagnostics.push({
+        code: 'missing-field',
+        message: `Value field "${value.field}" is missing on at least one record.`,
+        field: value.field,
+      });
     }
-    if (toNumber(raw) === null) {
-      invalidCount += 1;
+    if (invalidCount > 0) {
+      diagnostics.push({
+        code: 'non-numeric-value',
+        message: `${invalidCount} record(s) have a non-numeric value for "${value.field}" and were ignored.`,
+        field: value.field,
+        count: invalidCount,
+      });
     }
-  }
-  if (missingValueField) {
-    diagnostics.push({
-      code: 'missing-field',
-      message: `Value field "${valueField}" is missing on at least one record.`,
-      field: valueField,
-    });
-  }
-  if (invalidCount > 0) {
-    diagnostics.push({
-      code: 'non-numeric-value',
-      message: `${invalidCount} record(s) have a non-numeric value for "${valueField}" and were ignored.`,
-      field: valueField,
-      count: invalidCount,
-    });
   }
 
   const rowTree = buildTree(
@@ -508,32 +503,45 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
   );
 
   for (const root of rowTree.roots) {
-    computeStates(root, data, valueField, aggregator);
+    computeAggregates(root, data, values);
   }
   for (const root of columnTree.roots) {
-    computeStates(root, data, valueField, aggregator);
+    computeAggregates(root, data, values);
   }
 
   const defaultSort: PivotSort = { by: 'caption', direction: 'asc' };
-  sortTree(rowTree.roots, normalized.config.sort?.rows ?? defaultSort, locale, valueField);
-  sortTree(columnTree.roots, normalized.config.sort?.columns ?? defaultSort, locale, valueField);
+  sortTree(rowTree.roots, normalized.config.sort?.rows ?? defaultSort, locale, values);
+  sortTree(columnTree.roots, normalized.config.sort?.columns ?? defaultSort, locale, values);
 
   const rowLeaves = collectLeaves(rowTree.roots);
   const columnLeaves = collectLeaves(columnTree.roots);
 
+  const allRowNodes: InternalNode[] = [];
+  const collectNodes = (nodes: InternalNode[]): void => {
+    for (const node of nodes) {
+      allRowNodes.push(node);
+      collectNodes(Array.from(node.children.values()));
+    }
+  };
+  collectNodes(rowTree.roots);
+
   const cells = new Map<string, PivotCell>();
+  const nodeCells = new Map<string, PivotCell>();
   const columnRecordSets = new Map<InternalNode, Set<number>>();
   for (const leaf of columnLeaves) {
     columnRecordSets.set(leaf, new Set(leaf.records));
   }
 
-  for (const rowLeaf of rowLeaves) {
-    const rowSet = new Set(rowLeaf.records);
+  const buildCellsFor = (
+    rowNode: InternalNode,
+    target: Map<string, PivotCell>,
+  ): void => {
+    const rowSet = new Set(rowNode.records);
     for (const columnLeaf of columnLeaves) {
       const columnSet = columnRecordSets.get(columnLeaf) as Set<number>;
       const intersection: number[] = [];
-      if (rowLeaf.records.length <= columnSet.size) {
-        for (const index of rowLeaf.records) {
+      if (rowNode.records.length <= columnSet.size) {
+        for (const index of rowNode.records) {
           if (columnSet.has(index)) {
             intersection.push(index);
           }
@@ -546,134 +554,114 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
         }
       }
 
-      const state = createState(aggregator);
-      for (const index of intersection) {
-        addRecord(state, aggregator, getPath(data[index] ?? {}, valueField));
+      for (const value of values) {
+        const aggregator: Aggregator = value.aggregator ?? 'sum';
+        const state = createState(aggregator);
+        for (const index of intersection) {
+          addRecord(state, aggregator, getPath(data[index] ?? {}, value.field));
+        }
+        const cellValue = finalize(state, aggregator);
+        const cell: PivotCell = {
+          rowPath: rowNode.path,
+          columnPath: columnLeaf.path,
+          field: value.field,
+          value: cellValue,
+          counts: state.records,
+          auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, intersection),
+          formatted: formatValue(cellValue, value, locale, emptyText),
+        };
+        applyRules(cell, normalized.config.conditionalRules, false, diagnostics);
+        target.set(cellKey(rowNode.key, columnLeaf.key, value.field), cell);
       }
-      const value = finalize(state, aggregator);
-      const cell: PivotCell = {
-        rowPath: rowLeaf.path,
-        columnPath: columnLeaf.path,
-        field: valueField,
-        value,
-        counts: state.records,
-        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, intersection),
-        formatted: formatValue(value, valueConfig, locale, emptyText),
-      };
-      applyRules(cell, normalized.config.conditionalRules, false, diagnostics);
-      cells.set(cellKey(rowLeaf.key, columnLeaf.key, valueField), cell);
-    }
-  }
-
-  const allRowNodes: InternalNode[] = [];
-  const collectNodes = (nodes: InternalNode[]): void => {
-    for (const node of nodes) {
-      allRowNodes.push(node);
-      collectNodes(Array.from(node.children.values()));
     }
   };
-  collectNodes(rowTree.roots);
 
-  // Subtree aggregated per column, used when a node is collapsed.
-  const nodeCells = new Map<string, PivotCell>();
+  for (const rowLeaf of rowLeaves) {
+    buildCellsFor(rowLeaf, cells);
+  }
   for (const node of allRowNodes) {
-    if (node.children.size === 0) {
-      continue;
-    }
-    const nodeSet = new Set(node.records);
-    for (const columnLeaf of columnLeaves) {
-      const columnSet = columnRecordSets.get(columnLeaf) as Set<number>;
-      const intersection: number[] = [];
-      if (node.records.length <= columnSet.size) {
-        for (const index of node.records) {
-          if (columnSet.has(index)) {
-            intersection.push(index);
-          }
-        }
-      } else {
-        for (const index of columnSet) {
-          if (nodeSet.has(index)) {
-            intersection.push(index);
-          }
-        }
-      }
-      const state = createState(aggregator);
-      for (const index of intersection) {
-        addRecord(state, aggregator, getPath(data[index] ?? {}, valueField));
-      }
-      const value = finalize(state, aggregator);
-      const cell: PivotCell = {
-        rowPath: node.path,
-        columnPath: columnLeaf.path,
-        field: valueField,
-        value,
-        counts: state.records,
-        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, intersection),
-        formatted: formatValue(value, valueConfig, locale, emptyText),
-      };
-      applyRules(cell, normalized.config.conditionalRules, false, diagnostics);
-      nodeCells.set(cellKey(node.key, columnLeaf.key, valueField), cell);
+    if (node.children.size > 0) {
+      buildCellsFor(node, nodeCells);
     }
   }
 
   const rowTotals = new Map<string, PivotCell>();
   if (normalized.config.showRowTotals) {
     for (const node of allRowNodes) {
-      const state = node.state ?? createState(aggregator);
-      const value = finalize(state, aggregator);
-      const cell: PivotCell = {
-        rowPath: node.path,
-        columnPath: [],
-        field: valueField,
-        value,
-        counts: state.records,
-        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, node.records),
-        formatted: formatValue(value, valueConfig, locale, emptyText),
-      };
-      applyRules(cell, normalized.config.conditionalRules, true, diagnostics);
-      rowTotals.set(cellKey(node.key, '', valueField), cell);
+      for (const value of values) {
+        const aggregator: Aggregator = value.aggregator ?? 'sum';
+        const state = createState(aggregator);
+        for (const index of node.records) {
+          addRecord(state, aggregator, getPath(data[index] ?? {}, value.field));
+        }
+        const cellValue = finalize(state, aggregator);
+        const cell: PivotCell = {
+          rowPath: node.path,
+          columnPath: [],
+          field: value.field,
+          value: cellValue,
+          counts: state.records,
+          auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, node.records),
+          formatted: formatValue(cellValue, value, locale, emptyText),
+        };
+        applyRules(cell, normalized.config.conditionalRules, true, diagnostics);
+        rowTotals.set(cellKey(node.key, '', value.field), cell);
+      }
     }
   }
 
   const columnTotals = new Map<string, PivotCell>();
   if (normalized.config.showColumnTotals) {
     for (const columnLeaf of columnLeaves) {
-      const state = columnLeaf.state ?? createState(aggregator);
-      const value = finalize(state, aggregator);
-      const cell: PivotCell = {
-        rowPath: [],
-        columnPath: columnLeaf.path,
-        field: valueField,
-        value,
-        counts: state.records,
-        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, columnLeaf.records),
-        formatted: formatValue(value, valueConfig, locale, emptyText),
-      };
-      applyRules(cell, normalized.config.conditionalRules, true, diagnostics);
-      columnTotals.set(cellKey('', columnLeaf.key, valueField), cell);
+      for (const value of values) {
+        const aggregator: Aggregator = value.aggregator ?? 'sum';
+        const state = createState(aggregator);
+        for (const index of columnLeaf.records) {
+          addRecord(state, aggregator, getPath(data[index] ?? {}, value.field));
+        }
+        const cellValue = finalize(state, aggregator);
+        const cell: PivotCell = {
+          rowPath: [],
+          columnPath: columnLeaf.path,
+          field: value.field,
+          value: cellValue,
+          counts: state.records,
+          auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, columnLeaf.records),
+          formatted: formatValue(cellValue, value, locale, emptyText),
+        };
+        applyRules(cell, normalized.config.conditionalRules, true, diagnostics);
+        columnTotals.set(cellKey('', columnLeaf.key, value.field), cell);
+      }
     }
   }
 
-  let grandTotal: PivotCell | null = null;
-  if (normalized.config.showGrandTotal) {
+  const grandTotals = new Map<string, PivotCell>();
+  const allIndexes = data.map((_record, index) => index);
+  for (const value of values) {
+    const aggregator: Aggregator = value.aggregator ?? 'sum';
     const state = createState(aggregator);
-    for (const record of data) {
-      addRecord(state, aggregator, getPath(record, valueField));
+    for (const index of allIndexes) {
+      addRecord(state, aggregator, getPath(data[index] ?? {}, value.field));
     }
-    const value = finalize(state, aggregator);
-    grandTotal = {
+    const cellValue = finalize(state, aggregator);
+    const cell: PivotCell = {
       rowPath: [],
       columnPath: [],
-      field: valueField,
-      value,
+      field: value.field,
+      value: cellValue,
       counts: state.records,
-      auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, data.map((_record, index) => index)),
-      formatted: formatValue(value, valueConfig, locale, emptyText),
+      auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, allIndexes),
+      formatted: formatValue(cellValue, value, locale, emptyText),
     };
-    applyRules(grandTotal, normalized.config.conditionalRules, true, diagnostics);
+    applyRules(cell, normalized.config.conditionalRules, true, diagnostics);
+    grandTotals.set(value.field, cell);
   }
 
-  const result: PivotResult = {
+  if (normalized.config.strict && diagnostics.length > 0) {
+    throw new PivotError(diagnostics);
+  }
+
+  return {
     rowTree: rowTree.roots.map(toPublicNode),
     columnTree: columnTree.roots.map(toPublicNode),
     rows: rowLeaves.map(toPublicNode),
@@ -682,16 +670,11 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
     nodeCells,
     rowTotals,
     columnTotals,
-    grandTotal,
+    grandTotal: grandTotals.get(values[0].field) ?? null,
+    grandTotals,
     diagnostics,
     config: normalized.config,
   };
-
-  if (normalized.config.strict && diagnostics.length > 0) {
-    throw new PivotError(diagnostics);
-  }
-
-  return result;
 }
 
 /** Thrown by `buildPivot` when `config.strict` is enabled and diagnostics exist. */
@@ -701,6 +684,4 @@ export class PivotError extends Error {
     this.name = 'PivotError';
   }
 }
-
-
 

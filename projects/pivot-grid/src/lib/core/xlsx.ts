@@ -169,35 +169,43 @@ function buildTableRows(
   result: PivotResult,
   includeTotals: boolean,
 ): (string | number | null)[][] {
-  const valueField = result.config.values[0];
-  if (!valueField) {
+  const values = result.config.values;
+  if (values.length === 0) {
     return [];
   }
-  const field = valueField.field;
-  const valueCaption = valueField.caption ?? field;
+  const rows: (string | number | null)[][] = [];
   const rowCaptions = result.config.rows.map((row) => row.caption ?? row.field);
   const columns = result.columns;
   const includeRowTotal = Boolean(result.config.showRowTotals);
   const includeColumnTotal = includeTotals && Boolean(result.config.showColumnTotals);
 
-  const rows: (string | number | null)[][] = [
-    [
-      ...rowCaptions,
-      ...columns.map((column) => [...column.path, valueCaption].join(' / ')),
-      ...(includeRowTotal ? ['Total'] : []),
-    ],
-  ];
+  const caption = (value: { field: string; caption?: string }): string =>
+    value.caption ?? value.field;
+
+  rows.push([
+    ...rowCaptions,
+    ...columns.flatMap((column) =>
+      values.map((value) => [...column.path, caption(value)].join(' / ')),
+    ),
+    ...(includeRowTotal
+      ? values.map((value) => `Total - ${caption(value)}`)
+      : []),
+  ]);
 
   for (const row of result.rows) {
-    const values = columns.map(
-      (column) =>
-        result.cells.get(cellKey(row.key, column.key, field))?.value ?? null,
-    );
     rows.push([
       ...rowCaptions.map((_caption, index) => row.path[index] ?? ''),
-      ...values,
+      ...columns.flatMap((column) =>
+        values.map(
+          (value) =>
+            result.cells.get(cellKey(row.key, column.key, value.field))?.value ?? null,
+        ),
+      ),
       ...(includeRowTotal
-        ? [result.rowTotals.get(cellKey(row.key, '', field))?.value ?? null]
+        ? values.map(
+            (value) =>
+              result.rowTotals.get(cellKey(row.key, '', value.field))?.value ?? null,
+          )
         : []),
     ]);
   }
@@ -205,17 +213,20 @@ function buildTableRows(
   if (includeColumnTotal) {
     rows.push([
       'Total',
-      ...columns.map(
-        (column) =>
-          result.columnTotals.get(cellKey('', column.key, field))?.value ?? null,
+      ...columns.flatMap((column) =>
+        values.map(
+          (value) =>
+            result.columnTotals.get(cellKey('', column.key, value.field))?.value ?? null,
+        ),
       ),
-      ...(includeRowTotal ? [result.grandTotal?.value ?? null] : []),
+      ...(includeRowTotal
+        ? values.map((value) => result.grandTotals.get(value.field)?.value ?? null)
+        : []),
     ]);
   }
 
   return rows;
 }
-
 function sheetXml(rows: (string | number | null)[][]): string {
   const body = rows
     .map((row, rowIndex) => {
@@ -273,3 +284,4 @@ export function toXlsx(
     },
   ]);
 }
+

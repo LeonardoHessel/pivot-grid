@@ -11,3 +11,5 @@ na demo.
 
 - Básico: <https://leonardohessel.github.io/pivot-grid/>
 - Sticky + teclado: <https://leonardohessel.github.io/pivot-grid/sticky-keyboard>
+- Multi-medida: <https://leonardohessel.github.io/pivot-grid/multi-medida>
+

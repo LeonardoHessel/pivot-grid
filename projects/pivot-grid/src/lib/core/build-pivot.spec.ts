@@ -155,13 +155,72 @@ describe('buildPivot', () => {
     expect(missing[0].field).toBe('region');
   });
 
-  it('uses only the first value and reports the unsupported configuration', () => {
-    const result = buildPivot(data, config({
-      values: [{ field: 'amount' }, { field: 'amount', caption: 'Outro' }],
+  it('aggregates every configured value field', () => {
+    const rows = [
+      { group: 'A', month: '2026-01', amount: 10, qty: 2 },
+      { group: 'A', month: '2026-01', amount: 20, qty: 3 },
+    ];
+    const result = buildPivot(rows, config({
+      rows: [{ field: 'group' }],
+      columns: [{ field: 'month' }],
+      values: [
+        { field: 'amount', caption: 'Valor' },
+        { field: 'qty', caption: 'Qtd' },
+      ],
+      showRowTotals: true,
+      showGrandTotal: true,
     }));
 
-    expect(result.diagnostics.some((diagnostic) => diagnostic.code === 'multiple-values-unsupported')).toBeTrue();
+    expect(result.cells.get(cellKey('A', '2026-01', 'amount'))?.value).toBe(30);
+    expect(result.cells.get(cellKey('A', '2026-01', 'qty'))?.value).toBe(5);
+    expect(result.rowTotals.get(cellKey('A', '', 'qty'))?.value).toBe(5);
+    expect(result.grandTotals.get('qty')?.value).toBe(5);
     expect(result.grandTotal?.field).toBe('amount');
+    expect(result.diagnostics.length).toBe(0);
+  });
+
+  it('applies conditional rules per measure', () => {
+    const rows = [
+      { group: 'A', month: '2026-01', amount: 10, qty: 5 },
+      { group: 'B', month: '2026-01', amount: 90, qty: 1 },
+    ];
+    const result = buildPivot(rows, config({
+      rows: [{ field: 'group' }],
+      columns: [{ field: 'month' }],
+      values: [
+        { field: 'amount', caption: 'Valor' },
+        { field: 'qty', caption: 'Qtd' },
+      ],
+      conditionalRules: [
+        { field: 'qty', operator: '>=', value: 5, className: 'qty-high', applyToTotals: true },
+      ],
+    }));
+
+    expect(result.cells.get(cellKey('A', '2026-01', 'qty'))?.className).toBe('qty-high');
+    expect(result.cells.get(cellKey('A', '2026-01', 'amount'))?.className).toBeUndefined();
+    expect(result.cells.get(cellKey('B', '2026-01', 'qty'))?.className).toBeUndefined();
+  });
+
+  it('sorts rows by the measure selected in sort.field', () => {
+    const rows = [
+      { group: 'A', month: '2026-01', amount: 100, qty: 1 },
+      { group: 'B', month: '2026-01', amount: 10, qty: 9 },
+    ];
+    const byAmount = buildPivot(rows, config({
+      rows: [{ field: 'group' }],
+      columns: [{ field: 'month' }],
+      values: [{ field: 'amount' }, { field: 'qty' }],
+      sort: { rows: { by: 'value', field: 'amount', direction: 'desc' } },
+    }));
+    const byQty = buildPivot(rows, config({
+      rows: [{ field: 'group' }],
+      columns: [{ field: 'month' }],
+      values: [{ field: 'amount' }, { field: 'qty' }],
+      sort: { rows: { by: 'value', field: 'qty', direction: 'desc' } },
+    }));
+
+    expect(byAmount.rows.map((node) => node.caption)).toEqual(['A', 'B']);
+    expect(byQty.rows.map((node) => node.caption)).toEqual(['B', 'A']);
   });
 
   it('returns an empty result when values are missing', () => {
@@ -214,7 +273,7 @@ describe('buildPivot', () => {
 
   it('throws PivotError in strict mode when diagnostics exist', () => {
     expect(() =>
-      buildPivot(data, config({ strict: true, values: [{ field: 'amount' }, { field: 'amount' }] })),
+      buildPivot(data, config({ strict: true, rows: [{ field: 'region' }, { field: 'region' }] })),
     ).toThrowError(PivotError);
   });
 
@@ -291,5 +350,7 @@ describe('buildPivot', () => {
     expect(csv.split('\r\n').length).toBeGreaterThan(2);
   });
 });
+
+
 
 

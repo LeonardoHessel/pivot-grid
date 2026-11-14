@@ -108,11 +108,7 @@ export class PivotGridComponent {
     ...this.labels(),
   }));
 
-  readonly valueField = computed(() => this.config().values[0]?.field ?? '');
-  readonly valueCaption = computed(() => {
-    const value = this.config().values[0];
-    return value ? value.caption ?? value.field : '';
-  });
+  readonly values = computed(() => this.config().values);
 
   readonly rowFieldCount = computed(() => Math.max(1, this.config().rows.length));
 
@@ -259,20 +255,23 @@ export class PivotGridComponent {
     return level === entry.node.level ? entry.node : null;
   }
 
-  cellFor(entry: Entry, column: PivotNode): PivotCell | undefined {
-    const field = this.valueField();
+  cellFor(entry: Entry, column: PivotNode, field: string): PivotCell | undefined {
     const key = cellKey(entry.node.key, column.key, field);
     return entry.collapsed
       ? this.result().nodeCells.get(key)
       : this.result().cells.get(key);
   }
 
-  rowTotalFor(entry: Entry): PivotCell | undefined {
-    return this.result().rowTotals.get(cellKey(entry.node.key, '', this.valueField()));
+  rowTotalFor(entry: Entry, field: string): PivotCell | undefined {
+    return this.result().rowTotals.get(cellKey(entry.node.key, '', field));
   }
 
-  columnTotalFor(column: PivotNode): PivotCell | undefined {
-    return this.result().columnTotals.get(cellKey('', column.key, this.valueField()));
+  columnTotalFor(column: PivotNode, field: string): PivotCell | undefined {
+    return this.result().columnTotals.get(cellKey('', column.key, field));
+  }
+
+  grandTotalFor(field: string): PivotCell | undefined {
+    return this.result().grandTotals.get(field);
   }
 
   isExpanded(node: PivotNode): boolean {

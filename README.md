@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** v0.3.0 (sticky row headers + teclado; CSV/XLSX).
+> **Status:** v0.4.0 (múltiplos valores; sticky + teclado; CSV/XLSX).
 
 ## Funcionalidades
 
@@ -28,7 +28,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | Exportação CSV nativa | ✅ implementado |
 | Exportação Excel (XLSX mínimo) | ✅ implementado |
 | Virtualização | ⏳ v1.1 |
-| Múltiplos valores | ⏳ v1.1 |
+| Múltiplos valores (`values[]`) | ✅ 0.4.0 |
 | Painel de campos / filtros | ⏳ v1.2 |
 
 ## Documentação
@@ -80,12 +80,13 @@ export class ReportComponent {
 
 - Básico: <https://leonardohessel.github.io/pivot-grid/>
 - Sticky + teclado: <https://leonardohessel.github.io/pivot-grid/sticky-keyboard>
+- Multi-medida: <https://leonardohessel.github.io/pivot-grid/multi-medida>
 
 ## Distribuição
 
 - Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
 - Publicação **somente no npm**, com versão pinada no consumidor
-  (`npm install pivot-grid@0.3.1`); sem URL de git.
+  (`npm install pivot-grid@0.4.0`); sem URL de git.
 - Release por tag `vX.Y.Z` (workflow `publish.yml`), com
   `publishConfig.access = public` e checagem de versão da tag.
 - Licença MIT (`LICENSE` na raiz e no pacote).
@@ -109,6 +110,8 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
+
 
 
 

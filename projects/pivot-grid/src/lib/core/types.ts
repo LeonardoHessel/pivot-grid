@@ -119,7 +119,6 @@ export interface PivotCell {
 export type PivotDiagnosticCode =
   | 'missing-field'
   | 'non-numeric-value'
-  | 'multiple-values-unsupported'
   | 'invalid-config'
   | 'rule-error';
 
@@ -141,6 +140,7 @@ export interface PivotResult {
   rowTotals: ReadonlyMap<string, PivotCell>;
   columnTotals: ReadonlyMap<string, PivotCell>;
   grandTotal: PivotCell | null;
+  grandTotals: ReadonlyMap<string, PivotCell>;
   diagnostics: PivotDiagnostic[];
   config: PivotConfig;
 }
@@ -199,6 +199,8 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
+
 
 
 

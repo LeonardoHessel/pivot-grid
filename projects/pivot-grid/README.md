@@ -14,7 +14,7 @@ Excel.
 ## Instalação
 
 ```bash
-npm install --save-exact pivot-grid@0.3.1
+npm install --save-exact pivot-grid@0.4.0
 ```
 
 ## Uso
@@ -112,5 +112,6 @@ export class ReportComponent {
 ## Licença
 
 MIT © Leonardo Hessel
+
 
 

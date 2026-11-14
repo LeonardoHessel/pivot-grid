@@ -6,6 +6,22 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-14
+
+### Added
+
+- `values: PivotValueField[]` de ponta a ponta: uma célula/total por medida,
+  medida como nível mais interno do cabeçalho (ano → mês → medida), CSV/XLSX
+  com uma coluna por medida e regras condicionais por `rule.field`/`rule.measure`.
+- Ordenação por valor usando `sort.field` ou a primeira medida.
+- Exemplo `docs/examples/multi-medida.md` e rota `/multi-medida` na demo.
+- `PivotResult.grandTotals` (totais gerais por medida).
+
+### Removed
+
+- Diagnóstico `multiple-values-unsupported` (múltiplos valores agora são
+  suportados).
+
 ## [0.3.1] - 2026-11-14
 
 ### Changed

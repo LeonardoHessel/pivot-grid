@@ -3,7 +3,6 @@ import { CsvExportOptions, PivotResult } from './types';
 
 function escapeCsv(value: string, delimiter: string): string {
   let text = value ?? '';
-  // Prevent spreadsheet formula injection.
   if (/^[=+\-@\t\r]/.test(text)) {
     text = `'${text}`;
   }
@@ -13,15 +12,18 @@ function escapeCsv(value: string, delimiter: string): string {
   return text;
 }
 
+function valueCaption(value: { field: string; caption?: string }): string {
+  return value.caption ?? value.field;
+}
+
 /** Serializes the full pivot matrix (leaves + totals) to CSV. */
 export function toCsv(result: PivotResult, options: CsvExportOptions = {}): string {
   const delimiter = options.delimiter ?? ',';
-  const valueField = result.config.values[0];
-  if (!valueField) {
+  const values = result.config.values;
+  if (values.length === 0) {
     return '';
   }
-  const field = valueField.field;
-  const valueCaption = valueField.caption ?? field;
+
   const rowCaptions = result.config.rows.map((row) => row.caption ?? row.field);
   const columns = result.columns;
   const includeRowTotal = Boolean(result.config.showRowTotals);
@@ -29,35 +31,46 @@ export function toCsv(result: PivotResult, options: CsvExportOptions = {}): stri
 
   const header = [
     ...rowCaptions,
-    ...columns.map((column) => [...column.path, valueCaption].join(' / ')),
-    ...(includeRowTotal ? ['Total'] : []),
+    ...columns.flatMap((column) =>
+      values.map((value) => [...column.path, valueCaption(value)].join(' / ')),
+    ),
+    ...(includeRowTotal ? values.map((value) => `Total - ${valueCaption(value)}`) : []),
   ];
 
   const lines: string[][] = [header];
 
   for (const row of result.rows) {
-    const values = columns.map(
-      (column) =>
-        result.cells.get(cellKey(row.key, column.key, field))?.formatted ?? '',
+    const cells = columns.flatMap((column) =>
+      values.map(
+        (value) =>
+          result.cells.get(cellKey(row.key, column.key, value.field))?.formatted ?? '',
+      ),
     );
-    const rowTotal = includeRowTotal
-      ? [result.rowTotals.get(cellKey(row.key, '', field))?.formatted ?? '']
+    const rowTotals = includeRowTotal
+      ? values.map(
+          (value) =>
+            result.rowTotals.get(cellKey(row.key, '', value.field))?.formatted ?? '',
+        )
       : [];
     lines.push([
       ...rowCaptions.map((_caption, index) => row.path[index] ?? ''),
-      ...values,
-      ...rowTotal,
+      ...cells,
+      ...rowTotals,
     ]);
   }
 
   if (includeColumnTotal) {
     lines.push([
       'Total',
-      ...columns.map(
-        (column) =>
-          result.columnTotals.get(cellKey('', column.key, field))?.formatted ?? '',
+      ...columns.flatMap((column) =>
+        values.map(
+          (value) =>
+            result.columnTotals.get(cellKey('', column.key, value.field))?.formatted ?? '',
+        ),
       ),
-      ...(includeRowTotal ? [result.grandTotal?.formatted ?? ''] : []),
+      ...(includeRowTotal
+        ? values.map((value) => result.grandTotals.get(value.field)?.formatted ?? '')
+        : []),
     ]);
   }
 

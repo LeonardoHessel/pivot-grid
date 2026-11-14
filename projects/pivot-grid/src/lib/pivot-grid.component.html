@@ -20,7 +20,7 @@
         role="grid"
         (keydown)="onKeydown($event)"
         [attr.aria-rowcount]="entries().length + 1"
-        [attr.aria-colcount]="result().columns.length + rowFieldCount() + (showRowTotals() ? 1 : 0)"
+        [attr.aria-colcount]="result().columns.length * values().length + rowFieldCount() + (showRowTotals() ? values().length : 0)"
       >
         <thead>
           @for (row of columnHeaderRows(); track $index) {
@@ -40,14 +40,18 @@
                 <th
                   class="pg-header-cell"
                   scope="col"
-                  [attr.colspan]="cell.colspan"
+                  [attr.colspan]="cell.colspan * values().length"
                   (click)="onHeaderClick('column', cell.node, $event)"
                 >
                   {{ cell.node.caption }}
                 </th>
               }
               @if ($index === 0 && showRowTotals()) {
-                <th class="pg-header-cell pg-total-header" [attr.rowspan]="headerRowCount()">
+                <th
+                  class="pg-header-cell pg-total-header"
+                  [attr.colspan]="values().length"
+                  [attr.rowspan]="columnDepth()"
+                >
                   {{ resolvedLabels().rowTotal }}
                 </th>
               }
@@ -66,16 +70,22 @@
               ></th>
             }
             @for (column of result().columns; track column.key) {
-              <th
-                class="pg-header-cell pg-value-header"
-                scope="col"
-                (click)="onHeaderClick('column', column, $event)"
-              >
-                {{ valueCaption() }}
-              </th>
+              @for (value of values(); track value.field) {
+                <th
+                  class="pg-header-cell pg-value-header"
+                  scope="col"
+                  (click)="onHeaderClick('column', column, $event)"
+                >
+                  {{ value.caption ?? value.field }}
+                </th>
+              }
             }
             @if (showRowTotals()) {
-              <th class="pg-header-cell pg-total-header">{{ valueCaption() }}</th>
+              @for (value of values(); track value.field) {
+                <th class="pg-header-cell pg-total-header">
+                  {{ columnDepth() === 0 ? resolvedLabels().rowTotal : (value.caption ?? value.field) }}
+                </th>
+              }
             }
           </tr>
         </thead>
@@ -115,29 +125,33 @@
               }
 
               @for (column of result().columns; track column.key; let columnIndex = $index) {
-                <td
-                  class="pg-cell"
-                  [attr.data-r]="rowIndex"
-                  [attr.data-c]="columnIndex"
-                  [attr.tabindex]="rowIndex === 0 && columnIndex === 0 ? 0 : -1"
-                  [attr.aria-colindex]="rowFieldCount() + columnIndex + 1"
-                  [attr.aria-rowindex]="rowIndex + 2"
-                  [ngClass]="cellFor(entry, column)?.className"
-                  [style]="cellFor(entry, column)?.style"
-                  (click)="onCellClick(entry, column, cellFor(entry, column), $event)"
-                >
-                  {{ cellFor(entry, column)?.formatted ?? '' }}
-                </td>
+                @for (value of values(); track value.field; let valueIndex = $index) {
+                  <td
+                    class="pg-cell"
+                    [attr.data-r]="rowIndex"
+                    [attr.data-c]="columnIndex * values().length + valueIndex"
+                    [attr.tabindex]="rowIndex === 0 && columnIndex === 0 && valueIndex === 0 ? 0 : -1"
+                    [attr.aria-colindex]="rowFieldCount() + columnIndex * values().length + valueIndex + 1"
+                    [attr.aria-rowindex]="rowIndex + 2"
+                    [ngClass]="cellFor(entry, column, value.field)?.className"
+                    [style]="cellFor(entry, column, value.field)?.style"
+                    (click)="onCellClick(entry, column, cellFor(entry, column, value.field), $event)"
+                  >
+                    {{ cellFor(entry, column, value.field)?.formatted ?? '' }}
+                  </td>
+                }
               }
 
               @if (showRowTotals()) {
-                <td
-                  class="pg-cell pg-total"
-                  [ngClass]="rowTotalFor(entry)?.className"
-                  [style]="rowTotalFor(entry)?.style"
-                >
-                  {{ rowTotalFor(entry)?.formatted ?? '' }}
-                </td>
+                @for (value of values(); track value.field) {
+                  <td
+                    class="pg-cell pg-total"
+                    [ngClass]="rowTotalFor(entry, value.field)?.className"
+                    [style]="rowTotalFor(entry, value.field)?.style"
+                  >
+                    {{ rowTotalFor(entry, value.field)?.formatted ?? '' }}
+                  </td>
+                }
               }
             </tr>
           }
@@ -148,18 +162,22 @@
                 {{ resolvedLabels().columnTotal }}
               </th>
               @for (column of result().columns; track column.key) {
-                <td
-                  class="pg-cell pg-total"
-                  [ngClass]="columnTotalFor(column)?.className"
-                  [style]="columnTotalFor(column)?.style"
-                >
-                  {{ columnTotalFor(column)?.formatted ?? '' }}
-                </td>
+                @for (value of values(); track value.field) {
+                  <td
+                    class="pg-cell pg-total"
+                    [ngClass]="columnTotalFor(column, value.field)?.className"
+                    [style]="columnTotalFor(column, value.field)?.style"
+                  >
+                    {{ columnTotalFor(column, value.field)?.formatted ?? '' }}
+                  </td>
+                }
               }
               @if (showRowTotals()) {
-                <td class="pg-cell pg-total pg-grand-total">
-                  {{ result().grandTotal?.formatted ?? '' }}
-                </td>
+                @for (value of values(); track value.field) {
+                  <td class="pg-cell pg-total pg-grand-total">
+                    {{ grandTotalFor(value.field)?.formatted ?? '' }}
+                  </td>
+                }
               }
             </tr>
           } @else if (showGrandTotal()) {
@@ -167,12 +185,14 @@
               <th class="pg-rowheader pg-total" [attr.colspan]="rowFieldCount()">
                 {{ resolvedLabels().grandTotal }}
               </th>
-              <td
-                class="pg-cell pg-total pg-grand-total"
-                [attr.colspan]="result().columns.length"
-              >
-                {{ result().grandTotal?.formatted ?? '' }}
-              </td>
+              @for (value of values(); track value.field) {
+                <td
+                  class="pg-cell pg-total pg-grand-total"
+                  [attr.colspan]="result().columns.length"
+                >
+                  {{ grandTotalFor(value.field)?.formatted ?? '' }}
+                </td>
+              }
             </tr>
           }
         </tbody>
@@ -180,4 +200,3 @@
     </div>
   }
 </div>
-

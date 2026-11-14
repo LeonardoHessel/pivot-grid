@@ -159,6 +159,9 @@ Regras:
 ### 8.2 Eixos de coluna (dinâmicos)
 
 - `columns` define a hierarquia; as folhas viram colunas de valores.
+- A **medida é o nível mais interno**: para cada folha de coluna há uma
+  sub-coluna por item de `values` (ano → mês → medida). Com uma única medida,
+  o layout é idêntico ao anterior.
 - O cabeçalho é multi-linha: cada nível ocupa uma linha de `<thead>`, com
   `colspan` nas folhas e `rowspan` nos rótulos de valor.
 - Colunas são ordenadas pelo mesmo critério das linhas.
@@ -166,8 +169,9 @@ Regras:
 
 ### 8.3 Valores
 
-- v1 suporta **um** item em `values`. Mais de um gera diagnóstico e apenas o
-  primeiro é usado (multi-valor está no roadmap v1.1).
+- `values` aceita **uma ou mais** medidas; cada uma agrega e renderiza sua
+  própria célula/total.
+- Ordenação por valor usa a primeira medida, salvo `sort.field`.
 - `caption` do valor aparece no cabeçalho.
 - `format` pode ser objeto `Intl.NumberFormatOptions` ou função
   `(value: number) => string`.
@@ -409,12 +413,13 @@ Detalhes em [`API.md`](./API.md).
 | # | Decisão | Escolha |
 |---|---|---|
 | 1 | Excel | **writer XLSX mínimo sem dependência** (v0.2.0) |
-| 2 | Múltiplos valores | v1.1 |
+| 2 | Múltiplos valores | implementado na 0.4.0 |
 | 3 | Signals vs decorators | signals (18+) |
 | 4 | Virtualização | v1.1 |
 | 5 | Server-side | v2 |
 | 6 | Medidas auxiliares | `auxiliaryValues` + `rule.measure` (implementado) |
 | 7 | Distribuição | npm com versão pinada; publish por tag |
+
 
 
 

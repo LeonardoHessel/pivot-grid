@@ -81,6 +81,13 @@ for rowLeaf of rowLeaves:
 Complexidade no pior caso: `O(N × |rows| × |columns|)`; no caso comum
 (hierarquias balanceadas) próxima de `O(N × |columns|)`.
 
+## 5. Múltiplos valores
+
+Cada item de `values` tem seu próprio acumulador por célula e por total. A
+ordenação por valor usa `sort.field` ou a primeira medida. Células e totais são
+armazenados com a chave `(linha, coluna, campo)`, então o renderer e os exports
+percorrem uma coluna por medida.
+
 ## 5. Totais
 
 | Total | Conjunto |

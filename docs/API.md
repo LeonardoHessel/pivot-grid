@@ -75,7 +75,7 @@ export interface ConditionalRule {
 export interface PivotConfig {
   rows: PivotField[];                  // pode ser vazio
   columns: PivotField[];               // pode ser vazio
-  values: PivotValueField[];           // v1: exatamente um
+  values: PivotValueField[];           // uma ou mais medidas
   defaultExpandDepth?: number | 'all'; // default 1
   showRowTotals?: boolean;             // default false
   showColumnTotals?: boolean;          // default false
@@ -141,7 +141,9 @@ export interface PivotResult {
   cells: ReadonlyMap<string, PivotCell>; // chave: `${rowKey}||${columnKey}||${field}`
   rowTotals: ReadonlyMap<string, PivotCell>;
   columnTotals: ReadonlyMap<string, PivotCell>;
-  grandTotal: PivotCell | null;
+  grandTotal: PivotCell | null;                 // primeira medida
+  grandTotals: ReadonlyMap<string, PivotCell>;  // por campo de medida                 // primeira medida
+  grandTotals: ReadonlyMap<string, PivotCell>;  // por campo de medida
   diagnostics: PivotDiagnostic[];
   config: PivotConfig;
 }
@@ -357,7 +359,6 @@ export interface PivotLabels {
 |---|---|---|
 | `missing-field` | Campo não existe nos dados | Célula não é agregada; aviso |
 | `non-numeric-value` | Valor não numérico | Ignorado; aviso com contagem |
-| `multiple-values-unsupported` | `values.length > 1` na v1 | Usa o primeiro |
 | `invalid-config` | `values` vazio ou eixos inválidos | Estado vazio |
 | `rule-error` | Exceção em `predicate` | Regra ignorada |
 
@@ -367,4 +368,5 @@ Com `strict: true` (dev), os códigos acima lançam `PivotError`.
 
 - [docs/examples/sticky-keyboard.md](./examples/sticky-keyboard.md) — row headers fixos e teclado.
 - [docs/examples/](./examples/README.md) — índice por funcionalidade.
+
 

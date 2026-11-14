@@ -12,5 +12,7 @@ export class AppComponent {
   readonly links = [
     { path: '/', label: 'Básico', exact: true },
     { path: '/sticky-keyboard', label: 'Sticky + teclado', exact: false },
+    { path: '/multi-medida', label: 'Multi-medida', exact: false },
   ];
 }
+

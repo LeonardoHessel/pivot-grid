@@ -135,11 +135,37 @@ describe('PivotGridComponent', () => {
     expect(document.activeElement).toBe(second);
     expect(second?.getAttribute('tabindex')).toBe('0');
   });
+  it('renders one column per measure with the measure as inner header', () => {
+    const rows = data.map((row) => ({ ...row, goal: 1 }));
+    const fixture = create(
+      {
+        ...config,
+        values: [
+          { field: 'amount', caption: 'Total' },
+          { field: 'goal', caption: 'Meta' },
+        ],
+      },
+      rows,
+    );
+    const element: HTMLElement = fixture.nativeElement;
+    const headers = element.querySelectorAll<HTMLElement>('th.pg-value-header');
+
+    expect(headers.length).toBe(4); // 2 meses x 2 medidas
+    expect(Array.from(headers).map((header) => header.textContent?.trim())).toEqual([
+      'Total',
+      'Meta',
+      'Total',
+      'Meta',
+    ]);
+    expect(element.querySelectorAll('td.pg-cell:not(.pg-total)').length).toBe(12);
+  });
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
+
 
 
 
