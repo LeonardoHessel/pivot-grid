@@ -9,7 +9,8 @@
     "test": "ng test",
     "build:lib": "ng build pivot-grid --configuration production",
     "start:demo": "ng serve demo --port 4300",
-    "bench": "node scripts/benchmark.mjs"
+    "bench": "node scripts/benchmark.mjs",
+    "verify:package": "node scripts/verify-package.mjs"
   },
   "private": true,
   "dependencies": {

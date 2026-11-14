@@ -26,6 +26,9 @@ jobs:
       - name: Build
         run: npm run build:lib
 
+      - name: Verify package
+        run: npm run verify:package
+
       - name: Verify tag matches package version
         run: |
           PKG_VERSION=$(node -p "require('./dist/pivot-grid/package.json').version")
@@ -39,3 +42,17 @@ jobs:
         run: npm publish ./dist/pivot-grid --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Verify published version
+        run: |
+          PKG_VERSION=$(node -p "require('./dist/pivot-grid/package.json').version")
+          for i in $(seq 1 30); do
+            V=$(npm view pivot-grid version 2>/dev/null || true)
+            if [ "$V" = "$PKG_VERSION" ]; then
+              echo "pivot-grid@$V is available"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "pivot-grid@$PKG_VERSION not visible in registry"
+          exit 1

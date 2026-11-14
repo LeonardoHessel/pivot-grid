@@ -106,9 +106,11 @@ export class ReportComponent {
 - [API](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/API.md)
 - [Engine](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/ENGINE.md)
 - [Guia de integração](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/INTEGRATION.md)
+- [Exemplos](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/examples/README.md)
 - [Demo](https://leonardohessel.github.io/pivot-grid/)
 
 ## Licença
 
 MIT © Leonardo Hessel
+
 

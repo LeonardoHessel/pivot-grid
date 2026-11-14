@@ -42,7 +42,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | [Integração](docs/INTEGRATION.md) | Checklist de adoção no app consumidor |
 | [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, commits e release |
 | [Releases](docs/RELEASES.md) | Regras, gate e passo a passo de publicação |
-| [Exemplos](docs/examples/README.md) | Um exemplo por funcionalidade |
+| [Exemplos](docs/examples/README.md) | Um exemplo por funcionalidade (sticky/teclado) |
 
 ## Uso
 
@@ -85,7 +85,7 @@ export class ReportComponent {
 
 - Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
 - Publicação **somente no npm**, com versão pinada no consumidor
-  (`npm install pivot-grid@0.1.0`); sem URL de git.
+  (`npm install pivot-grid@0.3.1`); sem URL de git.
 - Release por tag `vX.Y.Z` (workflow `publish.yml`), com
   `publishConfig.access = public` e checagem de versão da tag.
 - Licença MIT (`LICENSE` na raiz e no pacote).
@@ -109,6 +109,8 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
+
 
 
 

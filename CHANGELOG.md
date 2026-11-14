@@ -69,3 +69,4 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 - Testes: engine (18) e componente (5).
 - Licença MIT, `publishConfig.access = public` e workflow de publish por tag.
 
+
