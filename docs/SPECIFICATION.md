@@ -169,8 +169,11 @@ Regras:
 - v1 suporta **um** item em `values`. Mais de um gera diagnóstico e apenas o
   primeiro é usado (multi-valor está no roadmap v1.1).
 - `caption` do valor aparece no cabeçalho.
-- `format` pode ser string de opções (`Intl.NumberFormat`) ou função
+- `format` pode ser objeto `Intl.NumberFormatOptions` ou função
   `(value: number) => string`.
+- **Medidas auxiliares** (`auxiliaryValues`): agregadas por célula e por total,
+  disponíveis em `cell.auxiliary[field]`, mas **não renderizadas**. Servem para
+  regras condicionais (`rule.measure`) sobre uma segunda medida.
 
 ### 8.4 Totais
 
@@ -333,6 +336,15 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
 - Formatação usa `locale` explícito quando SSR.
 - `loading` e estados são determinísticos no servidor.
 
+### 8.18 Dimensionamento e scroll
+
+- `width` default `'100%'`; `height` default `'100%'`.
+- O componente ocupa o container, com **scroll interno** (vertical e
+  horizontal); a página externa não é empurrada.
+- `stickyHeaders: true` mantém o cabeçalho multi-nível fixo no scroll vertical
+  e a coluna de rótulos fixa no scroll horizontal.
+- Valores numéricos são tratados como pixels; strings CSS são aceitas.
+
 ## 9. API do componente (resumo)
 
 Detalhes em [`API.md`](./API.md).
@@ -393,12 +405,14 @@ Detalhes em [`API.md`](./API.md).
 - [ ] README + API.md + ENGINE.md publicados.
 - [ ] CI (build + testes) verde.
 
-## 14. Decisões abertas
+## 14. Decisões
 
-| # | Decisão | Opções | Proposta |
-|---|---|---|---|
-| 1 | Excel nativo ou adaptador | adaptador (v1) / XLSX interno (v1.1) | adaptador no v1 |
-| 2 | Múltiplos valores | v1.1 | um valor no v1 |
-| 3 | Signals vs decorators | signals (18+) | signals |
-| 4 | Virtualização | v1.1 | após MVP |
-| 5 | Server-side | v2 | após v1.0 |
+| # | Decisão | Escolha |
+|---|---|---|
+| 1 | Excel | **writer XLSX mínimo sem dependência** (v0.2.0) |
+| 2 | Múltiplos valores | v1.1 |
+| 3 | Signals vs decorators | signals (18+) |
+| 4 | Virtualização | v1.1 |
+| 5 | Server-side | v2 |
+| 6 | Medidas auxiliares | `auxiliaryValues` + `rule.measure` (implementado) |
+| 7 | Distribuição | npm com versão pinada; publish por tag |

@@ -39,6 +39,11 @@ export interface PivotField {
   formatter?: (value: unknown) => string;
 }
 
+export interface PivotAuxiliaryValue {
+  field: string;
+  aggregator?: Aggregator;             // default 'sum'
+}
+
 export interface PivotValueField {
   field: string;
   caption?: string;
@@ -62,6 +67,8 @@ export interface ConditionalRule {
   style?: Record<string, string>;
   className?: string;
   applyToTotals?: boolean;             // default false
+  /** Compara esta medida auxiliar em vez do valor da célula. */
+  measure?: string;
   predicate?: (cell: PivotCell) => boolean;
 }
 
@@ -79,6 +86,8 @@ export interface PivotConfig {
   locale?: string;                     // default navigator.language
   sort?: { rows?: PivotSort; columns?: PivotSort };
   conditionalRules?: ConditionalRule[];
+  /** Medidas agregadas por célula mas não renderizadas (usadas por `measure`). */
+  auxiliaryValues?: PivotAuxiliaryValue[];
   strict?: boolean;                    // default false (diagnósticos viram erro)
 }
 ```
@@ -106,6 +115,10 @@ export interface PivotCell {
   aggregatedValue?: number;            // bruto, antes da formatação
   formatted: string;
   counts: number;                      // quantos registros contribuíram
+  /** Medidas auxiliares agregadas para o mesmo par linha/coluna. */
+  auxiliary?: Record<string, number | null>;
+  className?: string;
+  style?: Record<string, string>;
 }
 
 export interface PivotDiagnostic {
@@ -155,6 +168,8 @@ export class PivotGridComponent {}
 | `config` | `PivotConfig` | sim | — | Configuração dos eixos |
 | `state` | `PivotState \| null` | não | `null` | Estado controlado (expansão/ordenação) |
 | `loading` | `boolean` | não | `false` | Overlay de carregamento |
+| `width` | `number \| string` | não | `'100%'` | Largura do container; scroll horizontal interno |
+| `height` | `number \| string` | não | `'100%'` | Altura fixa com scroll vertical interno |
 | `stickyHeaders` | `boolean` | não | `true` | Cabeçalho fixo no scroll |
 | `density` | `'compact' \| 'default' \| 'comfortable'` | não | `'default'` | Densidade visual |
 | `labels` | `Partial<PivotLabels>` | não | `{}` | Textos/i18n |

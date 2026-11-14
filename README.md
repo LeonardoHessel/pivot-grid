@@ -10,22 +10,22 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** engine (core) implementado e testado; componente Angular em implementação.
+> **Status:** engine (`core`) implementado e testado; renderer Angular na v0.1.0.
 
 ## Funcionalidades
 
-| Recurso | v0.1 |
+| Recurso | Status |
 |---|---|
-| Linhas em múltiplos níveis | ✅ planejado |
-| Colunas dinâmicas | ✅ planejado |
-| Agregação `sum/avg/min/max/count/countDistinct` | ✅ planejado |
-| Totais de linha/coluna/geral | ✅ planejado |
-| Expandir/colapsar com estado controlado | ✅ planejado |
-| Ordenação por rótulo/valor | ✅ planejado |
-| Formatação numérica (`Intl`) | ✅ planejado |
-| Formatação condicional | ✅ planejado |
-| Exportação CSV (nativa) | ✅ planejado |
-| Exportação Excel (adaptador) | ✅ planejado |
+| Linhas multi-nível e colunas dinâmicas (engine) | ✅ implementado |
+| Agregação e totais (engine) | ✅ implementado |
+| Ordenação estável (rótulo/valor) | ✅ implementado |
+| Formatação numérica (`Intl`) | ✅ implementado |
+| Formatação condicional + medidas auxiliares | ✅ implementado |
+| Renderer Angular + expandir/colapsar | ⏳ v0.1.0 |
+| `height`/`width` + scroll + header sticky | ⏳ v0.1.0 |
+| Rótulos pt-BR (`labels`) | ⏳ v0.1.0 |
+| Exportação CSV nativa | ⏳ v0.1.0 |
+| Exportação Excel (XLSX mínimo) | ⏳ v0.2.0 |
 | Virtualização | ⏳ v1.1 |
 | Múltiplos valores | ⏳ v1.1 |
 | Painel de campos / filtros | ⏳ v1.2 |
@@ -72,6 +72,14 @@ export class ReportComponent {
 }
 ```
 
+## Distribuição
+
+- Publicação **somente no npm**, com versão pinada no consumidor
+  (`npm install @leonardohessel/pivot-grid@0.1.0`); sem URL de git.
+- Release por tag `vX.Y.Z` (workflow `publish.yml`), com
+  `publishConfig.access = public` e checagem de versão da tag.
+- Licença MIT (`LICENSE` na raiz e no pacote).
+
 ## Desenvolvimento
 
 ```bash
@@ -91,4 +99,7 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
+
+
 
