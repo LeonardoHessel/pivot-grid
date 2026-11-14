@@ -91,5 +91,10 @@ export class AppComponent {
   exportCsv(): void {
     this.grid()?.exportCsv({ filename: 'pivot-demo.csv' });
   }
+
+  exportExcel(): void {
+    this.grid()?.exportExcel({ filename: 'pivot-demo.xlsx' });
+  }
 }
+
 

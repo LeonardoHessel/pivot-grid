@@ -93,9 +93,21 @@ describe('PivotGridComponent', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalled();
   });
 
+  it('exports XLSX through the component', () => {
+    const fixture = create();
+    spyOn(URL, 'createObjectURL').and.returnValue('blob:test');
+    spyOn(URL, 'revokeObjectURL');
+    spyOn(HTMLAnchorElement.prototype, 'click');
+
+    fixture.componentInstance.exportExcel({ filename: 'report.xlsx' });
+
+    expect(URL.createObjectURL).toHaveBeenCalled();
+  });
+
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
 

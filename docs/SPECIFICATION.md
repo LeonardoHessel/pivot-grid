@@ -25,7 +25,7 @@ a partir de uma lista plana de registros, com:
 - agregação de valores (`sum`, `avg`, `min`, `max`, `count`, `countDistinct`);
 - totais por linha, por coluna e geral;
 - expandir/colapsar, ordenação, formatação e destaque condicional;
-- exportação CSV (nativo) e Excel (via adaptador);
+- exportação CSV nativa e Excel (XLSX mínimo, sem dependência);
 - acessibilidade e temas por CSS variables.
 
 O componente deve ser **genérico**: não conhece nenhum domínio de negócio, não
@@ -76,7 +76,7 @@ pivot-grid (entry point principal)
     ├── sortPivot()             # ordenação de eixos
     ├── formatPivotValue()      # formatação numérica
     ├── evaluateRules()         # formatação condicional
-    └── exporters/              # CSV nativo, adaptador Excel
+    └── exporters/              # CSV e XLSX nativos
 ```
 
 Fluxo:
@@ -256,9 +256,8 @@ interface ConditionalRule {
   opcional, aspas duplas escapadas, quebras de linha normalizadas.
 - **Proteção contra injeção de fórmula**: células iniciadas por `=`, `+`, `-`,
   `@`, TAB ou CR são prefixadas com `'`.
-- **Excel**: interface `PivotExcelExporter` (adaptador). O pacote **não**
-  embute biblioteca de XLSX; o consumidor injeta um adaptador. Um adaptador
-  padrão leve está no roadmap v1.1.
+- **Excel**: writer XLSX mínimo embutido (ZIP + XML, sem dependência), com
+  cabeçalho em negrito e painel congelado.
 - `exportMode`: `'visible'` (apenas expandido) ou `'full'` (default: matriz
   completa).
 - Exportação inclui cabeçalhos multi-nível achatados e totais visíveis.
@@ -416,4 +415,7 @@ Detalhes em [`API.md`](./API.md).
 | 5 | Server-side | v2 |
 | 6 | Medidas auxiliares | `auxiliaryValues` + `rule.measure` (implementado) |
 | 7 | Distribuição | npm com versão pinada; publish por tag |
+
+
+
 

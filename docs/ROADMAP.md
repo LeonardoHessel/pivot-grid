@@ -10,24 +10,24 @@
 
 ## v0.1.0 — Renderer
 
-- [ ] Componente `pg-pivot-grid` consumindo o engine
-- [ ] Cabeçalho multi-nível com `colspan`/`rowspan`
-- [ ] Expandir/colapsar com estado controlado
-- [ ] Totais de linha/coluna/geral
-- [ ] Células vazias (`emptyText`) e largura `100%`/altura configurável com scroll
-- [ ] Cabeçalho sticky
-- [ ] Rótulos pt-BR (`labels`)
-- [ ] Exportação **CSV** nativa
-- [ ] Testes do componente (render, expandir, teclado, CSV)
-- [ ] Demo com dataset sintético
+- [x] Componente `pg-pivot-grid` consumindo o engine
+- [x] Cabeçalho multi-nível com `colspan`/`rowspan`
+- [x] Expandir/colapsar com estado controlado
+- [x] Totais de linha/coluna/geral
+- [x] Células vazias (`emptyText`) e largura `100%`/altura configurável com scroll
+- [x] Cabeçalho sticky
+- [x] Rótulos pt-BR (`labels`)
+- [x] Exportação **CSV** nativa
+- [x] Testes do componente (render, expandir, teclado, CSV)
+- [x] Demo com dataset sintético
 
 ## v0.2.0 — Excel, medidas auxiliares e performance
 
-- [ ] Writer **XLSX mínimo** sem dependência (ZIP + XML)
-- [ ] `auxiliaryValues` na API pública + `rule.measure` documentados e testados
-- [ ] Benchmark com volume sintético (ex.: 10k linhas × 12 meses)
-- [ ] Testes de medição no CI (tempo do engine)
-- [ ] Publicação da demo (GitHub Pages)
+- [x] Writer **XLSX mínimo** sem dependência (ZIP + XML)
+- [x] `auxiliaryValues` na API pública + `rule.measure` documentados e testados
+- [x] Benchmark com volume sintético (ex.: 10k linhas × 12 meses)
+- [x] Testes de medição no CI (tempo do engine)
+- [x] Publicação da demo (GitHub Pages)
 
 ## v0.3.0 — Qualidade
 
@@ -54,3 +54,4 @@
 - [ ] Uso pleno das APIs novas
 - [ ] SSR/hydration
 - [ ] Modo server-side
+

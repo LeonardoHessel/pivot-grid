@@ -27,3 +27,9 @@ jobs:
 
       - name: Test library
         run: npx ng test pivot-grid --watch=false --browsers=ChromeHeadless
+
+      - name: Benchmark engine
+        run: npm run bench
+        env:
+          BENCH_MAX_MS: 800
+

@@ -173,7 +173,6 @@ export class PivotGridComponent {}
 | `stickyHeaders` | `boolean` | não | `true` | Cabeçalho fixo no scroll |
 | `density` | `'compact' \| 'default' \| 'comfortable'` | não | `'default'` | Densidade visual |
 | `labels` | `Partial<PivotLabels>` | não | `{}` | Textos/i18n |
-| `exporter` | `PivotExcelExporter \| null` | não | `null` | Adaptador de Excel |
 
 ### 4.2 Outputs
 
@@ -221,7 +220,7 @@ export interface PivotExpandEvent {
 | `getState(): PivotState` | Estado atual |
 | `setState(state: PivotState)` | Aplica estado |
 | `exportCsv(options?: CsvExportOptions): void` | Exporta CSV |
-| `exportExcel(options?: ExcelExportOptions): Promise<void>` | Exporta via adaptador (erro se ausente) |
+| `exportExcel(options?: XlsxExportOptions): void` | Exporta XLSX nativo (ZIP + XML, sem dependência) |
 | `refresh()` | Reprocessa a matriz (raro; inputs já reagem) |
 
 ### 4.4 Exemplo completo
@@ -282,13 +281,9 @@ export interface CsvExportOptions {
   includeTotals?: boolean;    // default true
 }
 
-export interface ExcelExportOptions {
+export interface XlsxExportOptions {
   filename?: string;          // default 'pivot.xlsx'
-  mode?: 'visible' | 'full';
-}
-
-export interface PivotExcelExporter {
-  export(input: PivotExportTable, options: ExcelExportOptions): Promise<Blob>;
+  includeTotals?: boolean;    // default true
 }
 ```
 
@@ -340,6 +335,8 @@ export interface PivotLabels {
 | `rule-error` | Exceção em `predicate` | Regra ignorada |
 
 Com `strict: true` (dev), os códigos acima lançam `PivotError`.
+
+
 
 
 

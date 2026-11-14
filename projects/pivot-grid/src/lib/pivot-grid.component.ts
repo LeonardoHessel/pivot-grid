@@ -10,8 +10,10 @@ import {
 } from '@angular/core';
 import { buildPivot, cellKey } from './core/build-pivot';
 import { toCsv } from './core/csv';
+import { toXlsx } from './core/xlsx';
 import type {
   CsvExportOptions,
+  XlsxExportOptions,
   PivotCell,
   PivotCellEvent,
   PivotConfig,
@@ -347,6 +349,24 @@ export class PivotGridComponent {
     this.exportComplete.emit({ format: 'csv', filename });
   }
 
+  exportExcel(options: XlsxExportOptions = {}): void {
+    const bytes = toXlsx(this.result(), options);
+    const filename = options.filename ?? 'pivot.xlsx';
+    if (typeof document === 'undefined') {
+      return;
+    }
+    const blob = new Blob([bytes as unknown as BlobPart], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    this.exportComplete.emit({ format: 'xlsx', filename });
+  }
+
   refresh(): void {
     // Inputs are signals: changing data/config rebuilds the result.
   }
@@ -355,4 +375,5 @@ export class PivotGridComponent {
     this.stateChange.emit({ expanded: { ...expanded }, sort: this.config().sort });
   }
 }
+
 

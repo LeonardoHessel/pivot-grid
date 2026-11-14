@@ -1,5 +1,6 @@
 import { buildPivot, cellKey, PivotError } from './build-pivot';
 import { toCsv } from './csv';
+import { toXlsx } from './xlsx';
 import { PivotConfig } from './types';
 
 const data = [
@@ -259,6 +260,18 @@ describe('buildPivot', () => {
     expect(result.grandTotal?.className).toBe('good');
   });
 
+  it('builds a minimal XLSX workbook (zip) with sheet data', () => {
+    const result = buildPivot(data, config());
+    const bytes = toXlsx(result);
+    expect(bytes[0]).toBe(0x50);
+    expect(bytes[1]).toBe(0x4b);
+    expect(bytes[2]).toBe(0x03);
+    expect(bytes[3]).toBe(0x04);
+    const text = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
+    expect(text).toContain('xl/worksheets/sheet1.xml');
+    expect(text).toContain('2026-01 / Total');
+  });
+
   it('serializes CSV with header, totals and formula-injection guard', () => {
     const rows = [
       { group: '=SUM(A1)', month: '2026-01', amount: 10 },
@@ -278,4 +291,5 @@ describe('buildPivot', () => {
     expect(csv.split('\r\n').length).toBeGreaterThan(2);
   });
 });
+
 

@@ -1,6 +1,6 @@
 {
   "name": "@leonardohessel/pivot-grid-workspace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build:lib": "ng build pivot-grid --configuration production",
-    "start:demo": "ng serve demo --port 4300"
+    "start:demo": "ng serve demo --port 4300",
+    "bench": "node scripts/benchmark.mjs"
   },
   "private": true,
   "dependencies": {
@@ -29,6 +30,7 @@
     "@angular/cli": "^18.2.21",
     "@angular/compiler-cli": "^18.2.0",
     "@types/jasmine": "~5.1.0",
+    "esbuild": "^0.23.0",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

@@ -7,9 +7,14 @@
         {{ total() | number }}.
       </p>
     </div>
-    <button type="button" class="demo-action" (click)="exportCsv()">
-      Exportar CSV
-    </button>
+    <div class="demo-actions">
+      <button type="button" class="demo-action" (click)="exportCsv()">
+        Exportar CSV
+      </button>
+      <button type="button" class="demo-action demo-action--secondary" (click)="exportExcel()">
+        Exportar Excel
+      </button>
+    </div>
   </header>
 
   <section class="demo-card">
@@ -23,3 +28,4 @@
     ></pg-pivot-grid>
   </section>
 </main>
+

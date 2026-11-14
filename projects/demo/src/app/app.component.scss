@@ -46,3 +46,19 @@ p {
   border-radius: 8px;
   padding: 12px;
 }
+
+.demo-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.demo-action--secondary {
+  background: #fff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.demo-action--secondary:hover {
+  background: #eff6ff;
+}
+

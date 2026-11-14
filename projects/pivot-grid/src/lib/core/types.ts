@@ -165,6 +165,11 @@ export interface PivotLabels {
   export: string;
 }
 
+export interface XlsxExportOptions {
+  filename?: string;
+  includeTotals?: boolean;
+}
+
 export interface CsvExportOptions {
   filename?: string;
   delimiter?: string;
@@ -195,4 +200,5 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
 

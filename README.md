@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** v0.1.0 (renderer + CSV). Excel e benchmark na v0.2.0.
+> **Status:** v0.2.0 (CSV + XLSX, benchmark e demo).
 
 ## Funcionalidades
 
@@ -25,7 +25,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | `height`/`width` + scroll + header sticky | ✅ implementado |
 | Rótulos pt-BR (`labels`) | ✅ implementado |
 | Exportação CSV nativa | ✅ implementado |
-| Exportação Excel (XLSX mínimo) | ⏳ v0.2.0 |
+| Exportação Excel (XLSX mínimo) | ✅ implementado |
 | Virtualização | ⏳ v1.1 |
 | Múltiplos valores | ⏳ v1.1 |
 | Painel de campos / filtros | ⏳ v1.2 |
@@ -74,6 +74,7 @@ export class ReportComponent {
 
 ## Distribuição
 
+- Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
 - Publicação **somente no npm**, com versão pinada no consumidor
   (`npm install @leonardohessel/pivot-grid@0.1.0`); sem URL de git.
 - Release por tag `vX.Y.Z` (workflow `publish.yml`), com
@@ -99,6 +100,7 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
 
 
 
