@@ -363,9 +363,8 @@ export interface PivotLabels {
 
 Com `strict: true` (dev), os códigos acima lançam `PivotError`.
 
+## 9. Exemplos
 
-
-
-
-
+- [docs/examples/sticky-keyboard.md](./examples/sticky-keyboard.md) — row headers fixos e teclado.
+- [docs/examples/](./examples/README.md) — índice por funcionalidade.
 

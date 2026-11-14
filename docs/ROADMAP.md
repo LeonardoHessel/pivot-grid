@@ -1,100 +1,45 @@
 # Roadmap
 
-## Política de versões
+## Política
 
-- **Semver**; releases publicados **somente no npm** com versão pinada
-  (consumidores não devem usar URL de git).
-- v0.x: API pode mudar entre minor (documentado no `CHANGELOG.md`).
-- v1.0+: quebra apenas em major.
-- Faixa suportada na v1: Angular `>=18 <21`.
+- Uma **funcionalidade-título por minor**; correções/docs podem acompanhar.
+- Toda minor é **publicada assim que o gate fecha** — não acumular.
+- Publicação **somente por tag** (`vX.Y.Z`), nunca por push em `main`.
+- `latest` = estável; `next` = RC.
+- `peerDependencies`: `>=18 <21` até a 1.0; **2.0** com `>=21`.
+- Breaking só em minor enquanto `0.x`; após a 1.0, apenas em major com
+  depreciação prévia.
+- Gate e passo a passo em [`RELEASES.md`](./RELEASES.md).
 
-## Congelamento atual
+## Sequência
 
-- **0.2.0** é a baseline da integração e permanece latest no npm.
-- Nenhuma publicação durante a janela de integração.
-- Mudanças pendentes entram na **0.3.0** (ver CHANGELOG.md e RELEASES.md).
+| Versão | Funcionalidade-título | Entregáveis |
+|---|---|---|
+| **0.3.0** | Sticky + teclado | row headers fixos, navegação por teclado, remoção de `CsvExportOptions.mode`, exemplo `sticky-keyboard` e rota na demo |
+| **0.4.0** | Múltiplos valores | `values[]` com cabeçalho por medida, exemplo `multi-medida` |
+| **0.5.0** | Virtualização | linhas virtualizadas + export `visible/full`, exemplo com 50k linhas |
+| **0.6.0** | Hardening | revisão de API/deprecações, a11y com axe, matriz CI 18/19/20, orçamentos de performance (sem feature nova) |
+| **0.9.0** | RC | API congelada, guia de migração, dist-tag `next` |
+| **1.0.0** | Estável | sem features novas; matriz de compatibilidade e docs congeladas |
+| **1.x** | Pós-1.0 | um por minor: painel de campos/filtros, pivot chart, PDF, server-side |
+| **2.0.0** | Angular 21+ | base `>=21`, zoneless, SSR/hydration |
 
-## v0.1.0 — Renderer
+## Escopo fechado da 1.0
 
-- [x] Componente `pg-pivot-grid` consumindo o engine
-- [x] Cabeçalho multi-nível com `colspan`/`rowspan`
-- [x] Expandir/colapsar com estado controlado
-- [x] Totais de linha/coluna/geral
-- [x] Células vazias (`emptyText`) e largura `100%`/altura configurável com scroll
-- [x] Cabeçalho sticky
-- [x] Rótulos pt-BR (`labels`)
-- [x] Exportação **CSV** nativa
-- [x] Testes do componente (render, expandir, teclado, CSV)
-- [x] Demo com dataset sintético
+- Linhas multi-nível e colunas dinâmicas.
+- `sum/avg/min/max/count/countDistinct` e múltiplos valores.
+- Totais de linha/coluna/geral.
+- Expandir/colapsar com estado controlado.
+- Ordenação por rótulo/valor.
+- Formatação numérica e condicional (com medidas auxiliares).
+- CSV e XLSX nativos (com modo `visible`/`full`).
+- Cabeçalho e colunas de rótulos fixos; navegação por teclado.
+- Acessibilidade validada com axe.
+- Angular 18, 19 e 20 na matriz de CI.
+- Orçamentos de performance documentados.
+- Docs congeladas: API, exemplos por funcionalidade, guia de migração.
 
-## v0.2.0 — Excel, medidas auxiliares e performance
+## Fora da 1.0
 
-- [x] Writer **XLSX mínimo** sem dependência (ZIP + XML)
-- [x] `auxiliaryValues` na API pública + `rule.measure` documentados e testados
-- [x] Benchmark com volume sintético (ex.: 10k linhas × 12 meses)
-- [x] Testes de medição no CI (tempo do engine)
-- [x] Publicação da demo (GitHub Pages)
-
-## Integração no consumidor — concluída
-
-- [x] App em Angular 18+ (consumidor validado em Angular 19)
-- [x] Instalar `--save-exact @leonardohessel/pivot-grid@0.2.0`
-- [x] Trocar a tela de Giro por CDP
-- [x] Validar paridade: matriz, totais, regra sobre `goalPercentage`
-      (inclusive totais), `-`, pt-BR e export XLSX
-- [x] Remover o pacote anterior e o registro de licença
-- [x] Build de produção do consumidor: 2,29 MB (496 kB gzip); zip de deploy regenerado
-- Limitações conhecidas fora do gate: coluna de rótulos não fixa e teclado parcial
-
-## v0.3.0 — Qualidade e breaking changes
-
-- [x] Colunas de rótulos sticky (stickyRowHeaders)
-- [x] Teclado nas células (setas, Home/End, PageUp/Down)
-- [x] README do pacote reescrito
-- [ ] Remover CsvExportOptions.mode (breaking em 0.x)
-- [ ] Publicar 0.3.0 (sem urgência; somente após a janela de integração)
-
-## v1.0 — Angular 18–20
-
-- [ ] Matriz de CI com Angular 18, 19 e 20
-- [ ] Orçamento de performance e acessibilidade
-- [ ] API congelada e guias de migração
-
-## v2.0 — Angular 21+
-
-- [ ] Base Angular >=21, zoneless
-- [ ] SSR/hydration e APIs modernas
-- [ ] Possível modo server-side
-
-- [x] Remover CsvExportOptions.mode (breaking em 0.x)
-- [x] README do pacote reescrito
-- [ ] Publicar 0.3.0 somente após a integração
-
-- [ ] Cobertura core ≥ 90%, componente ≥ 80%
-- [ ] Acessibilidade completa (teclado, `aria-sort`, foco)
-- [ ] Temas light/dark e RTL
-- [ ] Adaptador de Excel externo (opcional)
-
-## v1.0.0 — Estável
-
-- [ ] API congelada e documentada
-- [ ] Compatibilidade testada em Angular 18, 19 e 20 (matriz de CI)
-- [ ] Guias: temas, i18n, exportação, migração
-
-## v1.1.0 — Performance e múltiplos valores
-
-- [ ] Virtualização
-- [ ] Múltiplos valores por célula
-- [ ] Filtros de eixo
-
-## v2.0.0 — Angular 21+ (futuro)
-
-- [ ] Base em Angular `>=21`, zoneless
-- [ ] Uso pleno das APIs novas
-- [ ] SSR/hydration
-- [ ] Modo server-side
-
-
-
-
-
+- Painel de campos/filtros, pivot chart, PDF e server-side (entram em 1.x).
+- Angular 21+ (2.0).

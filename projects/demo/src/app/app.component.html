@@ -1,31 +1,21 @@
 <main>
   <header class="demo-header">
     <div>
-      <h1>{{ title }}</h1>
-      <p>
-        Dados sintéticos, {{ data.length }} registros, total
-        {{ total() | number }}.
-      </p>
+      <h1>pivot-grid demo</h1>
+      <p>Componente Angular de tabela dinâmica — exemplos por cenário.</p>
     </div>
-    <div class="demo-actions">
-      <button type="button" class="demo-action" (click)="exportCsv()">
-        Exportar CSV
-      </button>
-      <button type="button" class="demo-action demo-action--secondary" (click)="exportExcel()">
-        Exportar Excel
-      </button>
-    </div>
+    <nav class="demo-nav">
+      @for (link of links; track link.path) {
+        <a
+          [routerLink]="link.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: link.exact }"
+        >
+          {{ link.label }}
+        </a>
+      }
+    </nav>
   </header>
 
-  <section class="demo-card">
-    <pg-pivot-grid
-      [data]="data"
-      [config]="config"
-      [labels]="labels"
-      height="600px"
-      width="100%"
-      density="compact"
-    ></pg-pivot-grid>
-  </section>
+  <router-outlet />
 </main>
-

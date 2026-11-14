@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** v0.2.0 congelada como baseline; integração validada em consumidor Angular 19. A 0.3.0 (breaking + README) fica para depois.
+> **Status:** v0.3.0 (sticky row headers + teclado; CSV/XLSX).
 
 ## Funcionalidades
 
@@ -41,7 +41,8 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | [Roadmap](docs/ROADMAP.md) | Versões e entregas |
 | [Integração](docs/INTEGRATION.md) | Checklist de adoção no app consumidor |
 | [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, commits e release |
-| [Releases](docs/RELEASES.md) | Política de versões e congelamento da 0.2.0 |
+| [Releases](docs/RELEASES.md) | Regras, gate e passo a passo de publicação |
+| [Exemplos](docs/examples/README.md) | Um exemplo por funcionalidade |
 
 ## Uso
 
@@ -75,6 +76,11 @@ export class ReportComponent {
 }
 ```
 
+## Demo
+
+- Básico: <https://leonardohessel.github.io/pivot-grid/>
+- Sticky + teclado: <https://leonardohessel.github.io/pivot-grid/sticky-keyboard>
+
 ## Distribuição
 
 - Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
@@ -103,6 +109,7 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
 
 
 

@@ -4,18 +4,19 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
-## [Unreleased] — alvo 0.3.0
+## [Unreleased]
 
-> **Congelamento:** a versão **0.2.0** permanece como baseline da integração e
-> `latest` no npm. Nada é publicado durante a janela de integração. Ver
-> [`docs/RELEASES.md`](docs/RELEASES.md).
+## [0.3.0] - 2026-11-14
 
 ### Added
 
-- Colunas de rótulos (row headers) **sticky** no scroll horizontal, com
-  largura configurável por `PivotField.width` (default 160px).
-- Navegação por teclado nas células de dados: setas, Home/End e
-  PageUp/PageDown, com foco visível e `tabindex` móvel.
+- Colunas de rótulos (row headers) **sticky** no scroll horizontal, com largura
+  configurável por `PivotField.width` (default 160px) e `stickyRowHeaders`.
+- Navegação por teclado nas células de dados: setas, `Home`/`End`,
+  `PageUp`/`PageDown`, com foco visível e `tabindex` móvel.
+- Exemplo [`docs/examples/sticky-keyboard.md`](docs/examples/sticky-keyboard.md)
+  e rota `/sticky-keyboard` na demo.
+- Demo com uma rota por cenário (`/` básico e `/sticky-keyboard`).
 
 ### Changed
 
@@ -23,12 +24,13 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
   `labels`, `height`/`width` e export CSV/XLSX.
 - Guia de integração (`docs/INTEGRATION.md`) com mapeamento da tela, gate de
   paridade e limitações.
+- Política de releases documentada em `docs/RELEASES.md` e `docs/ROADMAP.md`.
 
 ### Removed
 
 - `CsvExportOptions.mode` (`'visible' | 'full'`) — nunca implementado; a
   exportação sempre gera a matriz completa. Mudança de tipo pública
-  (breaking em 0.x), portanto entra na **0.3.0**, não em patch.
+  (breaking em 0.x).
 
 ## [0.2.0] - 2026-11-14
 
@@ -58,4 +60,3 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 - Exportação **CSV** nativa com proteção contra injeção de fórmula.
 - Testes: engine (18) e componente (5).
 - Licença MIT, `publishConfig.access = public` e workflow de publish por tag.
-
