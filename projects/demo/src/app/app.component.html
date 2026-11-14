@@ -1,11 +1,25 @@
 <main>
-  <h1>{{ title }}</h1>
-  <p>
-    Biblioteca isolada <code>pivot-grid</code> com o app de demonstração do
-    componente de pivot.
-  </p>
+  <header class="demo-header">
+    <div>
+      <h1>{{ title }}</h1>
+      <p>
+        Dados sintéticos, {{ data.length }} registros, total
+        {{ total() | number }}.
+      </p>
+    </div>
+    <button type="button" class="demo-action" (click)="exportCsv()">
+      Exportar CSV
+    </button>
+  </header>
 
   <section class="demo-card">
-    <pg-pivot-grid></pg-pivot-grid>
+    <pg-pivot-grid
+      [data]="data"
+      [config]="config"
+      [labels]="labels"
+      height="600px"
+      width="100%"
+      density="compact"
+    ></pg-pivot-grid>
   </section>
 </main>

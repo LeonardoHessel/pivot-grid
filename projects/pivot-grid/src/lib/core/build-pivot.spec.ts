@@ -1,5 +1,6 @@
-import { buildPivot, cellKey, PivotError } from '../../../core/src/build-pivot';
-import { PivotConfig } from '../../../core/src/types';
+import { buildPivot, cellKey, PivotError } from './build-pivot';
+import { toCsv } from './csv';
+import { PivotConfig } from './types';
 
 const data = [
   { region: 'Sul', city: 'A', month: '2026-01', amount: 100 },
@@ -216,6 +217,19 @@ describe('buildPivot', () => {
     ).toThrowError(PivotError);
   });
 
+  it('exposes subtree cells for collapsed nodes', () => {
+    const result = buildPivot(data, config({
+      rows: [{ field: 'region' }, { field: 'city' }],
+      columns: [{ field: 'month' }],
+    }));
+
+    const sul = result.rowTree.find((node) => node.caption === 'Sul');
+    expect(sul).toBeTruthy();
+    const cell = result.nodeCells.get(cellKey(sul!.key, '2026-01', 'amount'));
+    expect(cell?.value).toBe(125);
+    expect(result.rowTotals.get(cellKey(sul!.key, '', 'amount'))?.value).toBe(175);
+  });
+
   it('aggregates auxiliary measures and evaluates rules against them', () => {
     const rows = [
       { group: 'A', month: '2026-01', amount: 100, goal: 0.8 },
@@ -244,6 +258,24 @@ describe('buildPivot', () => {
     expect(result.grandTotal?.auxiliary?.['goal']).toBeCloseTo(0.9333, 3);
     expect(result.grandTotal?.className).toBe('good');
   });
-});
 
+  it('serializes CSV with header, totals and formula-injection guard', () => {
+    const rows = [
+      { group: '=SUM(A1)', month: '2026-01', amount: 10 },
+      { group: 'B', month: '2026-02', amount: 20 },
+    ];
+    const result = buildPivot(rows, config({
+      rows: [{ field: 'group', caption: 'Grupo' }],
+      columns: [{ field: 'month', caption: 'Mes' }],
+      values: [{ field: 'amount', caption: 'Total' }],
+    }));
+    const csv = toCsv(result);
+
+    expect(csv.startsWith('\uFEFF')).toBeTrue();
+    expect(csv).toContain('Grupo');
+    expect(csv).toContain('2026-01 / Total');
+    expect(csv).toContain("'=SUM(A1)");
+    expect(csv.split('\r\n').length).toBeGreaterThan(2);
+  });
+});
 

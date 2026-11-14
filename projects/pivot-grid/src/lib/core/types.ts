@@ -136,6 +136,8 @@ export interface PivotResult {
   rows: PivotNode[];
   columns: PivotNode[];
   cells: ReadonlyMap<string, PivotCell>;
+  /** Cells for collapsed/internal nodes (subtree aggregated per column). */
+  nodeCells: ReadonlyMap<string, PivotCell>;
   rowTotals: ReadonlyMap<string, PivotCell>;
   columnTotals: ReadonlyMap<string, PivotCell>;
   grandTotal: PivotCell | null;
@@ -169,5 +171,28 @@ export interface CsvExportOptions {
   bom?: boolean;
   mode?: 'visible' | 'full';
   includeTotals?: boolean;
+}
+
+export interface PivotCellEvent {
+  rowPath: string[];
+  columnPath: string[];
+  field: string;
+  value: number | null;
+  formatted: string;
+  cell: PivotCell;
+  event: MouseEvent | KeyboardEvent;
+}
+
+export interface PivotHeaderEvent {
+  axis: 'row' | 'column';
+  path: string[];
+  field: string;
+  event: MouseEvent | KeyboardEvent;
+}
+
+export interface PivotExpandEvent {
+  axis: 'row' | 'column';
+  path: string[];
+  expanded: boolean;
 }
 

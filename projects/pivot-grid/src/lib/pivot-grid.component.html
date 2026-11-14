@@ -1,0 +1,167 @@
+<div
+  class="pg-root"
+  [class.pg-sticky]="stickyHeaders()"
+  [class.pg-density-compact]="density() === 'compact'"
+  [class.pg-density-comfortable]="density() === 'comfortable'"
+  [style]="sizeStyle()"
+>
+  @if (loading()) {
+    <div class="pg-loading" aria-busy="true">
+      <span class="pg-loading-text">{{ resolvedLabels().loading }}</span>
+    </div>
+  }
+
+  @if (result().rows.length === 0 && !loading()) {
+    <div class="pg-empty">{{ resolvedLabels().noData }}</div>
+  } @else {
+    <div class="pg-scroll">
+      <table
+        class="pg-table"
+        role="grid"
+        [attr.aria-rowcount]="entries().length + 1"
+        [attr.aria-colcount]="result().columns.length + rowFieldCount() + (showRowTotals() ? 1 : 0)"
+      >
+        <thead>
+          @for (row of columnHeaderRows(); track $index) {
+            <tr class="pg-header-row">
+              @if ($index === 0) {
+                <th
+                  class="pg-corner"
+                  [attr.rowspan]="headerRowCount()"
+                  [attr.colspan]="rowFieldCount()"
+                  scope="col"
+                ></th>
+              }
+              @for (cell of row; track cell.node.key) {
+                <th
+                  class="pg-header-cell"
+                  scope="col"
+                  [attr.colspan]="cell.colspan"
+                  (click)="onHeaderClick('column', cell.node, $event)"
+                >
+                  {{ cell.node.caption }}
+                </th>
+              }
+              @if ($index === 0 && showRowTotals()) {
+                <th class="pg-header-cell pg-total-header" [attr.rowspan]="headerRowCount()">
+                  {{ resolvedLabels().rowTotal }}
+                </th>
+              }
+            </tr>
+          }
+
+          <tr class="pg-header-row pg-value-row">
+            @if (columnDepth() === 0) {
+              <th
+                class="pg-corner"
+                [attr.colspan]="rowFieldCount()"
+                scope="col"
+              ></th>
+            }
+            @for (column of result().columns; track column.key) {
+              <th
+                class="pg-header-cell pg-value-header"
+                scope="col"
+                (click)="onHeaderClick('column', column, $event)"
+              >
+                {{ valueCaption() }}
+              </th>
+            }
+            @if (showRowTotals()) {
+              <th class="pg-header-cell pg-total-header">{{ valueCaption() }}</th>
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (entry of entries(); track entry.node.key; let rowIndex = $index) {
+            <tr class="pg-row" [class.pg-group-row]="entry.collapsed">
+              @for (cell of rowHeaderMatrix()[rowIndex]; track $index; let level = $index) {
+                @if (cell && cell.render) {
+                  <th
+                    class="pg-rowheader pg-level-{{ cell.node.level }}"
+                    [attr.rowspan]="cell.rowspan"
+                    [attr.colspan]="cell.colspan"
+                    scope="row"
+                  >
+                    <span class="pg-rowheader-content" [style.padding-left.px]="cell.node.level * 14">
+                      @if (cell.node.children.length > 0) {
+                        <button
+                          type="button"
+                          class="pg-expander"
+                          [attr.aria-expanded]="isExpanded(cell.node)"
+                          [attr.aria-label]="isExpanded(cell.node) ? resolvedLabels().collapse : resolvedLabels().expand"
+                          (click)="toggle(cell.node, $event)"
+                        >
+                          <span class="pg-chevron" [class.pg-chevron-open]="isExpanded(cell.node)">▸</span>
+                        </button>
+                      } @else {
+                        <span class="pg-expander-spacer"></span>
+                      }
+                      <span class="pg-rowheader-label">{{ cell.node.caption }}</span>
+                    </span>
+                  </th>
+                }
+              }
+
+              @for (column of result().columns; track column.key) {
+                <td
+                  class="pg-cell"
+                  [ngClass]="cellFor(entry, column)?.className"
+                  [style]="cellFor(entry, column)?.style"
+                  (click)="onCellClick(entry, column, cellFor(entry, column), $event)"
+                >
+                  {{ cellFor(entry, column)?.formatted ?? '' }}
+                </td>
+              }
+
+              @if (showRowTotals()) {
+                <td
+                  class="pg-cell pg-total"
+                  [ngClass]="rowTotalFor(entry)?.className"
+                  [style]="rowTotalFor(entry)?.style"
+                >
+                  {{ rowTotalFor(entry)?.formatted ?? '' }}
+                </td>
+              }
+            </tr>
+          }
+
+          @if (showColumnTotals()) {
+            <tr class="pg-row pg-total-row">
+              <th class="pg-rowheader pg-total" [attr.colspan]="rowFieldCount()">
+                {{ resolvedLabels().columnTotal }}
+              </th>
+              @for (column of result().columns; track column.key) {
+                <td
+                  class="pg-cell pg-total"
+                  [ngClass]="columnTotalFor(column)?.className"
+                  [style]="columnTotalFor(column)?.style"
+                >
+                  {{ columnTotalFor(column)?.formatted ?? '' }}
+                </td>
+              }
+              @if (showRowTotals()) {
+                <td class="pg-cell pg-total pg-grand-total">
+                  {{ result().grandTotal?.formatted ?? '' }}
+                </td>
+              }
+            </tr>
+          } @else if (showGrandTotal()) {
+            <tr class="pg-row pg-total-row">
+              <th class="pg-rowheader pg-total" [attr.colspan]="rowFieldCount()">
+                {{ resolvedLabels().grandTotal }}
+              </th>
+              <td
+                class="pg-cell pg-total pg-grand-total"
+                [attr.colspan]="result().columns.length"
+              >
+                {{ result().grandTotal?.formatted ?? '' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

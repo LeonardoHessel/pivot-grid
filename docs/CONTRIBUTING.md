@@ -29,7 +29,7 @@ npm install
 ```
 projects/pivot-grid/   # biblioteca publicada
   src/lib/             # componentes
-  core/                # entry point secundário (engine puro)
+  src/lib/core/        # engine puro (sem Angular)
 projects/demo/         # aplicação de demonstração
 docs/                  # especificação e guias
 ```
@@ -81,4 +81,5 @@ Escopos: `core`, `component`, `docs`, `demo`, `ci`.
 ## Licença
 
 Ao contribuir, você concorda que a contribuição é licenciada sob MIT.
+
 

@@ -210,9 +210,9 @@ function buildTree(
       parent = node;
       siblings = node.children;
 
-      if (level === fields.length - 1) {
-        node.records.push(index);
-      }
+      // Every node keeps its record indexes so collapsed subtrees can be
+      // aggregated per column without re-walking the tree.
+      node.records.push(index);
     });
   });
 
@@ -443,6 +443,7 @@ const emptyResult = (
   rows: [],
   columns: [],
   cells: new Map(),
+  nodeCells: new Map(),
   rowTotals: new Map(),
   columnTotals: new Map(),
   grandTotal: null,
@@ -564,22 +565,73 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
     }
   }
 
-  const rowTotals = new Map<string, PivotCell>();
-  if (normalized.config.showRowTotals) {
-    for (const rowLeaf of rowLeaves) {
-      const state = rowLeaf.state ?? createState(aggregator);
+  const allRowNodes: InternalNode[] = [];
+  const collectNodes = (nodes: InternalNode[]): void => {
+    for (const node of nodes) {
+      allRowNodes.push(node);
+      collectNodes(Array.from(node.children.values()));
+    }
+  };
+  collectNodes(rowTree.roots);
+
+  // Subtree aggregated per column, used when a node is collapsed.
+  const nodeCells = new Map<string, PivotCell>();
+  for (const node of allRowNodes) {
+    if (node.children.size === 0) {
+      continue;
+    }
+    const nodeSet = new Set(node.records);
+    for (const columnLeaf of columnLeaves) {
+      const columnSet = columnRecordSets.get(columnLeaf) as Set<number>;
+      const intersection: number[] = [];
+      if (node.records.length <= columnSet.size) {
+        for (const index of node.records) {
+          if (columnSet.has(index)) {
+            intersection.push(index);
+          }
+        }
+      } else {
+        for (const index of columnSet) {
+          if (nodeSet.has(index)) {
+            intersection.push(index);
+          }
+        }
+      }
+      const state = createState(aggregator);
+      for (const index of intersection) {
+        addRecord(state, aggregator, getPath(data[index] ?? {}, valueField));
+      }
       const value = finalize(state, aggregator);
       const cell: PivotCell = {
-        rowPath: rowLeaf.path,
+        rowPath: node.path,
+        columnPath: columnLeaf.path,
+        field: valueField,
+        value,
+        counts: state.records,
+        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, intersection),
+        formatted: formatValue(value, valueConfig, locale, emptyText),
+      };
+      applyRules(cell, normalized.config.conditionalRules, false, diagnostics);
+      nodeCells.set(cellKey(node.key, columnLeaf.key, valueField), cell);
+    }
+  }
+
+  const rowTotals = new Map<string, PivotCell>();
+  if (normalized.config.showRowTotals) {
+    for (const node of allRowNodes) {
+      const state = node.state ?? createState(aggregator);
+      const value = finalize(state, aggregator);
+      const cell: PivotCell = {
+        rowPath: node.path,
         columnPath: [],
         field: valueField,
         value,
         counts: state.records,
-        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, rowLeaf.records),
+        auxiliary: aggregateAuxiliary(normalized.config.auxiliaryValues, data, node.records),
         formatted: formatValue(value, valueConfig, locale, emptyText),
       };
       applyRules(cell, normalized.config.conditionalRules, true, diagnostics);
-      rowTotals.set(cellKey(rowLeaf.key, '', valueField), cell);
+      rowTotals.set(cellKey(node.key, '', valueField), cell);
     }
   }
 
@@ -627,6 +679,7 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
     rows: rowLeaves.map(toPublicNode),
     columns: columnLeaves.map(toPublicNode),
     cells,
+    nodeCells,
     rowTotals,
     columnTotals,
     grandTotal,
@@ -648,5 +701,6 @@ export class PivotError extends Error {
     this.name = 'PivotError';
   }
 }
+
 
 

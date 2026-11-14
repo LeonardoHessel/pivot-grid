@@ -4,13 +4,13 @@ Componente de **tabela dinâmica (pivot)** para Angular: linhas multi-nível,
 colunas dinâmicas, agregação, totais, formatação condicional e exportação.
 
 - Angular nativo, **sem dependências de runtime** (além de `tslib`)
-- Engine de agregação separado, testável e sem Angular (`pivot-grid/core`)
+- Engine de agregação separado, testável e sem Angular (`src/lib/core`, exportado pelo pacote)
 - Standalone component + `PivotModule` opcional
 - Acessível (roles ARIA, teclado, `aria-sort`)
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** engine (`core`) implementado e testado; renderer Angular na v0.1.0.
+> **Status:** v0.1.0 (renderer + CSV). Excel e benchmark na v0.2.0.
 
 ## Funcionalidades
 
@@ -21,10 +21,10 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | Ordenação estável (rótulo/valor) | ✅ implementado |
 | Formatação numérica (`Intl`) | ✅ implementado |
 | Formatação condicional + medidas auxiliares | ✅ implementado |
-| Renderer Angular + expandir/colapsar | ⏳ v0.1.0 |
-| `height`/`width` + scroll + header sticky | ⏳ v0.1.0 |
-| Rótulos pt-BR (`labels`) | ⏳ v0.1.0 |
-| Exportação CSV nativa | ⏳ v0.1.0 |
+| Renderer Angular + expandir/colapsar | ✅ implementado |
+| `height`/`width` + scroll + header sticky | ✅ implementado |
+| Rótulos pt-BR (`labels`) | ✅ implementado |
+| Exportação CSV nativa | ✅ implementado |
 | Exportação Excel (XLSX mínimo) | ⏳ v0.2.0 |
 | Virtualização | ⏳ v1.1 |
 | Múltiplos valores | ⏳ v1.1 |
@@ -40,7 +40,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | [Roadmap](docs/ROADMAP.md) | Versões e entregas |
 | [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, commits e release |
 
-## Uso (previsto para a v0.1)
+## Uso
 
 ```bash
 npm install @leonardohessel/pivot-grid
@@ -99,6 +99,8 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
+
 
 
 

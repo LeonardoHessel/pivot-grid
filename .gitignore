@@ -44,3 +44,7 @@ Thumbs.db
 # logs locais do demo
 demo.out.log
 demo.err.log
+
+# artefatos locais
+.chrome-*
+*.log

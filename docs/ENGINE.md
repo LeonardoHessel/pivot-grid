@@ -1,4 +1,4 @@
-# Engine (`pivot-grid/core`)
+# Engine (`src/lib/core`)
 
 O engine é TypeScript puro, sem Angular, sem I/O. Recebe dados planos e uma
 configuração e devolve um `PivotResult` imutável.
@@ -180,3 +180,4 @@ for cell of cells:
 - Formatação com `Intl` e com função.
 - Regras condicionais (primeira vence, `applyToTotals`).
 - Determinismo: executar duas vezes e comparar estruturas.
+

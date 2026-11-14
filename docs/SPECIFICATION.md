@@ -55,7 +55,7 @@ faz requisições HTTP e não depende de estado global.
 ## 5. Princípios de design
 
 1. **Engine separado da renderização.** Toda a matemática vive em
-   `@leonardohessel/pivot-grid/core`, sem dependência de Angular.
+   `src/lib/core`, sem dependência de Angular, exportado pelo pacote principal.
 2. **Dados imutáveis na entrada.** O componente nunca muta o array recebido.
 3. **Renderização declarativa.** A saída do engine é uma estrutura pronta para
    render; o componente só decide o que está visível (expandido).
@@ -71,7 +71,7 @@ faz requisições HTTP e não depende de estado global.
 pivot-grid (entry point principal)
 ├── PivotGridComponent          # renderização Angular
 ├── PivotModule (opcional)      # compatibilidade com NgModules
-└── core/ (entry point secundário)
+└── core/ (engine puro, interno)
     ├── buildPivot()            # pipeline de agregação
     ├── sortPivot()             # ordenação de eixos
     ├── formatPivotValue()      # formatação numérica
@@ -416,3 +416,4 @@ Detalhes em [`API.md`](./API.md).
 | 5 | Server-side | v2 |
 | 6 | Medidas auxiliares | `auxiliaryValues` + `rule.measure` (implementado) |
 | 7 | Distribuição | npm com versão pinada; publish por tag |
+

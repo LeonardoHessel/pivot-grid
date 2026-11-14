@@ -3,5 +3,5 @@
  */
 
 export * from './lib/pivot-grid.component';
-export * from './lib/types';
+export * from './lib/core/public-api';
 

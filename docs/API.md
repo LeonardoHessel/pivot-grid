@@ -12,10 +12,10 @@ import type {
 } from '@leonardohessel/pivot-grid';
 ```
 
-O engine puro fica no entry point secundário:
+O engine puro também é exportado pelo pacote:
 
 ```ts
-import { buildPivot, sortPivot, formatPivotValue } from '@leonardohessel/pivot-grid/core';
+import { buildPivot } from '@leonardohessel/pivot-grid';
 ```
 
 ## 2. Tipos do modelo
@@ -340,4 +340,6 @@ export interface PivotLabels {
 | `rule-error` | Exceção em `predicate` | Regra ignorada |
 
 Com `strict: true` (dev), os códigos acima lançam `PivotError`.
+
+
 
