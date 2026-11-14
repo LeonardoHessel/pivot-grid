@@ -36,6 +36,6 @@ jobs:
           fi
 
       - name: Publish
-        run: npm publish dist/pivot-grid --access public --provenance
+        run: npm publish ./dist/pivot-grid --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -75,7 +75,7 @@ Escopos: `core`, `component`, `docs`, `demo`, `ci`.
 1. Atualizar `CHANGELOG.md` (ou release-please).
 2. `npm version <major|minor|patch>` na raiz e na lib.
 3. `npm run build:lib`.
-4. `npm publish dist/pivot-grid --access public`.
+4. `npm publish ./dist/pivot-grid --access public`.
 5. Tag `vX.Y.Z` + release no GitHub.
 
 ## Licença
