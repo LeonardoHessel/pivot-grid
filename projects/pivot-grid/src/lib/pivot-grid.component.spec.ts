@@ -159,11 +159,52 @@ describe('PivotGridComponent', () => {
     ]);
     expect(element.querySelectorAll('td.pg-cell:not(.pg-total)').length).toBe(12);
   });
+  it('virtualizes rows while keeping sticky headers and spacers', () => {
+    const many = Array.from({ length: 200 }, (_value, index) => ({
+      group: `G${String(index).padStart(3, '0')}`,
+      month: '2026-01',
+      amount: index + 1,
+    }));
+    const fixture = create(
+      {
+        ...config,
+        rows: [{ field: 'group', caption: 'Grupo', width: 120 }],
+        columns: [{ field: 'month', caption: 'Mês' }],
+        values: [{ field: 'amount', caption: 'Total' }],
+      },
+      many,
+    );
+    fixture.componentRef.setInput('virtualScroll', true);
+    fixture.componentRef.setInput('height', '200px');
+    fixture.componentRef.setInput('rowHeight', 30);
+    fixture.detectChanges();
+
+    const element: HTMLElement = fixture.nativeElement;
+    expect(fixture.componentInstance.virtualScroll()).toBeTrue();
+    expect(fixture.componentInstance.renderedEntries().length).toBeLessThan(200);
+    expect(element.querySelectorAll('tr.pg-row').length).toBeLessThan(200);
+    expect(element.querySelectorAll('th.pg-sticky-col').length).toBeGreaterThan(0);
+
+    const scroller = element.querySelector('.pg-scroll') as HTMLElement;
+    scroller.scrollTop = 1500;
+    scroller.dispatchEvent(new Event('scroll'));
+    fixture.detectChanges();
+
+    expect(element.querySelectorAll('tr.pg-spacer').length).toBeGreaterThan(0);
+    expect(fixture.componentInstance.exportRows().length).toBe(200);
+  });
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
+
+
+
+
+
+
 
 
 

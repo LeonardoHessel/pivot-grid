@@ -1,5 +1,6 @@
 import { NgClass } from '@angular/common';
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -8,6 +9,7 @@ import {
   inject,
   input,
   output,
+  OnDestroy,
   signal,
 } from '@angular/core';
 import { buildPivot, cellKey } from './core/build-pivot';
@@ -21,6 +23,7 @@ import type {
   PivotConfig,
   PivotData,
   PivotExpandEvent,
+  PivotExportRow,
   PivotHeaderEvent,
   PivotLabels,
   PivotNode,
@@ -70,13 +73,16 @@ function toCssSize(value: string | number): string {
   templateUrl: './pivot-grid.component.html',
   styleUrl: './pivot-grid.component.scss',
 })
-export class PivotGridComponent {
+export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly data = input<PivotData>([]);
   readonly config = input.required<PivotConfig>();
   readonly state = input<PivotState | null>(null);
   readonly loading = input(false);
   readonly stickyHeaders = input(true);
   readonly stickyRowHeaders = input(true);
+  readonly virtualScroll = input(false);
+  readonly rowHeight = input(32);
+  readonly virtualOverscan = input(5);
   readonly density = input<'compact' | 'default' | 'comfortable'>('default');
   readonly labels = input<Partial<PivotLabels>>({});
   readonly width = input<string | number>('100%');
@@ -91,6 +97,9 @@ export class PivotGridComponent {
 
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly internalExpanded = signal<Record<string, boolean>>({});
+  private readonly scrollTop = signal(0);
+  private readonly viewportHeight = signal(0);
+  private resizeObserver?: ResizeObserver;
 
   constructor() {
     effect(() => {
@@ -100,6 +109,33 @@ export class PivotGridComponent {
       }
     });
   }
+
+  ngAfterViewInit(): void {
+    const scroller = this.scroller();
+    if (!scroller) {
+      return;
+    }
+    this.viewportHeight.set(scroller.clientHeight);
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.viewportHeight.set(scroller.clientHeight);
+      });
+      this.resizeObserver.observe(scroller);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+  }
+
+  private scroller(): HTMLElement | null {
+    return this.host.nativeElement.querySelector('.pg-scroll') as HTMLElement | null;
+  }
+
+  onScroll(event: Event): void {
+    this.scrollTop.set((event.target as HTMLElement).scrollTop);
+  }
+
 
   readonly result = computed(() => buildPivot(this.data(), this.config()));
 
@@ -163,6 +199,73 @@ export class PivotGridComponent {
     walk(this.result().rowTree, []);
     return entries;
   });
+
+  readonly virtualStart = computed(() => {
+    if (!this.virtualScroll()) {
+      return 0;
+    }
+    const height = Math.max(1, this.rowHeight());
+    return Math.max(0, Math.floor(this.scrollTop() / height) - this.virtualOverscan());
+  });
+
+  readonly viewportSize = computed(() => {
+    const raw = this.height();
+    if (typeof raw === 'number') {
+      return raw;
+    }
+    const match = /^(\d+(?:\.\d+)?)px$/.exec(raw.trim());
+    return match ? Number(match[1]) : this.viewportHeight();
+  });
+
+  readonly virtualEnd = computed(() => {
+    const total = this.entries().length;
+    if (!this.virtualScroll()) {
+      return total;
+    }
+    const height = Math.max(1, this.rowHeight());
+    const windowSize =
+      Math.ceil(Math.max(this.viewportSize(), height) / height) +
+      this.virtualOverscan() * 2 +
+      1;
+    return Math.min(total, this.virtualStart() + windowSize);
+  });
+
+  readonly renderedEntries = computed(() =>
+    this.entries()
+      .slice(this.virtualStart(), this.virtualEnd())
+      .map((entry, index) => ({ entry, rowIndex: this.virtualStart() + index })),
+  );
+
+  readonly topSpacerHeight = computed(() =>
+    this.virtualScroll() ? this.virtualStart() * this.rowHeight() : 0,
+  );
+
+  readonly bottomSpacerHeight = computed(() =>
+    this.virtualScroll()
+      ? (this.entries().length - this.virtualEnd()) * this.rowHeight()
+      : 0,
+  );
+
+  readonly columnCount = computed(
+    () =>
+      this.rowFieldCount() +
+      this.result().columns.length * this.values().length +
+      (this.showRowTotals() ? this.values().length : 0),
+  );
+
+  rowHeaderNodes(entry: Entry): (PivotNode | null)[] {
+    const nodes: (PivotNode | null)[] = [];
+    for (let level = 0; level < this.rowFieldCount(); level += 1) {
+      if (level < entry.ancestors.length) {
+        nodes.push(entry.ancestors[level]);
+      } else if (level === entry.node.level) {
+        nodes.push(entry.node);
+      } else {
+        nodes.push(null);
+      }
+    }
+    return nodes;
+  }
 
   readonly rowHeaderMatrix = computed<(HeaderCell | null)[][]>(() => {
     const entries = this.entries();
@@ -371,7 +474,7 @@ export class PivotGridComponent {
     this.focusCell(nextRow, nextColumn);
   }
 
-  private focusCell(row: number, column: number): void {
+  private focusCell(row: number, column: number, retry = true): void {
     const table = this.host.nativeElement.querySelector('table') as HTMLElement | null;
     if (!table) {
       return;
@@ -380,6 +483,12 @@ export class PivotGridComponent {
       `td[data-r="${row}"][data-c="${column}"]`,
     ) as HTMLElement | null;
     if (!target) {
+      const scroller = this.scroller();
+      if (retry && this.virtualScroll() && scroller) {
+        scroller.scrollTop = Math.max(0, row * this.rowHeight() - this.rowHeight());
+        this.scrollTop.set(scroller.scrollTop);
+        setTimeout(() => this.focusCell(row, column, false), 0);
+      }
       return;
     }
     const cells = table.querySelectorAll('td[tabindex]') as NodeListOf<HTMLElement>;
@@ -418,8 +527,23 @@ export class PivotGridComponent {
     this.headerClick.emit({ axis, path: node.path, field: node.field, event });
   }
 
+  exportRows(): PivotExportRow[] {
+    return this.entries().map((entry) => ({
+      key: entry.node.key,
+      path: entry.node.path,
+      collapsed: entry.collapsed,
+    }));
+  }
+
+  private withVisibleRows<T extends CsvExportOptions | XlsxExportOptions>(options: T): T {
+    if (options.mode !== 'visible' || options.rows) {
+      return options;
+    }
+    return { ...options, rows: this.exportRows() };
+  }
+
   exportCsv(options: CsvExportOptions = {}): void {
-    const csv = toCsv(this.result(), options);
+    const csv = toCsv(this.result(), this.withVisibleRows(options));
     const filename = options.filename ?? 'pivot.csv';
     if (typeof document === 'undefined') {
       return;
@@ -435,7 +559,7 @@ export class PivotGridComponent {
   }
 
   exportExcel(options: XlsxExportOptions = {}): void {
-    const bytes = toXlsx(this.result(), options);
+    const bytes = toXlsx(this.result(), this.withVisibleRows(options));
     const filename = options.filename ?? 'pivot.xlsx';
     if (typeof document === 'undefined') {
       return;
@@ -460,5 +584,9 @@ export class PivotGridComponent {
     this.stateChange.emit({ expanded: { ...expanded }, sort: this.config().sort });
   }
 }
+
+
+
+
 
 

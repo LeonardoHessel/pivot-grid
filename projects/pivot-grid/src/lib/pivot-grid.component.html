@@ -14,13 +14,13 @@
   @if (result().rows.length === 0 && !loading()) {
     <div class="pg-empty">{{ resolvedLabels().noData }}</div>
   } @else {
-    <div class="pg-scroll">
+    <div class="pg-scroll" #scroller (scroll)="onScroll($event)">
       <table
         class="pg-table"
         role="grid"
         (keydown)="onKeydown($event)"
         [attr.aria-rowcount]="entries().length + 1"
-        [attr.aria-colcount]="result().columns.length * values().length + rowFieldCount() + (showRowTotals() ? values().length : 0)"
+        [attr.aria-colcount]="columnCount()"
       >
         <thead>
           @for (row of columnHeaderRows(); track $index) {
@@ -91,36 +91,79 @@
         </thead>
 
         <tbody>
-          @for (entry of entries(); track entry.node.key; let rowIndex = $index) {
-            <tr class="pg-row" [class.pg-group-row]="entry.collapsed">
-              @for (cell of rowHeaderMatrix()[rowIndex]; track $index; let level = $index) {
-                @if (cell && cell.render) {
+          @if (virtualScroll() && topSpacerHeight() > 0) {
+            <tr class="pg-spacer" aria-hidden="true">
+              <td [attr.colspan]="columnCount()" [style.height.px]="topSpacerHeight()"></td>
+            </tr>
+          }
+
+          @for (entry of renderedEntries(); track entry.entry.node.key; let i = $index) {
+            @let rowIndex = virtualStart() + i;
+            <tr
+              class="pg-row"
+              [class.pg-group-row]="entry.entry.collapsed"
+              [class.pg-row-virtual]="virtualScroll()"
+              [style.height.px]="virtualScroll() ? rowHeight() : null"
+            >
+              @if (virtualScroll()) {
+                @for (node of rowHeaderNodes(entry.entry); track $index; let level = $index) {
                   <th
-                    class="pg-rowheader pg-level-{{ cell.node.level }}"
+                    class="pg-rowheader pg-level-{{ level }}"
                     [class.pg-sticky-col]="stickyRowHeaders()"
                     [style.left.px]="stickyRowHeaders() ? rowHeaderLefts()[level] : null"
                     [style.width.px]="rowHeaderWidths()[level]"
-                    [attr.rowspan]="cell.rowspan"
-                    [attr.colspan]="cell.colspan"
                     scope="row"
                   >
-                    <span class="pg-rowheader-content" [style.padding-left.px]="cell.node.level * 14">
-                      @if (cell.node.children.length > 0) {
-                        <button
-                          type="button"
-                          class="pg-expander"
-                          [attr.aria-expanded]="isExpanded(cell.node)"
-                          [attr.aria-label]="isExpanded(cell.node) ? resolvedLabels().collapse : resolvedLabels().expand"
-                          (click)="toggle(cell.node, $event)"
-                        >
-                          <span class="pg-chevron" [class.pg-chevron-open]="isExpanded(cell.node)">▸</span>
-                        </button>
-                      } @else {
-                        <span class="pg-expander-spacer"></span>
-                      }
-                      <span class="pg-rowheader-label">{{ cell.node.caption }}</span>
-                    </span>
+                    @if (node) {
+                      <span class="pg-rowheader-content" [style.padding-left.px]="level * 14">
+                        @if (node === entry.entry.node && node.children.length > 0) {
+                          <button
+                            type="button"
+                            class="pg-expander"
+                            [attr.aria-expanded]="isExpanded(node)"
+                            [attr.aria-label]="isExpanded(node) ? resolvedLabels().collapse : resolvedLabels().expand"
+                            (click)="toggle(node, $event)"
+                          >
+                            <span class="pg-chevron" [class.pg-chevron-open]="isExpanded(node)">▸</span>
+                          </button>
+                        } @else {
+                          <span class="pg-expander-spacer"></span>
+                        }
+                        <span class="pg-rowheader-label">{{ node.caption }}</span>
+                      </span>
+                    }
                   </th>
+                }
+              } @else {
+                @for (cell of rowHeaderMatrix()[rowIndex]; track $index; let level = $index) {
+                  @if (cell && cell.render) {
+                    <th
+                      class="pg-rowheader pg-level-{{ cell.node.level }}"
+                      [class.pg-sticky-col]="stickyRowHeaders()"
+                      [style.left.px]="stickyRowHeaders() ? rowHeaderLefts()[level] : null"
+                      [style.width.px]="rowHeaderWidths()[level]"
+                      [attr.rowspan]="cell.rowspan"
+                      [attr.colspan]="cell.colspan"
+                      scope="row"
+                    >
+                      <span class="pg-rowheader-content" [style.padding-left.px]="cell.node.level * 14">
+                        @if (cell.node.children.length > 0) {
+                          <button
+                            type="button"
+                            class="pg-expander"
+                            [attr.aria-expanded]="isExpanded(cell.node)"
+                            [attr.aria-label]="isExpanded(cell.node) ? resolvedLabels().collapse : resolvedLabels().expand"
+                            (click)="toggle(cell.node, $event)"
+                          >
+                            <span class="pg-chevron" [class.pg-chevron-open]="isExpanded(cell.node)">▸</span>
+                          </button>
+                        } @else {
+                          <span class="pg-expander-spacer"></span>
+                        }
+                        <span class="pg-rowheader-label">{{ cell.node.caption }}</span>
+                      </span>
+                    </th>
+                  }
                 }
               }
 
@@ -133,11 +176,11 @@
                     [attr.tabindex]="rowIndex === 0 && columnIndex === 0 && valueIndex === 0 ? 0 : -1"
                     [attr.aria-colindex]="rowFieldCount() + columnIndex * values().length + valueIndex + 1"
                     [attr.aria-rowindex]="rowIndex + 2"
-                    [ngClass]="cellFor(entry, column, value.field)?.className"
-                    [style]="cellFor(entry, column, value.field)?.style"
-                    (click)="onCellClick(entry, column, cellFor(entry, column, value.field), $event)"
+                    [ngClass]="cellFor(entry.entry, column, value.field)?.className"
+                    [style]="cellFor(entry.entry, column, value.field)?.style"
+                    (click)="onCellClick(entry.entry, column, cellFor(entry.entry, column, value.field), $event)"
                   >
-                    {{ cellFor(entry, column, value.field)?.formatted ?? '' }}
+                    {{ cellFor(entry.entry, column, value.field)?.formatted ?? '' }}
                   </td>
                 }
               }
@@ -146,13 +189,19 @@
                 @for (value of values(); track value.field) {
                   <td
                     class="pg-cell pg-total"
-                    [ngClass]="rowTotalFor(entry, value.field)?.className"
-                    [style]="rowTotalFor(entry, value.field)?.style"
+                    [ngClass]="rowTotalFor(entry.entry, value.field)?.className"
+                    [style]="rowTotalFor(entry.entry, value.field)?.style"
                   >
-                    {{ rowTotalFor(entry, value.field)?.formatted ?? '' }}
+                    {{ rowTotalFor(entry.entry, value.field)?.formatted ?? '' }}
                   </td>
                 }
               }
+            </tr>
+          }
+
+          @if (virtualScroll() && bottomSpacerHeight() > 0) {
+            <tr class="pg-spacer" aria-hidden="true">
+              <td [attr.colspan]="columnCount()" [style.height.px]="bottomSpacerHeight()"></td>
             </tr>
           }
 

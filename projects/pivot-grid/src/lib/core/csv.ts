@@ -38,13 +38,20 @@ export function toCsv(result: PivotResult, options: CsvExportOptions = {}): stri
   ];
 
   const lines: string[][] = [header];
+  const visibleRows =
+    options.mode === 'visible' && options.rows
+      ? options.rows
+      : result.rows.map((row) => ({ key: row.key, path: row.path, collapsed: false }));
 
-  for (const row of result.rows) {
+  for (const row of visibleRows) {
     const cells = columns.flatMap((column) =>
-      values.map(
-        (value) =>
-          result.cells.get(cellKey(row.key, column.key, value.field))?.formatted ?? '',
-      ),
+      values.map((value) => {
+        const key = cellKey(row.key, column.key, value.field);
+        const cell = row.collapsed
+          ? result.nodeCells.get(key)
+          : result.cells.get(key);
+        return cell?.formatted ?? '';
+      }),
     );
     const rowTotals = includeRowTotal
       ? values.map(
@@ -80,3 +87,4 @@ export function toCsv(result: PivotResult, options: CsvExportOptions = {}): stri
 
   return `${options.bom === false ? '' : '\uFEFF'}${body}`;
 }
+

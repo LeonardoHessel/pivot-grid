@@ -174,6 +174,9 @@ export class PivotGridComponent {}
 | `height` | `number \| string` | não | `'100%'` | Altura fixa com scroll vertical interno |
 | `stickyHeaders` | `boolean` | não | `true` | Cabeçalho de colunas fixo no scroll |
 | `stickyRowHeaders` | `boolean` | não | `true` | Coluna de rótulos fixa no scroll horizontal |
+| `virtualScroll` | `boolean` | não | `false` | Virtualiza as linhas renderizadas |
+| `rowHeight` | `number` | não | `32` | Altura fixa por linha (px) no modo virtual |
+| `virtualOverscan` | `number` | não | `5` | Linhas extras acima/abaixo da janela |
 | `density` | `'compact' \| 'default' \| 'comfortable'` | não | `'default'` | Densidade visual |
 | `labels` | `Partial<PivotLabels>` | não | `{}` | Textos/i18n |
 
@@ -303,16 +306,26 @@ export class ReportComponent {
 ## 5. Exportação
 
 ```ts
+export interface PivotExportRow {
+  key: string;
+  path: string[];
+  collapsed: boolean;
+}
+
 export interface CsvExportOptions {
   filename?: string;          // default 'pivot.csv'
   delimiter?: string;         // default ','
   bom?: boolean;              // default true
   includeTotals?: boolean;    // default true
+  mode?: 'visible' | 'full';  // default 'full'
+  rows?: readonly PivotExportRow[]; // obrigatório no modo visible
 }
 
 export interface XlsxExportOptions {
   filename?: string;          // default 'pivot.xlsx'
   includeTotals?: boolean;    // default true
+  mode?: 'visible' | 'full';  // default 'full'
+  rows?: readonly PivotExportRow[]; // obrigatório no modo visible
 }
 ```
 
@@ -364,7 +377,14 @@ export interface PivotLabels {
 
 Com `strict: true` (dev), os códigos acima lançam `PivotError`.
 
-## 9. Exemplos
+## 9. Exportação
+
+- `mode: 'full'` (default): todas as folhas da matriz.
+- `mode: 'visible'`: apenas as linhas atualmente visíveis (expandidas ou
+  colapsadas). O componente preenche `rows` automaticamente ao chamar
+  `exportCsv({ mode: 'visible' })` / `exportExcel({ mode: 'visible' })`.
+
+## 10. Exemplos
 
 - [docs/examples/sticky-keyboard.md](./examples/sticky-keyboard.md) — row headers fixos e teclado.
 - [docs/examples/](./examples/README.md) — índice por funcionalidade.

@@ -165,9 +165,17 @@ export interface PivotLabels {
   export: string;
 }
 
+export interface PivotExportRow {
+  key: string;
+  path: string[];
+  collapsed: boolean;
+}
+
 export interface XlsxExportOptions {
   filename?: string;
   includeTotals?: boolean;
+  mode?: 'visible' | 'full';
+  rows?: readonly PivotExportRow[];
 }
 
 export interface CsvExportOptions {
@@ -175,6 +183,8 @@ export interface CsvExportOptions {
   delimiter?: string;
   bom?: boolean;
   includeTotals?: boolean;
+  mode?: 'visible' | 'full';
+  rows?: readonly PivotExportRow[];
 }
 
 export interface PivotCellEvent {
@@ -199,6 +209,7 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
 
 
 

@@ -6,6 +6,22 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-14
+
+### Added
+
+- Virtualização de linhas (`virtualScroll`, `rowHeight`, `virtualOverscan`),
+  com cabeçalho de colunas e colunas de rótulos sticky e spacers de altura.
+- Exportação `mode: 'visible' | 'full'` em CSV e XLSX, com `rows` visíveis.
+- Exemplo `docs/examples/virtualizacao.md` e rota `/virtualizacao` (50k linhas).
+- Benchmark de 50k linhas no CI (`BENCH_MAX_50K_MS`).
+- Testes de virtualização/scroll e export visible.
+
+### Changed
+
+- `CsvExportOptions.mode` e `XlsxExportOptions.mode` passam a existir e a
+  funcionar (a remoção da 0.3.1 foi revertida por implementação real).
+
 ## [0.4.0] - 2026-11-14
 
 ### Added

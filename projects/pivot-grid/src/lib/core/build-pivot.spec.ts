@@ -319,6 +319,20 @@ describe('buildPivot', () => {
     expect(result.grandTotal?.className).toBe('good');
   });
 
+  it('exports only visible rows when mode is visible', () => {
+    const result = buildPivot(data, config({
+      rows: [{ field: 'region' }],
+      columns: [{ field: 'month' }],
+      values: [{ field: 'amount' }],
+    }));
+    const csv = toCsv(result, {
+      mode: 'visible',
+      rows: [{ key: 'Sul', path: ['Sul'], collapsed: true }],
+    });
+
+    expect(csv).toContain('Sul');
+    expect(csv).not.toContain('Norte');
+  });
   it('builds a minimal XLSX workbook (zip) with sheet data', () => {
     const result = buildPivot(data, config());
     const bytes = toXlsx(result);
@@ -350,6 +364,7 @@ describe('buildPivot', () => {
     expect(csv.split('\r\n').length).toBeGreaterThan(2);
   });
 });
+
 
 
 

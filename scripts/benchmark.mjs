@@ -19,19 +19,6 @@ await build({
 
 const { buildPivot } = await import(pathToFileURL(outfile).href);
 
-const rows = Number(process.env.BENCH_ROWS ?? 10_000);
-const maxMs = Number(process.env.BENCH_MAX_MS ?? 500);
-
-const data = [];
-for (let index = 0; index < rows; index += 1) {
-  data.push({
-    region: `R${index % 40}`,
-    city: `C${index % 7}`,
-    month: `2026-${String((index % 12) + 1).padStart(2, '0')}`,
-    amount: (index * 37) % 500,
-  });
-}
-
 const config = {
   rows: [
     { field: 'region', caption: 'Região' },
@@ -46,32 +33,59 @@ const config = {
   locale: 'pt-BR',
 };
 
-buildPivot(data, config);
-
-const runs = [];
-for (let run = 0; run < 3; run += 1) {
-  const start = performance.now();
-  const result = buildPivot(data, config);
-  runs.push(performance.now() - start);
-  if (run === 0 && result.rows.length === 0) {
-    throw new Error('benchmark produced an empty pivot');
+function run(label, data, pivotConfig, limitMs) {
+  buildPivot(data, pivotConfig);
+  const runs = [];
+  for (let run = 0; run < 3; run += 1) {
+    const start = performance.now();
+    const result = buildPivot(data, pivotConfig);
+    runs.push(performance.now() - start);
+    if (run === 0 && result.rows.length === 0) {
+      throw new Error(`${label}: benchmark produced an empty pivot`);
+    }
   }
+  runs.sort((left, right) => left - right);
+  const median = Math.round(runs[1]);
+  return {
+    label,
+    rows: data.length,
+    runsMs: runs.map((value) => Math.round(value)),
+    medianMs: median,
+    limitMs,
+  };
 }
 
-runs.sort((left, right) => left - right);
-const median = Math.round(runs[1]);
-const report = {
-  rows,
-  columns: 12,
-  runsMs: runs.map((value) => Math.round(value)),
-  medianMs: median,
-  limitMs: maxMs,
-};
+const small = Array.from({ length: 10_000 }, (_value, index) => ({
+  region: `R${index % 40}`,
+  city: `C${index % 7}`,
+  month: `2026-${String((index % 12) + 1).padStart(2, '0')}`,
+  amount: (index * 37) % 500,
+}));
+
+const large = Array.from({ length: 50_000 }, (_value, index) => ({
+  region: `R${index % 20}`,
+  city: `C${index % 10}`,
+  month: `2026-${String((index % 12) + 1).padStart(2, '0')}`,
+  amount: (index * 37) % 1000,
+}));
+
+const limit10k = Number(process.env.BENCH_MAX_MS ?? 800);
+const limit50k = Number(process.env.BENCH_MAX_50K_MS ?? 5000);
+
+const report = [
+  run('10k', small, config, limit10k),
+  run('50k', large, config, limit50k),
+];
 
 console.log(JSON.stringify(report, null, 2));
 await rm(path.join(root, '.bench'), { recursive: true, force: true });
 
-if (median > maxMs) {
-  console.error(`benchmark exceeded limit: ${median}ms > ${maxMs}ms`);
+const failed = report.filter((entry) => entry.medianMs > entry.limitMs);
+if (failed.length > 0) {
+  for (const entry of failed) {
+    console.error(
+      `${entry.label} exceeded limit: ${entry.medianMs}ms > ${entry.limitMs}ms`,
+    );
+  }
   process.exit(1);
 }

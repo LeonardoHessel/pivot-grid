@@ -175,3 +175,15 @@
   outline-offset: -2px;
 }
 
+
+.pg-spacer > td {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.pg-row-virtual > th,
+.pg-row-virtual > td {
+  overflow: hidden;
+}
+

@@ -167,8 +167,9 @@ function columnName(index: number): string {
 
 function buildTableRows(
   result: PivotResult,
-  includeTotals: boolean,
+  options: XlsxExportOptions,
 ): (string | number | null)[][] {
+  const includeTotals = options.includeTotals !== false;
   const values = result.config.values;
   if (values.length === 0) {
     return [];
@@ -192,14 +193,22 @@ function buildTableRows(
       : []),
   ]);
 
-  for (const row of result.rows) {
+  const visibleRows =
+    options.mode === 'visible' && options.rows
+      ? options.rows
+      : result.rows.map((row) => ({ key: row.key, path: row.path, collapsed: false }));
+
+  for (const row of visibleRows) {
     rows.push([
       ...rowCaptions.map((_caption, index) => row.path[index] ?? ''),
       ...columns.flatMap((column) =>
-        values.map(
-          (value) =>
-            result.cells.get(cellKey(row.key, column.key, value.field))?.value ?? null,
-        ),
+        values.map((value) => {
+          const key = cellKey(row.key, column.key, value.field);
+          const cell = row.collapsed
+            ? result.nodeCells.get(key)
+            : result.cells.get(key);
+          return cell?.value ?? null;
+        }),
       ),
       ...(includeRowTotal
         ? values.map(
@@ -267,7 +276,7 @@ export function toXlsx(
   result: PivotResult,
   options: XlsxExportOptions = {},
 ): Uint8Array {
-  const rows = buildTableRows(result, options.includeTotals !== false);
+  const rows = buildTableRows(result, options);
   const encoder = new TextEncoder();
   return createZip([
     { name: '[Content_Types].xml', data: encoder.encode(CONTENT_TYPES) },
@@ -284,4 +293,5 @@ export function toXlsx(
     },
   ]);
 }
+
 

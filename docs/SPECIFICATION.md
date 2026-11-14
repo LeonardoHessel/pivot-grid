@@ -262,8 +262,8 @@ interface ConditionalRule {
   `@`, TAB ou CR são prefixadas com `'`.
 - **Excel**: writer XLSX mínimo embutido (ZIP + XML, sem dependência), com
   cabeçalho em negrito e painel congelado.
-- Exportacao sempre da matriz completa; `exportMode` (visible/full) esta no
-  roadmap v1.1.
+- `mode: 'full'` exporta todas as folhas; `mode: 'visible'` exporta apenas as
+  linhas visíveis (expandidas ou colapsadas em subtotal).
 - Exportação inclui cabeçalhos multi-nível achatados e totais visíveis.
 
 ### 8.12 Estado
@@ -339,7 +339,18 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
 - Formatação usa `locale` explícito quando SSR.
 - `loading` e estados são determinísticos no servidor.
 
-### 8.18 Dimensionamento e scroll
+### 8.18 Virtualização
+
+- `virtualScroll: true` renderiza apenas a janela visível de linhas.
+- `rowHeight` (px) define a altura fixa usada no cálculo; `virtualOverscan`
+  adiciona linhas extras acima/abaixo.
+- Cabeçalho de colunas e colunas de rótulos permanecem **sticky**.
+- Em modo virtual, as colunas de rótulos não usam `rowspan`; cada linha exibe
+  seu próprio caminho para manter alinhamento e sticky.
+- Spacers superior/inferior preservam a altura total e a posição do scroll.
+- `height` em px é usado diretamente como viewport; `%` usa `ResizeObserver`.
+
+### 8.19 Dimensionamento e scroll
 
 - `width` default `'100%'`; `height` default `'100%'`.
 - O componente ocupa o container, com **scroll interno** (vertical e
@@ -415,7 +426,7 @@ Detalhes em [`API.md`](./API.md).
 | 1 | Excel | **writer XLSX mínimo sem dependência** (v0.2.0) |
 | 2 | Múltiplos valores | implementado na 0.4.0 |
 | 3 | Signals vs decorators | signals (18+) |
-| 4 | Virtualização | v1.1 |
+| 4 | Virtualização | implementada na 0.5.0 |
 | 5 | Server-side | v2 |
 | 6 | Medidas auxiliares | `auxiliaryValues` + `rule.measure` (implementado) |
 | 7 | Distribuição | npm com versão pinada; publish por tag |
