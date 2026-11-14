@@ -1,4 +1,4 @@
-# Especificação — `@leonardohessel/pivot-grid`
+# Especificação — `pivot-grid`
 
 > Status: **rascunho de especificação (pré-implementação)**.
 > Este documento é a fonte de verdade do comportamento esperado. Código e
@@ -8,7 +8,7 @@
 
 | Item | Valor |
 |---|---|
-| Pacote | `@leonardohessel/pivot-grid` |
+| Pacote | `pivot-grid` |
 | Repositório | `github.com/LeonardoHessel/pivot-grid` |
 | Licença | MIT |
 | Escopo v1 | Angular `>=18 <21` |

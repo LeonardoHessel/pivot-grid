@@ -1,6 +1,6 @@
 {
-  "name": "@leonardohessel/pivot-grid-workspace",
-  "version": "0.3.0",
+  "name": "pivot-grid-workspace",
+  "version": "0.3.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

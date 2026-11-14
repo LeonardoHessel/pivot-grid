@@ -47,11 +47,11 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 ## Uso
 
 ```bash
-npm install @leonardohessel/pivot-grid
+npm install pivot-grid
 ```
 
 ```ts
-import { PivotGridComponent, PivotConfig } from '@leonardohessel/pivot-grid';
+import { PivotGridComponent, PivotConfig } from 'pivot-grid';
 
 @Component({
   standalone: true,
@@ -85,7 +85,7 @@ export class ReportComponent {
 
 - Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
 - Publicação **somente no npm**, com versão pinada no consumidor
-  (`npm install @leonardohessel/pivot-grid@0.1.0`); sem URL de git.
+  (`npm install pivot-grid@0.1.0`); sem URL de git.
 - Release por tag `vX.Y.Z` (workflow `publish.yml`), com
   `publishConfig.access = public` e checagem de versão da tag.
 - Licença MIT (`LICENSE` na raiz e no pacote).

@@ -1,5 +1,5 @@
 import { Component, viewChild } from '@angular/core';
-import { PivotGridComponent } from '@leonardohessel/pivot-grid';
+import { PivotGridComponent } from 'pivot-grid';
 import { buildDemoData, DEMO_LABELS, demoConfig } from './data';
 
 @Component({

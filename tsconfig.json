@@ -17,7 +17,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
     "paths": {
-      "@leonardohessel/pivot-grid": [
+      "pivot-grid": [
         "./dist/pivot-grid"
       ]
     },

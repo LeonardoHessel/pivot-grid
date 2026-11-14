@@ -1,4 +1,4 @@
-# @leonardohessel/pivot-grid
+# pivot-grid
 
 Componente de **tabela dinâmica (pivot)** para Angular: linhas multi-nível,
 colunas dinâmicas, agregação, totais, formatação condicional, exportação CSV e
@@ -14,7 +14,7 @@ Excel.
 ## Instalação
 
 ```bash
-npm install --save-exact @leonardohessel/pivot-grid@0.3.0
+npm install --save-exact pivot-grid@0.3.1
 ```
 
 ## Uso
@@ -25,7 +25,7 @@ import {
   PivotGridComponent,
   PivotConfig,
   PivotLabels,
-} from '@leonardohessel/pivot-grid';
+} from 'pivot-grid';
 
 @Component({
   selector: 'app-report',

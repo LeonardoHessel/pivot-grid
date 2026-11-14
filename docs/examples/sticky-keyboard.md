@@ -9,7 +9,7 @@ Demonstra:
 ## Configuração
 
 ```ts
-import { PivotConfig } from '@leonardohessel/pivot-grid';
+import { PivotConfig } from 'pivot-grid';
 
 export const config: PivotConfig = {
   rows: [

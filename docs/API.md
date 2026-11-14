@@ -1,4 +1,4 @@
-# API pública — `@leonardohessel/pivot-grid`
+# API pública — `pivot-grid`
 
 Referência detalhada dos tipos, inputs, outputs, métodos e tokens de tema.
 Para o comportamento esperado, consulte [`SPECIFICATION.md`](./SPECIFICATION.md).
@@ -6,16 +6,16 @@ Para o comportamento esperado, consulte [`SPECIFICATION.md`](./SPECIFICATION.md)
 ## 1. Importação
 
 ```ts
-import { PivotGridComponent } from '@leonardohessel/pivot-grid';
+import { PivotGridComponent } from 'pivot-grid';
 import type {
   PivotConfig, PivotData, PivotState, PivotCellEvent,
-} from '@leonardohessel/pivot-grid';
+} from 'pivot-grid';
 ```
 
 O engine puro também é exportado pelo pacote:
 
 ```ts
-import { buildPivot } from '@leonardohessel/pivot-grid';
+import { buildPivot } from 'pivot-grid';
 ```
 
 ## 2. Tipos do modelo
@@ -230,7 +230,7 @@ export interface PivotExpandEvent {
 import { Component, viewChild } from '@angular/core';
 import {
   PivotGridComponent, PivotConfig, PivotLabels, PivotState,
-} from '@leonardohessel/pivot-grid';
+} from 'pivot-grid';
 
 @Component({
   selector: 'app-report',

@@ -6,6 +6,14 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-14
+
+### Changed
+
+- Pacote renomeado de `@leonardohessel/pivot-grid` para **`pivot-grid`**
+  (sem escopo). Primeiro release do novo nome; o nome antigo fica congelado e
+  sem suporte após a 1.0.
+
 ## [0.3.0] - 2026-11-14
 
 ### Added
@@ -60,3 +68,4 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 - Exportação **CSV** nativa com proteção contra injeção de fórmula.
 - Testes: engine (18) e componente (5).
 - Licença MIT, `publishConfig.access = public` e workflow de publish por tag.
+

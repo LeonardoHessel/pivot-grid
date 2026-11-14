@@ -1,4 +1,4 @@
-import { PivotConfig, PivotData, PivotLabels } from '@leonardohessel/pivot-grid';
+import { PivotConfig, PivotData, PivotLabels } from 'pivot-grid';
 
 const REGIONS = [
   { region: 'Norte', cities: ['Alfa', 'Bravo'] },

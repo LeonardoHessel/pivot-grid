@@ -1,5 +1,13 @@
 # Política de releases
 
+## Nome do pacote
+
+- Nome atual: **`pivot-grid`** (sem escopo).
+- O nome antigo `@leonardohessel/pivot-grid` está **congelado**: não recebe
+  novas versões, foi descontinuado e sai do suporte após a **1.0** (a
+  `0.3.1` é o primeiro release com o nome novo).
+- A 0.4.0 em diante é publicada como `pivot-grid@X.Y.Z`.
+
 ## Regras
 
 - **Uma funcionalidade-título por minor**; correções e docs podem acompanhar.
@@ -47,7 +55,7 @@ git tag vX.Y.Z
 git push origin vX.Y.Z
 
 # 5. conferir
-npm view @leonardohessel/pivot-grid version
+npm view pivot-grid version
 ```
 
 O workflow `publish.yml` valida `tag == version` e publica
@@ -66,3 +74,4 @@ parte do processo.
 Correção de tipos urgente antes de uma integração: publicar **patch** apenas
 com a correção mínima, avisar para re-pinar e registrar no `CHANGELOG.md`.
 Fora disso, nenhuma publicação fora do gate.
+
