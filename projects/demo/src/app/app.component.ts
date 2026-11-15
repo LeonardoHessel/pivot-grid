@@ -16,8 +16,10 @@ export class AppComponent {
     { path: '/virtualizacao', label: 'Virtualização', exact: false },
     { path: '/filtros', label: 'Filtros + datas', exact: false },
     { path: '/templates', label: 'Templates', exact: false },
+    { path: '/colunas', label: 'Colunas', exact: false },
   ];
 }
+
 
 
 

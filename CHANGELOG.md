@@ -6,6 +6,17 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-11-15
+
+### Added
+
+- Colunas redimensionáveis: alça no cabeçalho, `minColumnWidth`/
+  `maxColumnWidth`, reset com duplo clique e teclado (setas/Home).
+- Larguras persistidas em `PivotState.columns` e evento
+  `columnStateChange`.
+- Exemplo `docs/examples/colunas.md` e rota `/colunas` na demo.
+- Testes de componente para estado, teclado e reset.
+
 ## [2.0.0] - 2026-11-15
 
 Primeira versão estável da linha Angular 21+. Sem feature nova em relação ao

@@ -172,6 +172,8 @@ export interface PivotResult {
 
 export interface PivotState {
   expanded: Record<string, boolean>;
+  /** Larguras por coluna (chave da folha). */
+  columns?: Record<string, number>;
   sort?: {
     rows?: PivotSort;
     columns?: PivotSort;
@@ -190,6 +192,10 @@ export interface PivotLabels {
   export: string;
   /** Optional; default 'Clear filters'. */
   clearFilters?: string;
+  /** Optional; default 'Resize column'. */
+  resizeColumn?: string;
+  /** Optional; default 'Reset column width'. */
+  resetColumnWidth?: string;
 }
 
 export interface PivotExportRow {
@@ -236,6 +242,7 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
 
 
 

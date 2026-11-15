@@ -145,6 +145,12 @@ export interface PivotDiagnostic {
   count?: number;
 }
 
+export interface PivotState {
+  expanded: Record<string, boolean>;
+  /** Larguras por chave de coluna (2.1+). */
+  columns?: Record<string, number>;
+  sort?: { rows?: PivotSort; columns?: PivotSort };
+}
 export interface PivotResult {
   rowTree: PivotNode[];
   columnTree: PivotNode[];
@@ -178,7 +184,7 @@ export class PivotGridComponent {}
 |---|---|---|---|---|
 | `data` | `PivotData` | sim | `[]` | Registros planos |
 | `config` | `PivotConfig` | sim | — | Configuração dos eixos |
-| `state` | `PivotState \| null` | não | `null` | Estado controlado (expansão/ordenação) |
+| `state` | `PivotState \| null` | não | `null` | Estado controlado (expansão, ordenação e larguras) |
 | `loading` | `boolean` | não | `false` | Overlay de carregamento |
 | `width` | `number \| string` | não | `'100%'` | Largura do container; scroll horizontal interno |
 | `height` | `number \| string` | não | `'100%'` | Altura fixa com scroll vertical interno |
@@ -191,6 +197,8 @@ export class PivotGridComponent {}
 | `labels` | `Partial<PivotLabels>` | não | `{}` | Textos/i18n |
 | `filters` | `PivotFilter[] \| null` | não | `null` | Filtros controlados (barra) |
 | `cellTemplate` | `TemplateRef<PivotCellTemplateContext> \| null` | não | `null` | Template da célula |
+| `minColumnWidth` | `number` | não | `60` | Largura mínima ao redimensionar |
+| `maxColumnWidth` | `number` | não | `600` | Largura máxima ao redimensionar |
 | `headerTemplate` | `TemplateRef<PivotHeaderTemplateContext> \| null` | não | `null` | Template do cabeçalho |
 
 ### 4.2 Outputs
@@ -203,6 +211,7 @@ export class PivotGridComponent {}
 | `sortChange` | `{ rows?: PivotSort; columns?: PivotSort }` |
 | `stateChange` | `PivotState` |
 | `filtersChange` | `PivotFilter[]` |
+| `columnStateChange` | `Record<string, number>` (larguras por coluna) |
 | `exportComplete` | `{ format: 'csv' \| 'xlsx'; filename: string }` |
 
 ```ts
@@ -337,6 +346,24 @@ templates de célula também valem para totais (linha, coluna e geral).
 <ng-template #headerTpl let-label="label" let-axis="axis">
   {{ axis }}: {{ label }}
 </ng-template>
+```
+
+## 4.6 Redimensionamento de colunas
+
+- Alça no cabeçalho: arrastar, setas (`←`/`→`, ±10px), `Home` restaura e
+  duplo clique restaura.
+- `minColumnWidth`/`maxColumnWidth` limitam o arraste.
+- Larguras persistem em `PivotState.columns` e são emitidas em
+  `columnStateChange`.
+- Sem larguras no estado, o layout permanece o padrão.
+
+```html
+<pg-pivot-grid
+  [data]="rows"
+  [config]="config"
+  [state]="state"
+  (columnStateChange)="state = { ...state, columns: $event }">
+</pg-pivot-grid>
 ```
 
 ## 5. Exportação
@@ -486,6 +513,7 @@ Superfície estável — somente o que sai de `public-api.ts`:
 
 - [docs/examples/sticky-keyboard.md](./examples/sticky-keyboard.md) — row headers fixos e teclado.
 - [docs/examples/](./examples/README.md) — índice por funcionalidade.
+
 
 
 

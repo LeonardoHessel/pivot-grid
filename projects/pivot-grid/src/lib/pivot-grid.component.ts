@@ -48,6 +48,8 @@ const DEFAULT_LABELS: PivotLabels = {
   collapse: 'Collapse',
   export: 'Export',
   clearFilters: 'Clear filters',
+  resizeColumn: 'Resize column',
+  resetColumnWidth: 'Reset column width',
 };
 
 interface Entry {
@@ -100,7 +102,10 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly expandChange = output<PivotExpandEvent>();
   readonly sortChange = output<{ rows?: PivotSort; columns?: PivotSort }>();
   readonly stateChange = output<PivotState>();
+  readonly columnStateChange = output<Record<string, number>>();
   readonly filters = input<PivotFilter[] | null>(null);
+  readonly minColumnWidth = input(60);
+  readonly maxColumnWidth = input(600);
   readonly cellTemplate = input<TemplateRef<PivotCellTemplateContext> | null>(null);
   readonly headerTemplate = input<TemplateRef<PivotHeaderTemplateContext> | null>(null);
   readonly filtersChange = output<PivotFilter[]>();
@@ -109,6 +114,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly internalExpanded = signal<Record<string, boolean>>({});
   private readonly internalFilters = signal<PivotFilter[]>([]);
+  private readonly internalColumnWidths = signal<Record<string, number>>({});
   private filtersInitialized = false;
   private readonly scrollTop = signal(0);
   private readonly viewportHeight = signal(0);
@@ -448,11 +454,17 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   }
 
   getState(): PivotState {
-    return { expanded: { ...this.expandedMap() }, sort: this.config().sort };
+    const columns = { ...this.columnWidths() };
+    return {
+      expanded: { ...this.expandedMap() },
+      sort: this.config().sort,
+      ...(Object.keys(columns).length > 0 ? { columns } : {}),
+    };
   }
 
   setState(state: PivotState): void {
     this.internalExpanded.set(state.expanded ?? {});
+    this.internalColumnWidths.set(state.columns ?? {});
     this.stateChange.emit(this.getState());
   }
 
@@ -638,6 +650,92 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
       node,
     };
   }
+  readonly columnWidths = computed(
+    () => this.state()?.columns ?? this.internalColumnWidths(),
+  );
+
+  readonly hasColumnWidths = computed(
+    () => Object.keys(this.columnWidths()).length > 0,
+  );
+
+  columnWidth(key: string): number | null {
+    return this.columnWidths()[key] ?? null;
+  }
+
+  startResize(event: PointerEvent, key: string): void {
+    event.preventDefault();
+    if (typeof document === 'undefined') {
+      return;
+    }
+    const handle = event.target as HTMLElement;
+    const header = handle.closest('th') as HTMLElement | null;
+    const startWidth = this.columnWidth(key) ?? header?.offsetWidth ?? 120;
+    const startX = event.clientX;
+
+    const move = (moveEvent: PointerEvent): void => {
+      this.setColumnWidth(
+        key,
+        startWidth + (moveEvent.clientX - startX),
+        false,
+      );
+    };
+    const up = (): void => {
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      this.emitColumnState();
+    };
+
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up, { once: true });
+  }
+
+  onResizeKeydown(event: KeyboardEvent, key: string): void {
+    const current = this.columnWidth(key) ?? 120;
+    let next: number | null = null;
+    switch (event.key) {
+      case 'ArrowRight':
+        next = current + 10;
+        break;
+      case 'ArrowLeft':
+        next = current - 10;
+        break;
+      case 'Home':
+        this.resetColumnWidth(key);
+        event.preventDefault();
+        return;
+      default:
+        return;
+    }
+    event.preventDefault();
+    this.setColumnWidth(key, next, true);
+  }
+
+  resetColumnWidth(key: string): void {
+    const next = { ...this.columnWidths() };
+    delete next[key];
+    this.internalColumnWidths.set(next);
+    this.emitColumnState();
+  }
+
+  private setColumnWidth(key: string, width: number, emit: boolean): void {
+    const clamped = Math.min(
+      Math.max(width, this.minColumnWidth()),
+      Math.max(this.minColumnWidth(), this.maxColumnWidth()),
+    );
+    this.internalColumnWidths.set({
+      ...this.columnWidths(),
+      [key]: Math.round(clamped),
+    });
+    if (emit) {
+      this.emitColumnState();
+    }
+  }
+
+  private emitColumnState(): void {
+    const widths = { ...this.columnWidths() };
+    this.columnStateChange.emit(widths);
+    this.stateChange.emit(this.getState());
+  }
   exportRows(): PivotExportRow[] {
     return this.entries().map((entry) => ({
       key: entry.node.key,
@@ -691,6 +789,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.stateChange.emit({ expanded: { ...expanded }, sort: this.config().sort });
   }
 }
+
 
 
 

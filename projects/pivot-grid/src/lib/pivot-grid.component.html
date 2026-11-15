@@ -40,6 +40,7 @@
     <div class="pg-scroll" #scroller (scroll)="onScroll($event)">
       <table
         class="pg-table"
+        [class.pg-fixed]="hasColumnWidths()"
         role="grid"
         (keydown)="onKeydown($event)"
         [attr.aria-rowcount]="entries().length + 1"
@@ -102,13 +103,32 @@
               ></th>
             }
             @for (column of result().columns; track column.key) {
-              @for (value of values(); track value.field) {
+              @for (value of values(); track value.field; let valueIndex = $index) {
                 <th
                   class="pg-header-cell pg-value-header"
                   scope="col"
+                  [style.width.px]="columnWidth(column.key)"
+                  [style.min-width.px]="columnWidth(column.key) ? minColumnWidth() : null"
+                  [style.max-width.px]="columnWidth(column.key) ? maxColumnWidth() : null"
                   (click)="onHeaderClick('column', column, $event)"
                 >
                   {{ value.caption ?? value.field }}
+                  @if (valueIndex === 0) {
+                    <span
+                      class="pg-resize-handle"
+                      role="separator"
+                      tabindex="0"
+                      aria-orientation="vertical"
+                      [attr.aria-label]="resolvedLabels().resizeColumn"
+                      [attr.aria-valuenow]="columnWidth(column.key) ?? 120"
+                      [attr.aria-valuemin]="minColumnWidth()"
+                      [attr.aria-valuemax]="maxColumnWidth()"
+                      (pointerdown)="startResize($event, column.key)"
+                      (dblclick)="resetColumnWidth(column.key)"
+                      (keydown)="onResizeKeydown($event, column.key)"
+                      (click)="$event.stopPropagation()"
+                    ></span>
+                  }
                 </th>
               }
             }
@@ -223,6 +243,9 @@
                     [attr.tabindex]="rowIndex === 0 && columnIndex === 0 && valueIndex === 0 ? 0 : -1"
                     [attr.aria-colindex]="rowFieldCount() + columnIndex * values().length + valueIndex + 1"
                     [attr.aria-rowindex]="rowIndex + 2"
+                    [style.width.px]="columnWidth(column.key)"
+                    [style.min-width.px]="columnWidth(column.key) ? minColumnWidth() : null"
+                    [style.max-width.px]="columnWidth(column.key) ? maxColumnWidth() : null"
                     [ngClass]="cell?.className"
                     [style]="cell?.style"
                     (click)="onCellClick(entry.entry, column, cell, $event)"
@@ -277,6 +300,9 @@
                   @let total = columnTotalFor(column, value.field);
                   <td
                     class="pg-cell pg-total"
+                    [style.width.px]="columnWidth(column.key)"
+                    [style.min-width.px]="columnWidth(column.key) ? minColumnWidth() : null"
+                    [style.max-width.px]="columnWidth(column.key) ? maxColumnWidth() : null"
                     [ngClass]="total?.className"
                     [style]="total?.style"
                   >
@@ -335,6 +361,9 @@
     </div>
   }
 </div>
+
+
+
 
 
 

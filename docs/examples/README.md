@@ -15,6 +15,8 @@ na demo.
 - Virtualização: <https://leonardohessel.github.io/pivot-grid/virtualizacao>
 - Filtros + datas: <https://leonardohessel.github.io/pivot-grid/filtros>
 - Templates: <https://leonardohessel.github.io/pivot-grid/templates>
+- Colunas: <https://leonardohessel.github.io/pivot-grid/colunas>
+
 
 
 

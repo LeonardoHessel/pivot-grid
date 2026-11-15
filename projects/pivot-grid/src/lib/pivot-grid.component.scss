@@ -228,3 +228,38 @@
   font: inherit;
 }
 
+
+.pg-table.pg-fixed {
+  table-layout: fixed;
+}
+
+.pg-value-header {
+  position: relative;
+}
+
+.pg-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 7px;
+  height: 100%;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+
+.pg-resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  bottom: 20%;
+  right: 3px;
+  width: 1px;
+  background: var(--pg-color-border, #e5e7eb);
+}
+
+.pg-resize-handle:focus-visible {
+  outline: 2px solid var(--pg-focus-ring, #2563eb);
+  outline-offset: -2px;
+}
+

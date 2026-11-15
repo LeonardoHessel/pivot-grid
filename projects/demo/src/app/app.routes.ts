@@ -5,6 +5,7 @@ import { MultiMeasureComponent } from './examples/multi-measure.component';
 import { VirtualizationComponent } from './examples/virtualization.component';
 import { FiltersComponent } from './examples/filters.component';
 import { TemplatesComponent } from './examples/templates.component';
+import { ColumnsComponent } from './examples/columns.component';
 
 export const routes: Routes = [
   { path: '', component: BasicComponent },
@@ -13,8 +14,10 @@ export const routes: Routes = [
   { path: 'virtualizacao', component: VirtualizationComponent },
   { path: 'filtros', component: FiltersComponent },
   { path: 'templates', component: TemplatesComponent },
+  { path: 'colunas', component: ColumnsComponent },
   { path: '**', redirectTo: '' },
 ];
+
 
 
 

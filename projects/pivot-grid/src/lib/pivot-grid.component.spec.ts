@@ -259,11 +259,50 @@ describe('PivotGridComponent', () => {
     );
     expect(element.querySelector('.custom-cell')?.textContent).toContain('|');
   });
+  it('applies persisted column widths from state', () => {
+    const fixture = create();
+    const key = fixture.componentInstance.result().columns[0].key;
+    fixture.componentRef.setInput('state', {
+      expanded: {},
+      columns: { [key]: 220 },
+    });
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+
+    expect(element.querySelector('table')?.classList).toContain('pg-fixed');
+    const widths = Array.from(
+      element.querySelectorAll<HTMLElement>('th.pg-value-header'),
+    ).map((header) => header.style.width);
+    expect(widths).toContain('220px');
+  });
+
+  it('resizes with the keyboard and resets on double click', () => {
+    const fixture = create();
+    const element: HTMLElement = fixture.nativeElement;
+    const handle = element.querySelector<HTMLElement>('.pg-resize-handle');
+    const emitted: Record<string, number>[] = [];
+    fixture.componentInstance.columnStateChange.subscribe((widths) => emitted.push(widths));
+
+    expect(handle).toBeTruthy();
+    handle?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(emitted.length).toBe(1);
+    expect(Object.values(emitted[0])[0]).toBe(130);
+    expect(element.querySelector('table')?.classList).toContain('pg-fixed');
+
+    handle?.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(emitted[1]).toEqual({});
+    expect(element.querySelector('table')?.classList).not.toContain('pg-fixed');
+  });
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
 
 
 

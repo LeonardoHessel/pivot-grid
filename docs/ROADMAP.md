@@ -56,6 +56,12 @@ remover ou alterar contratos existentes):
 Nenhum tipo/input especulativo é criado antes da implementação da respectiva
 minor.
 
+## 2.1.0 — Colunas redimensionáveis (estável)
+
+- resize com alça, min/max, reset (duplo clique/Home) e teclado;
+- larguras em `PivotState.columns` + `columnStateChange`;
+- reordenar/fixar colunas ficam para a 2.2.
+
 ## 2.0.0 — Angular 21+ (estável)
 
 Publicada após a validação do RC pelo consumidor no Angular 22.
