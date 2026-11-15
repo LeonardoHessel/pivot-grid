@@ -1,13 +1,14 @@
 # pivot-grid
 
 Componente de **tabela dinâmica (pivot)** para Angular: linhas multi-nível,
-colunas dinâmicas, agregação, totais, formatação condicional, exportação CSV e
-Excel.
+colunas dinâmicas, múltiplos valores, agregação, totais, filtros, hierarquia de
+datas, templates, virtualização e exportação CSV/XLSX.
 
 - Angular **21 ou 22** (linha 2.x estável); Angular 18–20 na linha 1.x
 - Sem dependências de runtime (além de `tslib`)
 - Standalone component, `OnPush`, API baseada em signals
-- Acessível (roles ARIA, `aria-sort`, expandir/colapsar via botão)
+- Acessível (roles ARIA, teclado, expandir/colapsar, axe)
+- Zoneless e SSR/hydration na linha 2.x
 - Tema por CSS variables
 - Licença **MIT**
 
@@ -90,28 +91,32 @@ export class ReportComponent {
 
 ## Recursos
 
-| Recurso | Status |
+| Recurso | Situação |
 |---|---|
 | Linhas multi-nível e colunas dinâmicas | ✅ |
 | Agregação `sum/avg/min/max/count/countDistinct` | ✅ |
+| Múltiplos valores (`values[]`) | ✅ |
 | Totais de linha/coluna/geral | ✅ |
 | Expandir/colapsar com estado controlado | ✅ |
+| Filtros por eixo + hierarquia de datas | ✅ |
+| Templates de célula/cabeçalho | ✅ |
+| Colunas redimensionáveis (`PivotState.columns`) | ✅ |
+| Virtualização (`virtualScroll`) | ✅ |
 | Formatação condicional por medida auxiliar | ✅ |
 | CSV e XLSX (sem dependência) | ✅ |
-| Virtualização e múltiplos valores | ⏳ v1.1 |
+| Zoneless + SSR/hydration (2.x) | ✅ |
 
 ## Documentação
 
 - [Especificação](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/SPECIFICATION.md)
 - [API](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/API.md)
 - [Engine](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/ENGINE.md)
-- [Guia de integração](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/INTEGRATION.md)
+- [Integração](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/INTEGRATION.md)
+- [Migração 2.x](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/MIGRATION-2.md)
+- [Compatibilidade](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/COMPATIBILITY.md)
 - [Exemplos](https://github.com/LeonardoHessel/pivot-grid/blob/main/docs/examples/README.md)
 - [Demo](https://leonardohessel.github.io/pivot-grid/)
 
 ## Licença
 
 MIT © Leonardo Hessel
-
-
-

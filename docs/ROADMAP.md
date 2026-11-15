@@ -1,80 +1,60 @@
 # Roadmap
 
-## Política
+## Linhas de release
 
-- Uma **funcionalidade-título por minor**; correções/docs podem acompanhar.
-- Toda minor é **publicada assim que o gate fecha** — não acumular.
-- Publicação **somente por tag** (`vX.Y.Z`), nunca por push em `main`.
-- `latest` = estável; `next` = RC.
-- `peerDependencies`: `>=18 <21` até a 1.0; **2.0** com `>=21`.
-- Breaking só em minor enquanto `0.x`; após a 1.0, apenas em major com
-  depreciação prévia.
-- Gate e passo a passo em [`RELEASES.md`](./RELEASES.md).
+| Linha | Angular | Versão atual | Estado |
+|---|---|---|---|
+| **2.x** | 21, 22 | **2.1.0** (`latest`) | ativa; zoneless + SSR/hydration |
+| **1.x** | 18, 19, 20 | **1.2.0** | congelada; manutenção |
 
-## Sequência
+- Novas features entram **somente na 2.x**, uma funcionalidade-título por minor.
+- A 1.x não recebe features novas.
+- Breaking só em major; a 2.x é aditiva.
 
-| Versão | Funcionalidade-título | Entregáveis |
-|---|---|---|
-| **0.3.0** | Sticky + teclado | row headers fixos, navegação por teclado, remoção de `CsvExportOptions.mode`, exemplo `sticky-keyboard` e rota na demo |
-| **0.4.0** | Múltiplos valores ✅ | `values[]` com cabeçalho por medida, exemplo `multi-medida` |
-| **0.5.0** | Virtualização ✅ | linhas virtualizadas + export `visible/full`, exemplo com 50k linhas |
-| **0.6.0** | Hardening ✅ | revisão de API/deprecações, a11y com axe, matriz CI 18/19/20, orçamentos de performance (sem feature nova) |
-| **0.9.0** | RC ✅ | API congelada, guia de migração, dist-tag `next` |
-| **1.0.0** | Estável ✅ | sem features novas; matriz de compatibilidade e docs congeladas |
-| **1.1.0** | Filtros + datas ✅ | filtros por eixo e hierarquia de datas |
-| **1.2.0** | Templates ✅ | templates de célula e cabeçalho |
-| **1.x** | Pós-1.0 | um por minor: templates, redimensionar/reordenar, drill-down, campos calculados, chart, PDF |
-| **2.0.0** | Angular 21+ ✅ | `>=21 <23`, zoneless, SSR/hydration, `latest` |
+## Histórico publicado
 
-## Escopo fechado da 1.0
+| Versão | Título |
+|---|---|
+| 0.1.0 | Engine + renderer + CSV |
+| 0.2.0 | XLSX mínimo, benchmark, Pages |
+| 0.3.0 | Sticky row headers + teclado |
+| 0.4.0 | Múltiplos valores |
+| 0.5.0 | Virtualização + export `visible/full` |
+| 0.6.0 | Hardening (axe, matriz 18/19/20, orçamentos) |
+| 0.9.0 | RC (API congelada) |
+| 1.0.0 | Estável |
+| 1.1.0 | Filtros + hierarquia de datas |
+| 1.2.0 | Templates de célula/cabeçalho |
+| 2.0.0 | Angular 21+, zoneless, SSR/hydration |
+| 2.1.0 | Colunas redimensionáveis |
 
-- Linhas multi-nível e colunas dinâmicas.
-- `sum/avg/min/max/count/countDistinct` e múltiplos valores.
-- Totais de linha/coluna/geral.
-- Expandir/colapsar com estado controlado.
-- Ordenação por rótulo/valor.
-- Formatação numérica e condicional (com medidas auxiliares).
-- CSV e XLSX nativos (com modo `visible`/`full`).
-- Cabeçalho e colunas de rótulos fixos; navegação por teclado.
-- Acessibilidade validada com axe.
-- Angular 18, 19 e 20 na matriz de CI.
-- Orçamentos de performance documentados.
-- Docs congeladas: API, exemplos por funcionalidade, guia de migração.
+## 2.x — próximas minors (aditivas)
 
-## 1.x — adições opcionais
+Uma funcionalidade-título por minor; sem quebrar a API existente:
 
-Uma funcionalidade-título por minor, sempre **aditiva e não-breaking** (sem
-remover ou alterar contratos existentes):
-
-- filtros de eixo;
-- redimensionar/reordenar colunas;
-- drill-down;
-- campos calculados;
-- pivot chart;
-- exportação PDF.
+| Versão | Funcionalidade |
+|---|---|
+| **2.2** | Reordenar e fixar colunas (`PivotState.columnOrder`/`pinned`, eventos) |
+| **2.3** | Drill-down (evento + callback de detalhe) |
+| **2.4** | Campos calculados (fórmulas declarativas) |
+| **2.5** | Pivot chart |
+| **2.6** | Exportação PDF |
+| **2.7** | Modo server-side |
 
 Nenhum tipo/input especulativo é criado antes da implementação da respectiva
 minor.
 
-## 2.1.0 — Colunas redimensionáveis (estável)
+## Escopo fechado da 1.0/2.0
 
-- resize com alça, min/max, reset (duplo clique/Home) e teclado;
-- larguras em `PivotState.columns` + `columnStateChange`;
-- reordenar/fixar colunas ficam para a 2.2.
+- Linhas multi-nível, colunas dinâmicas, múltiplos valores.
+- Agregadores, totais e ordenação.
+- Formatação numérica/condicional com medidas auxiliares.
+- Filtros, hierarquia de datas e templates.
+- Virtualização e export CSV/XLSX.
+- Sticky headers e teclado.
+- Matriz de compatibilidade e orçamentos de performance.
 
-## 2.0.0 — Angular 21+ (estável)
+## Fora de escopo
 
-Publicada após a validação do RC pelo consumidor no Angular 22.
-
-- peerDependencies >=21 <22;
-- **zoneless** por padrão, sem dependência de NgZone;
-- SSR/hydration e APIs modernas do Angular 21;
-- revisão de standalone/control flow e limpeza de APIs obsoletas;
-- guia [MIGRATION-2.md](./MIGRATION-2.md) com passos 1.x → 2.x.
-
-## Fora da 1.0
-
-- Templates, redimensionar/reordenar, drill-down, campos calculados, chart e PDF
-  entram em 1.x (um por minor).
-- Angular 21+ (2.0).
-
+- Novas features na 1.x.
+- Mudanças de API na 2.x que quebrem consumidores existentes.

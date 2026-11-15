@@ -1,8 +1,7 @@
 # Especificação — `pivot-grid`
 
-> Status: **rascunho de especificação (pré-implementação)**.
-> Este documento é a fonte de verdade do comportamento esperado. Código e
-> documentação de uso devem ser derivados dele.
+> Status: **estável (2.1.0)**. Este documento descreve o comportamento
+> implementado e é a fonte de verdade para a API congelada.
 
 ## 1. Identidade
 
@@ -11,8 +10,8 @@
 | Pacote | `pivot-grid` |
 | Repositório | `github.com/LeonardoHessel/pivot-grid` |
 | Licença | MIT |
-| Escopo v1 | Angular `>=18 <21` |
-| Escopo v2 (planejado) | Angular `>=21` |
+| Escopo 2.x | Angular `>=21 <23` |
+| Escopo 1.x | Angular `>=18 <21` |
 | Dependências de runtime | nenhuma além de `@angular/*` e `tslib` |
 
 ## 2. Objetivo
@@ -39,7 +38,7 @@ faz requisições HTTP e não depende de estado global.
 - Pivot chart.
 - Drag-and-drop de campos (painel de campos).
 - Filtros de eixo na interface.
-- Virtualização de linhas/colunas (prevista para v1.1).
+- Reordenar/fixar colunas e drill-down (2.2/2.3).
 - Modo server-side (previsto para v2).
 - Exportação PDF.
 
@@ -68,15 +67,14 @@ faz requisições HTTP e não depende de estado global.
 ## 6. Arquitetura
 
 ```
-pivot-grid (entry point principal)
+pivot-grid (public-api.ts — única superfície)
 ├── PivotGridComponent          # renderização Angular
-├── PivotModule (opcional)      # compatibilidade com NgModules
-└── core/ (engine puro, interno)
-    ├── buildPivot()            # pipeline de agregação
-    ├── sortPivot()             # ordenação de eixos
-    ├── formatPivotValue()      # formatação numérica
-    ├── evaluateRules()         # formatação condicional
-    └── exporters/              # CSV e XLSX nativos
+└── lib/core/ (engine puro, interno)
+    ├── build-pivot.ts          # pipeline de agregação
+    ├── aggregate.ts            # acumuladores por agregador
+    ├── util.ts                 # chaves, datas, Intl
+    ├── csv.ts e xlsx.ts        # exportadores nativos
+    └── types.ts                # tipos públicos
 ```
 
 Fluxo:
@@ -298,7 +296,7 @@ interface PivotLabels {
 - Container `role="grid"`, linhas `role="row"`, células `role="gridcell"`,
   cabeçalhos `role="columnheader"`/`"rowheader"`.
 - `aria-rowcount`, `aria-colcount`, `aria-rowindex`, `aria-colindex`.
-- Cabeçalho ordenável expõe `aria-sort`.
+- Alça de resize expõe `role="separator"` com `aria-valuenow/min/max` (2.1).
 - Botão de expandir: `aria-expanded` + `aria-label` ("Expandir …").
 - Navegação por teclado:
   - `Tab` entra/sai do grid;
@@ -338,22 +336,8 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
 - Nenhum acesso a `window`/`document` no construtor/inputs.
 - Formatação usa `locale` explícito quando SSR.
 - `loading` e estados são determinísticos no servidor.
-
-### 8.20 Filtros
-
-- `PivotField.filterable` habilita o campo na barra de filtros do componente.
-- `PivotFilter { field, values }` é aplicado **antes** da agregação; `values`
-  vazio significa sem restrição.
-- O componente mantém o estado internamente quando `filters` não é fornecido e
-  emite `filtersChange`.
-
-### 8.21 Hierarquia de datas
-
-- `dateHierarchy: true` expande em ano + mês; um array escolhe os níveis
-  (`year`, `quarter`, `month`, `day`).
-- Aceita `Date`, ISO ou string parseável; valores derivados são strings
-  (`2026`, `Q1`, `01`).
-- Cada nível vira um nível do eixo, mantendo a ordem configurada.
+- A linha 2.x suporta SSR/hydration (`@angular/ssr`); medições de viewport usam
+  `ResizeObserver` apenas no browser.
 
 ### 8.18 Virtualização
 
@@ -375,6 +359,31 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
   e a coluna de rótulos fixa no scroll horizontal.
 - Valores numéricos são tratados como pixels; strings CSS são aceitas.
 
+### 8.20 Filtros
+
+- `PivotField.filterable` habilita o campo na barra de filtros do componente.
+- `PivotFilter { field, values }` é aplicado **antes** da agregação; `values`
+  vazio significa sem restrição.
+- O componente mantém o estado internamente quando `filters` não é fornecido e
+  emite `filtersChange`.
+
+### 8.21 Hierarquia de datas
+
+- `dateHierarchy: true` expande em ano + mês; um array escolhe os níveis
+  (`year`, `quarter`, `month`, `day`).
+- Aceita `Date`, ISO ou string parseável; valores derivados são strings
+  (`2026`, `Q1`, `01`).
+- Cada nível vira um nível do eixo, mantendo a ordem configurada.
+
+### 8.22 Redimensionamento de colunas (2.1)
+
+- Alça no cabeçalho da coluna; arraste com ponteiro.
+- `minColumnWidth` (default 60) e `maxColumnWidth` (default 600).
+- Teclado na alça: `←`/`→` (±10px), `Home` restaura; duplo clique restaura.
+- Larguras ficam em `PivotState.columns` (chave da folha) e são emitidas em
+  `columnStateChange`.
+- Sem larguras no estado, o layout permanece o padrão (sem `table-layout:
+  fixed`).
 ## 9. API do componente (resumo)
 
 Detalhes em [`API.md`](./API.md).
@@ -402,6 +411,8 @@ Detalhes em [`API.md`](./API.md).
 | `expandChange` | `{ axis, path, expanded }` |
 | `sortChange` | `{ rows?, columns? }` |
 | `stateChange` | `PivotState` |
+| `filtersChange` | `PivotFilter[]` |
+| `columnStateChange` | `Record<string, number>` |
 | `exportComplete` | `{ format: 'csv' \| 'xlsx', filename }` |
 
 ## 11. Validação e diagnóstico
@@ -424,16 +435,16 @@ Detalhes em [`API.md`](./API.md).
 
 ## 13. Critérios de aceite do MVP (v0.1)
 
-- [ ] Engine com `sum/avg/min/max/count/countDistinct` e testes.
-- [ ] Linhas multi-nível + colunas dinâmicas + totais.
-- [ ] Expandir/colapsar e estado controlado.
-- [ ] Formatação numérica e `emptyText`.
-- [ ] Formatação condicional (operadores + estilo).
-- [ ] CSV nativo com proteção de fórmula.
-- [ ] Demo com dataset genérico e troca de configuração.
-- [ ] Acessibilidade básica (roles, teclado, aria-sort).
-- [ ] README + API.md + ENGINE.md publicados.
-- [ ] CI (build + testes) verde.
+- [x] Engine com `sum/avg/min/max/count/countDistinct` e testes.
+- [x] Linhas multi-nível + colunas dinâmicas + totais.
+- [x] Expandir/colapsar e estado controlado.
+- [x] Formatação numérica e `emptyText`.
+- [x] Formatação condicional (operadores + estilo).
+- [x] CSV nativo com proteção de fórmula.
+- [x] Demo com dataset genérico e troca de configuração.
+- [x] Acessibilidade básica (roles, teclado, axe).
+- [x] README + API.md + ENGINE.md publicados.
+- [x] CI (build + testes) verde.
 
 ## 14. Decisões
 
@@ -446,6 +457,7 @@ Detalhes em [`API.md`](./API.md).
 | 5 | Server-side | v2 |
 | 6 | Medidas auxiliares | `auxiliaryValues` + `rule.measure` (implementado) |
 | 7 | Distribuição | npm com versão pinada; publish por tag |
+
 
 
 

@@ -1,70 +1,65 @@
 # pivot-grid
 
 Componente de **tabela dinâmica (pivot)** para Angular: linhas multi-nível,
-colunas dinâmicas, agregação, totais, formatação condicional e exportação.
+colunas dinâmicas, múltiplos valores, agregação, totais, filtros, hierarquia de
+datas, templates, virtualização e exportação CSV/XLSX.
 
 - Angular nativo, **sem dependências de runtime** (além de `tslib`)
-- Engine de agregação separado, testável e sem Angular (`src/lib/core`, exportado pelo pacote)
-- Standalone component + `PivotModule` opcional
-- Acessível (roles ARIA, teclado, `aria-sort`)
+- Engine de agregação separado, testável e sem Angular (`src/lib/core`)
+- Standalone component, `OnPush`, API baseada em signals
+- Acessível (roles ARIA, navegação por teclado, expandir/colapsar, auditoria axe)
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** **2.1.0 estável** (`latest`) para Angular 21+ (zoneless/SSR), com colunas redimensionáveis. A linha 1.x (1.2.0) segue disponível para Angular 18–20.
+## Linhas suportadas
+
+| Linha | Angular | Versão atual | Situação |
+|---|---|---|---|
+| **2.x** | **21 e 22** (`>=21 <23`) | **2.1.0** (`latest`) | zoneless + SSR/hydration |
+| **1.x** | **18, 19 e 20** (`>=18 <21`) | **1.2.0** | manutenção; sem novas features |
+
+> **Status:** **2.1.0 estável** (`latest`) para Angular 21+, com colunas
+> redimensionáveis. A 1.2.0 segue publicada para Angular 18–20.
 
 ## Funcionalidades
 
-| Recurso | Status |
+| Recurso | Situação |
 |---|---|
-| Linhas multi-nível e colunas dinâmicas (engine) | ✅ implementado |
-| Agregação e totais (engine) | ✅ implementado |
-| Ordenação estável (rótulo/valor) | ✅ implementado |
-| Formatação numérica (`Intl`) | ✅ implementado |
-| Formatação condicional + medidas auxiliares | ✅ implementado |
-| Renderer Angular + expandir/colapsar | ✅ implementado |
-| `height`/`width` + scroll + header sticky | ✅ implementado |
-| Coluna de rótulos fixa + teclado (setas/Home/End/PageUp/Down) | ✅ main (0.3.0) |
-| Rótulos pt-BR (`labels`) | ✅ implementado |
-| Exportação CSV nativa | ✅ implementado |
-| Exportação Excel (XLSX mínimo) | ✅ implementado |
-| Virtualização (`virtualScroll`, 50k) | ✅ 0.5.0 |
-| Hardening (a11y axe, matriz 18/19/20, orçamentos) | ✅ 0.6.0 |
+| Linhas multi-nível e colunas dinâmicas | ✅ |
+| Agregação `sum/avg/min/max/count/countDistinct` | ✅ |
+| Múltiplos valores (`values[]`) | ✅ 0.4.0 |
+| Totais de linha/coluna/geral | ✅ |
+| Expandir/colapsar com estado controlado | ✅ |
+| Ordenação estável (rótulo/valor) | ✅ |
+| Formatação numérica (`Intl`) e condicional | ✅ |
+| Medidas auxiliares (`auxiliaryValues`/`rule.measure`) | ✅ |
 | Filtros por eixo + hierarquia de datas | ✅ 1.1.0 |
 | Templates de célula e cabeçalho | ✅ 1.2.0 |
-| Linha 2.x (Angular 21+, zoneless, SSR/hydration) | ✅ 2.0.0 estável |
-| Colunas redimensionáveis (2.1) | ✅ 2.1.0 |
-| Múltiplos valores (`values[]`) | ✅ 0.4.0 |
-| Painel de campos / filtros | ⏳ v1.2 |
+| Colunas redimensionáveis (alça, teclado, reset) | ✅ 2.1.0 |
+| Virtualização de linhas (`virtualScroll`, 50k) | ✅ 0.5.0 |
+| Exportação CSV e XLSX (sem dependência) | ✅ |
+| `height`/`width`, scroll interno, headers sticky | ✅ |
+| Rótulos pt-BR (`labels`) | ✅ |
+| Zoneless + SSR/hydration (linha 2.x) | ✅ 2.0.0 |
 
-## Documentação
+## Instalação
 
-| Documento | Conteúdo |
-|---|---|
-| [Especificação](docs/SPECIFICATION.md) | Comportamento, regras, estados e critérios de aceite |
-| [API](docs/API.md) | Tipos, inputs, outputs, métodos, tema e erros |
-| [Engine](docs/ENGINE.md) | Algoritmos, complexidade e casos de borda |
-| [Roadmap](docs/ROADMAP.md) | Versões e entregas |
-| [Integração](docs/INTEGRATION.md) | Checklist de adoção no app consumidor |
-| [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, commits e release |
-| [Releases](docs/RELEASES.md) | Regras, gate e passo a passo de publicação |
-| [Migração](docs/MIGRATION.md) | Rename e remoções da 0.9.0 |
-| [Migração 2.x](docs/MIGRATION-2.md) | Plano 1.x → 2.x (Angular 21+) |
-| [Compatibilidade](docs/COMPATIBILITY.md) | Angular 18/19/20 e toolchain |
-| [Performance](docs/PERFORMANCE.md) | Orçamentos de 10k/50k no CI |
-| [Exemplos](docs/examples/README.md) | Um exemplo por funcionalidade (sticky/teclado) |
+```bash
+# Angular 21/22 (linha 2.x)
+npm install --save-exact pivot-grid@2.1.0
+
+# Angular 18/19/20 (linha 1.x)
+npm install --save-exact pivot-grid@1.2.0
+```
 
 ## Uso
 
-```bash
-npm install --save-exact pivot-grid@2.1.0
-```
-
-> `latest` aponta para a 2.0.0 (Angular 21+); a 1.2.0 atende Angular 18–20.
-
 ```ts
+import { Component } from '@angular/core';
 import { PivotGridComponent, PivotConfig } from 'pivot-grid';
 
 @Component({
+  selector: 'app-report',
   standalone: true,
   imports: [PivotGridComponent],
   template: `
@@ -87,6 +82,24 @@ export class ReportComponent {
 }
 ```
 
+## Documentação
+
+| Documento | Conteúdo |
+|---|---|
+| [Especificação](docs/SPECIFICATION.md) | Comportamento, regras, estados e critérios |
+| [API](docs/API.md) | Tipos, inputs, outputs, métodos, tema e erros |
+| [Engine](docs/ENGINE.md) | Algoritmos, complexidade e casos de borda |
+| [Roadmap](docs/ROADMAP.md) | Versões, linhas 1.x/2.x e plano 2.x |
+| [Integração](docs/INTEGRATION.md) | Checklist de adoção no app consumidor |
+| [Migração 1.x](docs/MIGRATION.md) | Rename do pacote e remoções da 0.9.0 |
+| [Migração 2.x](docs/MIGRATION-2.md) | Guia 1.x → 2.x (Angular 21+) |
+| [Compatibilidade](docs/COMPATIBILITY.md) | Angular 18–22, toolchain e matriz |
+| [Performance](docs/PERFORMANCE.md) | Orçamentos de 10k/50k no CI |
+| [Releases](docs/RELEASES.md) | Regras, gate e passo a passo de publicação |
+| [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, branches e release |
+| [Exemplos](docs/examples/README.md) | Um exemplo por funcionalidade |
+| [Changelog](CHANGELOG.md) | Histórico de versões |
+
 ## Demo
 
 - Básico: <https://leonardohessel.github.io/pivot-grid/>
@@ -97,51 +110,34 @@ export class ReportComponent {
 - Templates: <https://leonardohessel.github.io/pivot-grid/templates>
 - Colunas: <https://leonardohessel.github.io/pivot-grid/colunas>
 
-## Distribuição
+## Compatibilidade
 
-- Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
-- Publicação **somente no npm**, com versão pinada no consumidor
-  (`npm install --save-exact pivot-grid@2.1.0`); sem URL de git.
-- Release por tag `vX.Y.Z` (workflow `publish.yml`), com
-  `publishConfig.access = public` e checagem de versão da tag.
-- Licença MIT (`LICENSE` na raiz e no pacote).
+| Linha | Angular | Peer |
+|---|---|---|
+| 2.x | 21, 22 | `>=21 <23` |
+| 1.x | 18, 19, 20 | `>=18 <21` |
+
+Detalhes e matriz de CI em [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## Desenvolvimento
 
 ```bash
-npm install
+npm ci
 npm run build:lib      # compila a biblioteca
 npm run start:demo     # demo em http://localhost:4300
 npm test               # testes
+npm run bench          # orçamentos 10k/50k
+npm run verify:package # valida o pacote antes do publish
 ```
 
-## Compatibilidade
+## Distribuição
 
-| Versão | Angular |
-|---|---|
-| v1 | `>=18 <21` |
-| v2 (planejada) | `>=21` |
+- Publicação **somente no npm**, com versão pinada; sem URL de git.
+- Release por tag `vX.Y.Z` (workflow `publish.yml`), com
+  `publishConfig.access = public`, provenance e verificação de `dist-tag`.
+- `latest` = 2.1.0; `next` = RC/próxima linha.
+- Licença MIT (`LICENSE` na raiz e no pacote).
 
 ## Licença
 
 MIT © Leonardo Hessel
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,7 @@
-# Guia de migração
+# Guia de migração (1.x)
+
+> Para a linha 2.x (Angular 21+), veja [MIGRATION-2.md](./MIGRATION-2.md).
+> A última versão da 1.x é a **1.2.0**.
 
 ## 1. Nome do pacote
 
@@ -72,7 +75,7 @@ Removido; os inputs são signals e a matriz é recalculada automaticamente.
       chamadas a `refresh()`;
 - [ ] rodar `npm install` e o build;
 - [ ] validar export CSV/XLSX e regras condicionais;
-- [ ] rodar o app nas versões suportadas (Angular 18, 19 ou 20).
+- [ ] rodar o app nas versões da linha 1.x (Angular 18, 19 ou 20).
 
 ## 4. Versões
 
@@ -81,3 +84,4 @@ Removido; os inputs são signals e a matriz é recalculada automaticamente.
 | 0.6.0 | estável anterior |
 | 0.9.0 | RC (dist-tag `next`) |
 | 1.0.0 | **estável** (`latest`) |
+

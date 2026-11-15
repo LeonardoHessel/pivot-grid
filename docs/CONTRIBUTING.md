@@ -2,84 +2,82 @@
 
 ## Pré-requisitos
 
-- Node.js 20+ (recomendado 22)
-- npm 10+
-- Chrome (para testes Karma)
+- Node.js `>=20.19` (recomendado 22)
+- npm 11 (`packageManager`)
+- Chrome (testes Karma)
 
 ## Setup
 
 ```bash
 git clone https://github.com/LeonardoHessel/pivot-grid.git
 cd pivot-grid
-npm install
+npm ci
 ```
+
+## Branches
+
+| Branch | Linha | Angular |
+|---|---|---|
+| `main` | 1.x (manutenção, 1.2.0) | 18–20 |
+| `2.x` | 2.x (ativa) | 21–22 |
+
+Features novas entram na `2.x`, uma por minor. Correções críticas podem ir para
+a linha correspondente.
 
 ## Scripts
 
 | Comando | Descrição |
 |---|---|
-| `npm run build:lib` | Build de produção da biblioteca |
-| `npm run start:demo` | Demo em `http://localhost:4300` |
-| `npm test` | Testes de todas as projects |
-| `ng test pivot-grid` | Testes da biblioteca |
-| `ng build demo` | Build do demo |
+| `npm run build:lib` | build de produção da biblioteca |
+| `npm run start:demo` | demo em `http://localhost:4300` |
+| `npm test` | testes da biblioteca |
+| `npm run bench` | benchmark 10k/50k (orçamentos) |
+| `npm run verify:package` | valida nome/versão/tag/LICENSE + `npm pack` |
 
 ## Estrutura
 
 ```
 projects/pivot-grid/   # biblioteca publicada
-  src/lib/             # componentes
   src/lib/core/        # engine puro (sem Angular)
-projects/demo/         # aplicação de demonstração
-docs/                  # especificação e guias
+  src/lib/             # componente e templates
+projects/demo/         # demo com uma rota por cenário
+docs/                  # especificação, API, guias e exemplos
+scripts/               # benchmark, verificação e consumidor de compatibilidade
 ```
 
-> **Tipos duplicados:** `core/src/types.ts` e `src/lib/types.ts` devem permanecer
-> idênticos (o ng-packagr não suporta import entre entry points).
+A superfície pública é apenas `projects/pivot-grid/src/public-api.ts`; os
+`exports` do pacote bloqueiam deep imports.
 
-## Padrões de código
+## Padrões
 
 - TypeScript `strict`; sem `any` em API pública.
-- Componentes `standalone` e `OnPush`.
-- Nomes de classes/atributos com prefixo `pg`.
-- CSS escopado no componente + variables para tema.
+- Componentes `standalone` e `OnPush`; inputs/outputs via signals.
+- Prefixo `pg` em classes/seletores.
+- CSS escopado + CSS variables para tema.
 - Sem dependências de runtime novas sem discussão em issue.
 
 ## Commits
 
-Conventional Commits:
+Conventional Commits, com escopo:
 
 ```
-feat(core): add avg aggregator
-fix(component): keep focus after collapse
-docs: clarify empty cell semantics
+feat(component): add column resizing
+fix(core): keep totals on filtered rows
+docs: update compatibility matrix
+ci: use npm 11 in workflows
 ```
-
-Escopos: `core`, `component`, `docs`, `demo`, `ci`.
 
 ## Testes
 
-- Toda regra de negócio do engine precisa de teste unitário.
+- Regras de negócio do engine precisam de teste unitário.
 - Bugfix acompanha teste que falha antes e passa depois.
-- Rodar `npm test` antes de abrir PR.
-
-## Pull requests
-
-1. Issue descrevendo o problema/feature.
-2. Branch a partir de `main`.
-3. PR pequeno, com descrição e evidência (teste/screenshot).
-4. CI verde + revisão.
+- `npm test` e `npm run bench` antes do PR.
 
 ## Release
 
-1. Atualizar `CHANGELOG.md` (ou release-please).
-2. `npm version <major|minor|patch>` na raiz e na lib.
-3. `npm run build:lib`.
-4. `npm publish ./dist/pivot-grid --access public`.
-5. Tag `vX.Y.Z` + release no GitHub.
+Siga [`RELEASES.md`](./RELEASES.md): gate, bump, commit de release, tag e
+workflow OIDC. Não publique manualmente.
 
 ## Licença
 
 Ao contribuir, você concorda que a contribuição é licenciada sob MIT.
-
-

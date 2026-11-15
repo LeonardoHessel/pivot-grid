@@ -1,8 +1,9 @@
 # API pública — `pivot-grid`
 
-> **API estável (1.0).** Superfície congelada na 0.9.0; mudanças de contrato
-> só em major. A única superfície pública é `public-api.ts` (deep imports são
-> bloqueados pelos `exports` do pacote).
+> **API estável (2.x).** Superfície congelada desde a 1.0; a linha 2.x é
+> aditiva (2.0/2.1 não quebram a API). Mudanças de contrato só em major. A
+> única superfície pública é `public-api.ts` (deep imports bloqueados pelos
+> `exports` do pacote).
 
 Referência detalhada dos tipos, inputs, outputs, métodos e tokens de tema.
 Para o comportamento esperado, consulte [`SPECIFICATION.md`](./SPECIFICATION.md).
@@ -513,6 +514,7 @@ Superfície estável — somente o que sai de `public-api.ts`:
 
 - [docs/examples/sticky-keyboard.md](./examples/sticky-keyboard.md) — row headers fixos e teclado.
 - [docs/examples/](./examples/README.md) — índice por funcionalidade.
+
 
 
 
