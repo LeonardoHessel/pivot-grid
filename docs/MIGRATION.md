@@ -78,6 +78,6 @@ Removido; os inputs são signals e a matriz é recalculada automaticamente.
 
 | Versão | Situação |
 |---|---|
-| 0.6.0 | estável anterior (`latest`) |
-| 0.9.0 | **RC**, publicado com dist-tag `next` |
-| 1.0.0 | estável após validação do RC no consumidor |
+| 0.6.0 | estável anterior |
+| 0.9.0 | RC (dist-tag `next`) |
+| 1.0.0 | **estável** (`latest`) |

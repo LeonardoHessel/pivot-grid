@@ -6,6 +6,16 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-14
+
+Primeira versão estável. Sem feature nova em relação ao RC.
+
+### Changed
+
+- API congelada e publicada como `latest`.
+- RC 0.9.0 validado pelo consumidor (matriz, totais, regras, XLSX, sticky,
+  zero erros de console).
+
 ## [0.9.0] - 2026-11-14
 
 Release Candidate (sem feature nova).

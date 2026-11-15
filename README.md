@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** v0.9.0 **RC** (`next`); `latest` permanece 0.6.0 até a validação do RC.
+> **Status:** **1.0.0 estável** (`latest`). A linha 2.x será para Angular 21+.
 
 ## Funcionalidades
 
@@ -51,10 +51,10 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 ## Uso
 
 ```bash
-npm install --save-exact pivot-grid@next
+npm install --save-exact pivot-grid@1.0.0
 ```
 
-> `@next` aponta para o RC 0.9.0; a estável atual é `pivot-grid@0.6.0`.
+> `latest` aponta para a 1.0.0 estável; `next` permanece no RC 0.9.0.
 
 ```ts
 import { PivotGridComponent, PivotConfig } from 'pivot-grid';
@@ -93,8 +93,7 @@ export class ReportComponent {
 
 - Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
 - Publicação **somente no npm**, com versão pinada no consumidor
-  (`npm install --save-exact pivot-grid@0.6.0` para estável ou
-  `pivot-grid@next` para o RC); sem URL de git.
+  (`npm install --save-exact pivot-grid@1.0.0`); sem URL de git.
 - Release por tag `vX.Y.Z` (workflow `publish.yml`), com
   `publishConfig.access = public` e checagem de versão da tag.
 - Licença MIT (`LICENSE` na raiz e no pacote).
