@@ -4,7 +4,7 @@ Adoção do `pivot-grid` em um app Angular. Escolha a linha conforme a versão:
 
 | App | Linha | Instalação |
 |---|---|---|
-| Angular 21/22 | 2.x | `npm install --save-exact pivot-grid@2.3.0` |
+| Angular 21/22 | 2.x | `npm install --save-exact pivot-grid@2.3.1` |
 | Angular 18/19/20 | 1.x | `npm install --save-exact pivot-grid@1.2.0` |
 
 Campos de exemplo são genéricos; adapte aos nomes da sua API.
@@ -133,5 +133,6 @@ Somente após o gate: remover imports/módulos e licença do pacote anterior,
   devem usar o modo normal.
 - Tema por CSS variables e drill-down (`cellDetails`) disponíveis na 2.3.
 - Reordenar/fixar colunas entram na 2.4.
+
 
 

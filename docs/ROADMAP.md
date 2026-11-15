@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Estado |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.3.0** (`latest`) | ativa; tema + drill-down |
+| **2.x** | 21, 22 | **2.3.1** (`latest`) | ativa; tema + drill-down |
 | **1.x** | 18, 19, 20 | **1.2.0** | congelada; manutenção |
 
 - Novas features entram **somente na 2.x**, uma funcionalidade-título por minor.
@@ -60,4 +60,5 @@ minor.
 
 - Novas features na 1.x.
 - Mudanças de API na 2.x que quebrem consumidores existentes.
+
 

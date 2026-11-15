@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Situação |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.3.0** (`latest`) | estável; tema + drill-down |
+| **2.x** | 21, 22 | **2.3.1** (`latest`) | estável; tema + drill-down |
 | **1.x** | 18, 19, 20 | **1.2.0** | manutenção; sem novas features |
 
 `peerDependencies`:
@@ -42,4 +42,5 @@ Cada job:
   (`@angular/ssr`, `outputMode: server`, prerender de rotas estáticas).
 - O componente não depende de `NgZone` e não acessa `window`/`document` na
   construção.
+
 

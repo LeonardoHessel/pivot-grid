@@ -469,6 +469,16 @@ describe('PivotGridComponent', () => {
       'tr.pg-group-row > th.pg-rowheader',
     ) as HTMLElement;
     expect(getComputedStyle(groupHeader).backgroundColor).toBe('rgb(255, 238, 204)');
+
+    const defaults = create({ ...config, defaultExpandDepth: 0 });
+    const defaultGroup = defaults.nativeElement.querySelector(
+      'tr.pg-group-row > th.pg-rowheader',
+    ) as HTMLElement;
+    expect(getComputedStyle(defaultGroup).backgroundColor).toBe('rgb(240, 249, 255)');
+    const defaultChevron = defaults.nativeElement.querySelector(
+      'button.pg-expander',
+    ) as HTMLElement;
+    expect(getComputedStyle(defaultChevron).color).toBe('rgb(107, 114, 128)');
   });
 
   it('supports per-value alignment', () => {
@@ -583,6 +593,7 @@ describe('PivotGridComponent', () => {
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
 
 
 

@@ -6,6 +6,13 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-11-15
+
+### Fixed
+
+- Fallbacks de --pg-chevron-color e --pg-group-bg para os tokens base
+  (--pg-color-muted/--pg-color-total-bg), preservando os defaults visuais.
+
 ## [2.3.0] - 2026-11-15
 
 ### Added
@@ -258,5 +265,6 @@ Release Candidate (sem feature nova).
 - Exportação **CSV** nativa com proteção contra injeção de fórmula.
 - Testes: engine (18) e componente (5).
 - Licença MIT, `publishConfig.access = public` e workflow de publish por tag.
+
 
 

@@ -5,9 +5,10 @@
   --pg-header-font-weight: 600;
   --pg-rowheader-font-weight: 600;
   --pg-total-font-weight: 600;
-  --pg-chevron-color: var(--pg-color-muted);
+  --pg-chevron-color: var(--pg-color-muted, #6b7280);
   --pg-chevron-size: 18px;
   --pg-rowheader-bg: #fff;
-  --pg-group-bg: var(--pg-color-total-bg);
+  --pg-group-bg: var(--pg-color-total-bg, #f0f9ff);
   --pg-rowheader-width: 200px;
 }
+
