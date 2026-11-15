@@ -384,6 +384,27 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
   `columnStateChange`.
 - Sem larguras no estado, o layout permanece o padrão (sem `table-layout:
   fixed`).
+### 8.23 Layout do cabeçalho de linha (2.2)
+
+- `rowHeaderLayout: 'columns' | 'tree'`; default `columns` (preserva o layout
+  anterior).
+- `tree` renderiza **uma** coluna de cabeçalho, com indentação
+  `node.level * indentSize` (default 16), chevrons e largura
+  `rowHeaderWidth` (default 200).
+- Todos os nós visíveis são renderizados (pais e folhas); nós internos usam
+  `nodeCells` e `rowTotals` do engine, portanto exibem agregados corretos.
+- Funciona com sticky, virtualização, teclado, `headerTemplate`, filtros,
+  hierarquia de datas, export e estado controlado.
+- `columns` mantém uma coluna por campo, com `rowspan` como antes.
+
+### 8.24 Cabeçalho da medida (2.2)
+
+- `showValueHeader` default `true`.
+- Com **uma** medida e `false`, a linha de cabeçalho da medida é removida;
+  os cabeçalhos de coluna passam a identificar apenas a coluna.
+- Com **duas ou mais** medidas, a linha é mantida e um diagnóstico
+  `ignored-option` é adicionado a `PivotResult.diagnostics`.
+
 ## 9. API do componente (resumo)
 
 Detalhes em [`API.md`](./API.md).

@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Situação |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.1.1** (`latest`) | estável; 2.1.1 é só documentação |
+| **2.x** | 21, 22 | **2.2.0** (`latest`) | estável; tree header + showValueHeader |
 | **1.x** | 18, 19, 20 | **1.2.0** | manutenção; sem novas features |
 
 `peerDependencies`:

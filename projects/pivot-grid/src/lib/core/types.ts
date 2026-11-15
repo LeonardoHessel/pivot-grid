@@ -17,6 +17,8 @@ export type Aggregator =
 
 export type DateLevel = 'year' | 'quarter' | 'month' | 'day';
 
+export type PivotRowHeaderLayout = 'columns' | 'tree';
+
 export interface PivotFilter {
   field: string;
   values: string[];
@@ -146,6 +148,7 @@ export type PivotDiagnosticCode =
   | 'missing-field'
   | 'non-numeric-value'
   | 'invalid-config'
+  | 'ignored-option'
   | 'rule-error';
 
 export interface PivotDiagnostic {
@@ -242,6 +245,7 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
 
 
 

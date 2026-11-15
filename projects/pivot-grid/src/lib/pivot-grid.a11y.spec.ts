@@ -23,6 +23,28 @@ const config: PivotConfig = {
   locale: 'pt-BR',
 };
 
+async function expectNoViolations(
+  layout: 'columns' | 'tree',
+  showValueHeader: boolean,
+): Promise<void> {
+  const fixture = TestBed.createComponent(PivotGridComponent);
+  fixture.componentRef.setInput('data', data);
+  fixture.componentRef.setInput('config', config);
+  fixture.componentRef.setInput('rowHeaderLayout', layout);
+  fixture.componentRef.setInput('showValueHeader', showValueHeader);
+  fixture.detectChanges();
+  document.body.appendChild(fixture.nativeElement);
+
+  const results = await axe.run(fixture.nativeElement, {
+    rules: { 'color-contrast': { enabled: false } },
+  });
+
+  fixture.nativeElement.remove();
+  expect(
+    results.violations.map((violation) => `${violation.id}: ${violation.nodes.length}`),
+  ).toEqual([]);
+}
+
 describe('PivotGridComponent accessibility', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -31,22 +53,14 @@ describe('PivotGridComponent accessibility', () => {
   });
 
   it('has no axe violations', async () => {
-    const fixture = TestBed.createComponent(PivotGridComponent);
-    fixture.componentRef.setInput('data', data);
-    fixture.componentRef.setInput('config', config);
-    fixture.detectChanges();
-    document.body.appendChild(fixture.nativeElement);
+    await expectNoViolations('columns', true);
+  });
 
-    const results = await axe.run(fixture.nativeElement, {
-      rules: { 'color-contrast': { enabled: false } },
-    });
+  it('has no axe violations in tree layout', async () => {
+    await expectNoViolations('tree', false);
+  });
 
-    fixture.nativeElement.remove();
-
-    const violations = results.violations.map(
-      (violation) => `${violation.id}: ${violation.nodes.length}`,
-    );
-    expect(violations).toEqual([]);
+  it('has no axe violations with tree layout and value header hidden', async () => {
+    await expectNoViolations('tree', true);
   });
 });
-

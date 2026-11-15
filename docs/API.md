@@ -31,6 +31,8 @@ export type PivotData = readonly Record<string, unknown>[];
 export type Aggregator =
   | 'sum' | 'avg' | 'min' | 'max' | 'count' | 'countDistinct';
 
+export type PivotRowHeaderLayout = 'columns' | 'tree';
+
 export type DateLevel = 'year' | 'quarter' | 'month' | 'day';
 
 export interface PivotFilter {
@@ -200,6 +202,10 @@ export class PivotGridComponent {}
 | `cellTemplate` | `TemplateRef<PivotCellTemplateContext> \| null` | não | `null` | Template da célula |
 | `minColumnWidth` | `number` | não | `60` | Largura mínima ao redimensionar |
 | `maxColumnWidth` | `number` | não | `600` | Largura máxima ao redimensionar |
+| `rowHeaderLayout` | `'columns' \| 'tree'` | não | `'columns'` | Layout do cabeçalho de linha |
+| `indentSize` | `number` | não | `16` | Indentação por nível no modo tree (px) |
+| `rowHeaderWidth` | `number` | não | `200` | Largura da coluna tree (px) |
+| `showValueHeader` | `boolean` | não | `true` | Cabeçalho da medida (uma medida) |
 | `headerTemplate` | `TemplateRef<PivotHeaderTemplateContext> \| null` | não | `null` | Template do cabeçalho |
 
 ### 4.2 Outputs
@@ -367,6 +373,50 @@ templates de célula também valem para totais (linha, coluna e geral).
 </pg-pivot-grid>
 ```
 
+## 4.7 Layout do cabeçalho de linha
+
+`rowHeaderLayout: 'columns' | 'tree'` (default `columns`).
+
+- **`columns`**: uma coluna por campo de linha (layout anterior, inalterado).
+- **`tree`**: uma única coluna hierárquica indentada por `indentSize` (default
+  16), com chevrons, largura `rowHeaderWidth` (default 200), sticky,
+  virtualização, teclado, `headerTemplate`, `cellTemplate`, filtros,
+  hierarquia de datas, export e estado controlado. Nós internos usam os
+  agregados próprios (`nodeCells`/`rowTotals`), então cada nível exibe seus
+  valores.
+
+`showValueHeader: false` remove a linha de cabeçalho da medida quando há
+**uma** medida. Com duas ou mais, a linha é mantida (necessária para
+distinguir) e um diagnóstico `ignored-option` é adicionado a
+`PivotResult.diagnostics`.
+
+```html
+<pg-pivot-grid
+  [data]="rows"
+  [config]="config"
+  rowHeaderLayout="tree"
+  [showValueHeader]="false"
+  [indentSize]="18"
+  [rowHeaderWidth]="220">
+</pg-pivot-grid>
+```
+
+```ts
+const config: PivotConfig = {
+  rows: [
+    { field: 'region', caption: 'Região' },
+    { field: 'city', caption: 'CDP Principal' },
+    { field: 'cdp', caption: 'CDP' },
+  ],
+  columns: [{ field: 'month', caption: 'Mês' }],
+  values: [{ field: 'amount', caption: 'MÉDIA POD.', aggregator: 'avg' }],
+  showRowTotals: true,
+  showColumnTotals: true,
+  showGrandTotal: true,
+  defaultExpandDepth: 'all',
+};
+```
+
 ## 5. Exportação
 
 ```ts
@@ -399,6 +449,9 @@ export interface XlsxExportOptions {
 |---|---|---|
 | `--pg-font-family` | `inherit` | Tipografia |
 | `--pg-font-size` | `13px` | Texto |
+| `--pg-header-font-size` | `12px` | Tipografia dos cabeçalhos |
+| `--pg-cell-font-size` | `13px` | Tipografia das células |
+| `--pg-row-height` | `auto` | Altura base de células/cabeçalhos |
 | `--pg-color-text` | `#1f2937` | Texto |
 | `--pg-color-muted` | `#6b7280` | Texto secundário |
 | `--pg-color-border` | `#e5e7eb` | Bordas |
@@ -507,6 +560,7 @@ Superfície estável — somente o que sai de `public-api.ts`:
 - `XlsxExportOptions`
 - `DateLevel`
 - `PivotFilter`
+- `PivotRowHeaderLayout`
 - `PivotCellTemplateContext`
 - `PivotHeaderTemplateContext`
 

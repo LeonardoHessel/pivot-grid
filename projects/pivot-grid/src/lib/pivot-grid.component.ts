@@ -33,6 +33,7 @@ import type {
   PivotHeaderEvent,
   PivotLabels,
   PivotNode,
+  PivotRowHeaderLayout,
   PivotSort,
   PivotState,
 } from './core/types';
@@ -96,6 +97,10 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly labels = input<Partial<PivotLabels>>({});
   readonly width = input<string | number>('100%');
   readonly height = input<string | number>('100%');
+  readonly rowHeaderLayout = input<PivotRowHeaderLayout>('columns');
+  readonly indentSize = input(16);
+  readonly rowHeaderWidth = input(200);
+  readonly showValueHeader = input(true);
 
   readonly cellClick = output<PivotCellEvent>();
   readonly headerClick = output<PivotHeaderEvent>();
@@ -168,9 +173,26 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     () => this.filters() ?? this.internalFilters(),
   );
 
-  readonly result = computed(() =>
-    buildPivot(this.data(), { ...this.config(), filters: this.effectiveFilters() }),
-  );
+  readonly result = computed(() => {
+    const base = buildPivot(this.data(), {
+      ...this.config(),
+      filters: this.effectiveFilters(),
+    });
+    if (!this.showValueHeader() && this.values().length > 1) {
+      return {
+        ...base,
+        diagnostics: [
+          ...base.diagnostics,
+          {
+            code: 'ignored-option' as const,
+            message:
+              'showValueHeader=false was ignored: multiple measures require the value header.',
+          },
+        ],
+      };
+    }
+    return base;
+  });
 
   readonly resolvedLabels = computed<PivotLabels>(() => ({
     ...DEFAULT_LABELS,
@@ -179,10 +201,18 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
 
   readonly values = computed(() => this.config().values);
 
-  readonly rowFieldCount = computed(() => Math.max(1, this.config().rows.length));
+  readonly treeMode = computed(() => this.rowHeaderLayout() === 'tree');
+
+  readonly rowFieldCount = computed(() =>
+    this.treeMode() ? 1 : Math.max(1, this.config().rows.length),
+  );
 
   readonly rowHeaderWidths = computed<number[]>(() =>
-    this.config().rows.map((row) => (typeof row.width === 'number' ? row.width : 160)),
+    this.treeMode()
+      ? [this.rowHeaderWidth()]
+      : this.config().rows.map((row) =>
+          typeof row.width === 'number' ? row.width : 160,
+        ),
   );
 
   readonly rowHeaderLefts = computed<number[]>(() => {
@@ -196,10 +226,20 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   });
 
   readonly rowHeaderTotalWidth = computed(() =>
-    this.rowHeaderWidths().reduce((total, width) => total + width, 0),
+    this.treeMode()
+      ? this.rowHeaderWidth()
+      : this.rowHeaderWidths().reduce((total, width) => total + width, 0),
   );
   readonly columnDepth = computed(() => this.config().columns.length);
-  readonly headerRowCount = computed(() => this.columnDepth() + 1);
+  readonly showValueHeaderRow = computed(
+    () =>
+      this.showValueHeader() ||
+      this.values().length > 1 ||
+      this.columnDepth() === 0,
+  );
+  readonly headerRowCount = computed(
+    () => this.columnDepth() + (this.showValueHeaderRow() ? 1 : 0),
+  );
   readonly showRowTotals = computed(() => Boolean(this.config().showRowTotals));
   readonly showColumnTotals = computed(() => Boolean(this.config().showColumnTotals));
   readonly showGrandTotal = computed(() => Boolean(this.config().showGrandTotal));
@@ -233,6 +273,25 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     return entries;
   });
 
+  readonly treeRows = computed<{ node: PivotNode; level: number }[]>(() => {
+    const expanded = this.expandedMap();
+    const rows: { node: PivotNode; level: number }[] = [];
+    const walk = (nodes: PivotNode[], level: number): void => {
+      for (const node of nodes) {
+        rows.push({ node, level });
+        if (node.children.length > 0 && (expanded[node.key] ?? node.expanded)) {
+          walk(node.children, level + 1);
+        }
+      }
+    };
+    walk(this.result().rowTree, 0);
+    return rows;
+  });
+
+  readonly displayRowCount = computed(() =>
+    this.treeMode() ? this.treeRows().length : this.entries().length,
+  );
+
   readonly virtualStart = computed(() => {
     if (!this.virtualScroll()) {
       return 0;
@@ -251,7 +310,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   });
 
   readonly virtualEnd = computed(() => {
-    const total = this.entries().length;
+    const total = this.displayRowCount();
     if (!this.virtualScroll()) {
       return total;
     }
@@ -269,13 +328,22 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
       .map((entry, index) => ({ entry, rowIndex: this.virtualStart() + index })),
   );
 
+  readonly renderedTreeRows = computed(() =>
+    this.treeRows()
+      .slice(this.virtualStart(), this.virtualEnd())
+      .map((row, index) => ({
+        ...row,
+        rowIndex: this.virtualStart() + index,
+      })),
+  );
+
   readonly topSpacerHeight = computed(() =>
     this.virtualScroll() ? this.virtualStart() * this.rowHeight() : 0,
   );
 
   readonly bottomSpacerHeight = computed(() =>
     this.virtualScroll()
-      ? (this.entries().length - this.virtualEnd()) * this.rowHeight()
+      ? (this.displayRowCount() - this.virtualEnd()) * this.rowHeight()
       : 0,
   );
 
@@ -410,6 +478,20 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     return this.result().grandTotals.get(field);
   }
 
+  treeCellFor(
+    node: PivotNode,
+    column: PivotNode,
+    field: string,
+  ): PivotCell | undefined {
+    const source =
+      node.children.length > 0 ? this.result().nodeCells : this.result().cells;
+    return source.get(cellKey(node.key, column.key, field));
+  }
+
+  treeRowTotalFor(node: PivotNode, field: string): PivotCell | undefined {
+    return this.result().rowTotals.get(cellKey(node.key, '', field));
+  }
+
   isExpanded(node: PivotNode): boolean {
     return this.expandedMap()[node.key] ?? node.expanded;
   }
@@ -475,7 +557,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     }
     const row = Number(cell.dataset['r']);
     const column = Number(cell.dataset['c']);
-    const maxRow = this.entries().length - 1;
+    const maxRow = this.displayRowCount() - 1;
     const maxColumn = this.result().columns.length - 1;
     let nextRow = row;
     let nextColumn = column;
@@ -539,7 +621,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   }
 
   onCellClick(
-    entry: Entry,
+    entry: Entry | PivotNode,
     column: PivotNode,
     cell: PivotCell | undefined,
     event: MouseEvent | KeyboardEvent,
@@ -547,8 +629,9 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     if (!cell) {
       return;
     }
+    const rowNode = 'node' in entry ? entry.node : entry;
     this.cellClick.emit({
-      rowPath: entry.node.path,
+      rowPath: rowNode.path,
       columnPath: column.path,
       field: cell.field,
       value: cell.value,
@@ -789,6 +872,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.stateChange.emit({ expanded: { ...expanded }, sort: this.config().sort });
   }
 }
+
 
 
 

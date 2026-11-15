@@ -6,6 +6,7 @@ import { VirtualizationComponent } from './examples/virtualization.component';
 import { FiltersComponent } from './examples/filters.component';
 import { TemplatesComponent } from './examples/templates.component';
 import { ColumnsComponent } from './examples/columns.component';
+import { RowHeaderComponent } from './examples/row-header.component';
 
 export const routes: Routes = [
   { path: '', component: BasicComponent },
@@ -15,8 +16,10 @@ export const routes: Routes = [
   { path: 'filtros', component: FiltersComponent },
   { path: 'templates', component: TemplatesComponent },
   { path: 'colunas', component: ColumnsComponent },
+  { path: 'row-header', component: RowHeaderComponent },
   { path: '**', redirectTo: '' },
 ];
+
 
 
 

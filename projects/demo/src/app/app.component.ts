@@ -17,8 +17,10 @@ export class AppComponent {
     { path: '/filtros', label: 'Filtros + datas', exact: false },
     { path: '/templates', label: 'Templates', exact: false },
     { path: '/colunas', label: 'Colunas', exact: false },
+    { path: '/row-header', label: 'Row header', exact: false },
   ];
 }
+
 
 
 

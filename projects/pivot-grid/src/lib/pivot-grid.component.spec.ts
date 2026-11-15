@@ -49,6 +49,29 @@ class TemplateHostComponent {
   readonly data = data;
   readonly config = config;
 }
+
+@Component({
+  selector: 'app-tree-template-host',
+  standalone: true,
+  imports: [PivotGridComponent],
+  template: `
+    <pg-pivot-grid
+      [data]="data"
+      [config]="config"
+      rowHeaderLayout="tree"
+      [headerTemplate]="headerTpl">
+    </pg-pivot-grid>
+
+    <ng-template #headerTpl let-label="label" let-axis="axis">
+      <span class="tree-header" [attr.data-axis]="axis">{{ label }}</span>
+    </ng-template>
+  `,
+})
+class TreeTemplateHostComponent {
+  readonly data = data;
+  readonly config = config;
+}
+
 describe('PivotGridComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -297,11 +320,123 @@ describe('PivotGridComponent', () => {
     expect(emitted[1]).toEqual({});
     expect(element.querySelector('table')?.classList).not.toContain('pg-fixed');
   });
+
+  it('renders a single indented row header column in tree layout', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('rowHeaderLayout', 'tree');
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const rows = element.querySelectorAll('tr.pg-row:not(.pg-total-row)');
+
+    expect(rows.length).toBe(5);
+    expect(element.querySelectorAll('th.pg-tree-rowheader').length).toBe(5);
+    for (const row of Array.from(rows)) {
+      expect(row.querySelectorAll('th.pg-rowheader').length).toBe(1);
+    }
+    const cityHeader = Array.from(
+      element.querySelectorAll<HTMLElement>('th.pg-tree-rowheader'),
+    ).find((header) => header.textContent?.trim().startsWith('A'));
+    expect(cityHeader).toBeTruthy();
+    expect(
+      cityHeader?.querySelector<HTMLElement>('.pg-rowheader-content')?.style.paddingLeft,
+    ).toBe('16px');
+  });
+
+  it('collapses tree groups and keeps sticky row headers', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('rowHeaderLayout', 'tree');
+    fixture.componentRef.setInput('stickyRowHeaders', true);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const headers = Array.from(element.querySelectorAll<HTMLElement>('th.pg-tree-rowheader'));
+    const firstHeader = headers[0];
+
+    expect(firstHeader.classList).toContain('pg-sticky-col');
+    const sulHeader = headers.find((header) => header.textContent?.includes('Sul'));
+    const button = sulHeader?.querySelector('button.pg-expander') as HTMLButtonElement;
+    button.click();
+    fixture.detectChanges();
+
+    expect(element.querySelectorAll('tr.pg-row:not(.pg-total-row)').length).toBe(3);
+  });
+
+  it('navigates tree rows with the keyboard', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('rowHeaderLayout', 'tree');
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const firstCell = element.querySelector('td.pg-cell[data-r="0"]') as HTMLElement;
+
+    firstCell.focus();
+    firstCell.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(document.activeElement?.getAttribute('data-r')).toBe('1');
+  });
+
+  it('virtualizes tree rows', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('rowHeaderLayout', 'tree');
+    fixture.componentRef.setInput('virtualScroll', true);
+    fixture.componentRef.setInput('height', '64px');
+    fixture.componentRef.setInput('rowHeight', 32);
+    fixture.componentRef.setInput('virtualOverscan', 0);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+
+    expect(
+      element.querySelectorAll('tr.pg-row:not(.pg-total-row)').length,
+    ).toBeLessThan(5);
+    expect(element.querySelector('.pg-spacer')).toBeTruthy();
+  });
+
+  it('uses header templates for tree row headers', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ imports: [TreeTemplateHostComponent] });
+    const fixture = TestBed.createComponent(TreeTemplateHostComponent);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const rowHeaders = element.querySelectorAll('.tree-header[data-axis="row"]');
+
+    expect(rowHeaders.length).toBe(5);
+  });
+
+  it('hides the value header with one measure when showValueHeader is false', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('showValueHeader', false);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+
+    expect(element.querySelector('.pg-value-row')).toBeNull();
+    expect(element.querySelectorAll('th.pg-header-cell').length).toBeGreaterThan(0);
+  });
+
+  it('keeps the value header and emits a diagnostic with multiple measures', () => {
+    const twoValues: PivotConfig = {
+      ...config,
+      values: [
+        { field: 'amount', caption: 'Total' },
+        { field: 'amount', caption: 'Dobro', aggregator: 'count' },
+      ],
+    };
+    const fixture = create(twoValues);
+    fixture.componentRef.setInput('showValueHeader', false);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const diagnostics = fixture.componentInstance.result().diagnostics;
+
+    expect(element.querySelector('.pg-value-row')).toBeTruthy();
+    expect(diagnostics.some((diagnostic) => diagnostic.code === 'ignored-option')).toBeTrue();
+  });
+
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
+
+
 
 
 

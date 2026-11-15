@@ -6,6 +6,22 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-15
+
+### Added
+
+- `rowHeaderLayout: 'columns' | 'tree'` (default `columns`): modo tree com uma
+  única coluna hierárquica indentada, chevrons, largura configurável e
+  agregados por nó.
+- `indentSize` (default 16) e `rowHeaderWidth` (default 200).
+- `showValueHeader` (default true): remove a linha da medida com uma medida;
+  com múltiplas, mantém e emite diagnóstico `ignored-option`.
+- Variáveis de tema `--pg-header-font-size`, `--pg-cell-font-size` e
+  `--pg-row-height`.
+- Exemplo `docs/examples/row-header-tree.md` e rota `/row-header` com toggle.
+- Testes de tree (coluna única, indentação, expandir, sticky, teclado,
+  virtualização, template) e de `showValueHeader`.
+
 ## [2.1.1] - 2026-11-15
 
 ### Documentation

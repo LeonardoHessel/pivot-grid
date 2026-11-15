@@ -16,6 +16,8 @@ na demo.
 - Filtros + datas: <https://leonardohessel.github.io/pivot-grid/filtros>
 - Templates: <https://leonardohessel.github.io/pivot-grid/templates>
 - Colunas: <https://leonardohessel.github.io/pivot-grid/colunas>
+- Row header tree: <https://leonardohessel.github.io/pivot-grid/row-header>
+
 
 
 

@@ -43,7 +43,7 @@
         [class.pg-fixed]="hasColumnWidths()"
         role="grid"
         (keydown)="onKeydown($event)"
-        [attr.aria-rowcount]="entries().length + 1"
+        [attr.aria-rowcount]="displayRowCount() + 1"
         [attr.aria-colcount]="columnCount()"
       >
         <thead>
@@ -82,7 +82,7 @@
                 <th
                   class="pg-header-cell pg-total-header"
                   [attr.colspan]="values().length"
-                  [attr.rowspan]="columnDepth()"
+                  [attr.rowspan]="showValueHeaderRow() ? columnDepth() : headerRowCount()"
                 >
                   {{ resolvedLabels().rowTotal }}
                 </th>
@@ -90,6 +90,7 @@
             </tr>
           }
 
+          @if (showValueHeaderRow()) {
           <tr class="pg-header-row pg-value-row">
             @if (columnDepth() === 0) {
               <th
@@ -140,6 +141,7 @@
               }
             }
           </tr>
+          }
         </thead>
 
         <tbody>
@@ -149,6 +151,94 @@
             </tr>
           }
 
+          @if (treeMode()) {
+            @for (row of renderedTreeRows(); track row.node.key; let i = $index) {
+              @let rowIndex = row.rowIndex;
+              <tr
+                class="pg-row"
+                [class.pg-group-row]="row.node.children.length > 0 && !isExpanded(row.node)"
+                [class.pg-row-virtual]="virtualScroll()"
+                [style.height.px]="virtualScroll() ? rowHeight() : null"
+              >
+                <th
+                  class="pg-rowheader pg-tree-rowheader"
+                  [class.pg-sticky-col]="stickyRowHeaders()"
+                  [style.left.px]="stickyRowHeaders() ? 0 : null"
+                  [style.width.px]="rowHeaderWidth()"
+                  scope="row"
+                >
+                  <span class="pg-rowheader-content" [style.padding-left.px]="row.level * indentSize()">
+                    @if (row.node.children.length > 0) {
+                      <button
+                        type="button"
+                        class="pg-expander"
+                        [attr.aria-expanded]="isExpanded(row.node)"
+                        [attr.aria-label]="isExpanded(row.node) ? resolvedLabels().collapse : resolvedLabels().expand"
+                        (click)="toggle(row.node, $event)"
+                      >
+                        <span class="pg-chevron" [class.pg-chevron-open]="isExpanded(row.node)">▸</span>
+                      </button>
+                    } @else {
+                      <span class="pg-expander-spacer"></span>
+                    }
+                    @if (headerTemplate()) {
+                      <ng-container
+                        [ngTemplateOutlet]="headerTemplate()"
+                        [ngTemplateOutletContext]="headerContext('row', row.node)"
+                      />
+                    } @else {
+                      <span class="pg-rowheader-label">{{ row.node.caption }}</span>
+                    }
+                  </span>
+                </th>
+
+                @for (column of result().columns; track column.key; let columnIndex = $index) {
+                  @for (value of values(); track value.field; let valueIndex = $index) {
+                    @let cell = treeCellFor(row.node, column, value.field);
+                    <td
+                      class="pg-cell"
+                      [attr.data-r]="rowIndex"
+                      [attr.data-c]="columnIndex * values().length + valueIndex"
+                      [attr.tabindex]="rowIndex === 0 && columnIndex === 0 && valueIndex === 0 ? 0 : -1"
+                      [attr.aria-colindex]="rowFieldCount() + columnIndex * values().length + valueIndex + 1"
+                      [attr.aria-rowindex]="rowIndex + 2"
+                      [style.width.px]="columnWidth(column.key)"
+                      [style.min-width.px]="columnWidth(column.key) ? minColumnWidth() : null"
+                      [style.max-width.px]="columnWidth(column.key) ? maxColumnWidth() : null"
+                      [ngClass]="cell?.className"
+                      [style]="cell?.style"
+                      (click)="onCellClick(row.node, column, cell, $event)"
+                    >
+                      @if (cellTemplate() && cell) {
+                        <ng-container
+                          [ngTemplateOutlet]="cellTemplate()"
+                          [ngTemplateOutletContext]="cellContext(row.node.path, column.path, value.field, cell)"
+                        />
+                      } @else {
+                        {{ cell?.formatted ?? '' }}
+                      }
+                    </td>
+                  }
+                }
+
+                @if (showRowTotals()) {
+                  @for (value of values(); track value.field) {
+                    @let total = treeRowTotalFor(row.node, value.field);
+                    <td class="pg-cell pg-total" [ngClass]="total?.className" [style]="total?.style">
+                      @if (cellTemplate() && total) {
+                        <ng-container
+                          [ngTemplateOutlet]="cellTemplate()"
+                          [ngTemplateOutletContext]="cellContext(row.node.path, [], value.field, total)"
+                        />
+                      } @else {
+                        {{ total?.formatted ?? '' }}
+                      }
+                    </td>
+                  }
+                }
+              </tr>
+            }
+          } @else {
           @for (entry of renderedEntries(); track entry.entry.node.key; let i = $index) {
             @let rowIndex = virtualStart() + i;
             <tr
@@ -282,6 +372,8 @@
                 }
               }
             </tr>
+          }
+
           }
 
           @if (virtualScroll() && bottomSpacerHeight() > 0) {

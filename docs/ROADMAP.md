@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Estado |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.1.1** (`latest`) | ativa; 2.1.1 é só documentação |
+| **2.x** | 21, 22 | **2.2.0** (`latest`) | ativa; tree header + showValueHeader |
 | **1.x** | 18, 19, 20 | **1.2.0** | congelada; manutenção |
 
 - Novas features entram **somente na 2.x**, uma funcionalidade-título por minor.
@@ -28,6 +28,7 @@
 | 2.0.0 | Angular 21+, zoneless, SSR/hydration |
 | 2.1.0 | Colunas redimensionáveis |
 | 2.1.1 | Documentação (sem código) |
+| 2.2.0 | Cabeçalho de linha em árvore + showValueHeader |
 
 ## 2.x — próximas minors (aditivas)
 
@@ -35,12 +36,12 @@ Uma funcionalidade-título por minor; sem quebrar a API existente:
 
 | Versão | Funcionalidade |
 |---|---|
-| **2.2** | Reordenar e fixar colunas (`PivotState.columnOrder`/`pinned`, eventos) |
-| **2.3** | Drill-down (evento + callback de detalhe) |
-| **2.4** | Campos calculados (fórmulas declarativas) |
-| **2.5** | Pivot chart |
-| **2.6** | Exportação PDF |
-| **2.7** | Modo server-side |
+| **2.3** | Reordenar e fixar colunas (`PivotState.columnOrder`/`pinned`, eventos) |
+| **2.4** | Drill-down (evento + callback de detalhe) |
+| **2.5** | Campos calculados (fórmulas declarativas) |
+| **2.6** | Pivot chart |
+| **2.7** | Exportação PDF |
+| **2.8** | Modo server-side |
 
 Nenhum tipo/input especulativo é criado antes da implementação da respectiva
 minor.

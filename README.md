@@ -15,12 +15,12 @@ datas, templates, virtualização e exportação CSV/XLSX.
 
 | Linha | Angular | Versão atual | Situação |
 |---|---|---|---|
-| **2.x** | **21 e 22** (`>=21 <23`) | **2.1.1** (`latest`) | zoneless + SSR/hydration |
+| **2.x** | **21 e 22** (`>=21 <23`) | **2.2.0** (`latest`) | zoneless + SSR/hydration |
 | **1.x** | **18, 19 e 20** (`>=18 <21`) | **1.2.0** | manutenção; sem novas features |
 
-> **Status:** **2.1.1 estável** (`latest`) para Angular 21+, com colunas
-> redimensionáveis. A 2.1.1 é **somente documentação** (sem mudança de código).
-> A 1.2.0 segue publicada para Angular 18–20.
+> **Status:** **2.2.0 estável** (`latest`) para Angular 21+, com layout de
+> cabeçalho de linha em árvore e colunas redimensionáveis. A 1.2.0 segue
+> publicada para Angular 18–20.
 
 ## Funcionalidades
 
@@ -37,6 +37,7 @@ datas, templates, virtualização e exportação CSV/XLSX.
 | Filtros por eixo + hierarquia de datas | ✅ 1.1.0 |
 | Templates de célula e cabeçalho | ✅ 1.2.0 |
 | Colunas redimensionáveis (alça, teclado, reset) | ✅ 2.1.0 |
+| Cabeçalho de linha em árvore (paridade clássica) + showValueHeader | ✅ 2.2.0 |
 | Virtualização de linhas (`virtualScroll`, 50k) | ✅ 0.5.0 |
 | Exportação CSV e XLSX (sem dependência) | ✅ |
 | `height`/`width`, scroll interno, headers sticky | ✅ |
@@ -47,7 +48,7 @@ datas, templates, virtualização e exportação CSV/XLSX.
 
 ```bash
 # Angular 21/22 (linha 2.x)
-npm install --save-exact pivot-grid@2.1.1
+npm install --save-exact pivot-grid@2.2.0
 
 # Angular 18/19/20 (linha 1.x)
 npm install --save-exact pivot-grid@1.2.0
@@ -110,6 +111,7 @@ export class ReportComponent {
 - Filtros + datas: <https://leonardohessel.github.io/pivot-grid/filtros>
 - Templates: <https://leonardohessel.github.io/pivot-grid/templates>
 - Colunas: <https://leonardohessel.github.io/pivot-grid/colunas>
+- Row header tree: <https://leonardohessel.github.io/pivot-grid/row-header>
 
 ## Compatibilidade
 

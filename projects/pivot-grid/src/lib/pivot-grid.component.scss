@@ -263,3 +263,22 @@
   outline-offset: -2px;
 }
 
+
+.pg-tree-rowheader {
+  white-space: nowrap;
+}
+
+.pg-table {
+  font-size: var(--pg-cell-font-size, 13px);
+}
+
+.pg-header-cell,
+.pg-rowheader {
+  font-size: var(--pg-header-font-size, 12px);
+}
+
+.pg-cell,
+.pg-rowheader {
+  height: var(--pg-row-height, auto);
+}
+
