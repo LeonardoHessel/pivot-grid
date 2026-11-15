@@ -99,7 +99,6 @@ function normalizeConfig(config: PivotConfig): Normalized {
     locale,
     emptyText,
     defaultExpandDepth: config.defaultExpandDepth ?? 1,
-    totalsPosition: config.totalsPosition ?? 'end',
     sort: {
       rows: config.sort?.rows,
       columns: config.sort?.columns,
@@ -437,7 +436,6 @@ const emptyResult = (
   nodeCells: new Map(),
   rowTotals: new Map(),
   columnTotals: new Map(),
-  grandTotal: null,
   grandTotals: new Map(),
   diagnostics,
   config,
@@ -670,7 +668,6 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
     nodeCells,
     rowTotals,
     columnTotals,
-    grandTotal: grandTotals.get(values[0].field) ?? null,
     grandTotals,
     diagnostics,
     config: normalized.config,

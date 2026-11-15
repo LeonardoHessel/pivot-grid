@@ -19,9 +19,9 @@
 | **0.4.0** | Múltiplos valores ✅ | `values[]` com cabeçalho por medida, exemplo `multi-medida` |
 | **0.5.0** | Virtualização ✅ | linhas virtualizadas + export `visible/full`, exemplo com 50k linhas |
 | **0.6.0** | Hardening ✅ | revisão de API/deprecações, a11y com axe, matriz CI 18/19/20, orçamentos de performance (sem feature nova) |
-| **0.9.0** | RC | API congelada, guia de migração, dist-tag `next` |
+| **0.9.0** | RC ✅ | API congelada, guia de migração, dist-tag `next` |
 | **1.0.0** | Estável | sem features novas; matriz de compatibilidade e docs congeladas |
-| **1.x** | Pós-1.0 | um por minor: painel de campos/filtros, pivot chart, PDF, server-side |
+| **1.x** | Pós-1.0 | um por minor: filtros, templates, redimensionar/reordenar, drill-down, campos calculados, chart, PDF |
 | **2.0.0** | Angular 21+ | base `>=21`, zoneless, SSR/hydration |
 
 ## Escopo fechado da 1.0
@@ -38,6 +38,22 @@
 - Angular 18, 19 e 20 na matriz de CI.
 - Orçamentos de performance documentados.
 - Docs congeladas: API, exemplos por funcionalidade, guia de migração.
+
+## 1.x — adições opcionais
+
+Uma funcionalidade-título por minor, sempre **aditiva e não-breaking** (sem
+remover ou alterar contratos existentes):
+
+- filtros de eixo;
+- templates de célula/cabeçalho;
+- redimensionar/reordenar colunas;
+- drill-down;
+- campos calculados;
+- pivot chart;
+- exportação PDF.
+
+Nenhum tipo/input especulativo é criado antes da implementação da respectiva
+minor.
 
 ## Fora da 1.0
 

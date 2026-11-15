@@ -42,19 +42,23 @@ jobs:
           fi
 
       - name: Publish (trusted publishing / OIDC)
-        run: npm publish ./dist/pivot-grid --access public --provenance
+        run: |
+          TAG=latest
+          case "$GITHUB_REF_NAME" in v0.9.*) TAG=next ;; esac
+          npm publish ./dist/pivot-grid --access public --provenance --tag "$TAG"
 
       - name: Verify published version
         run: |
           PKG_VERSION=$(node -p "require('./dist/pivot-grid/package.json').version")
+          EXPECTED_TAG=latest
+          case "$GITHUB_REF_NAME" in v0.9.*) EXPECTED_TAG=next ;; esac
           for i in $(seq 1 30); do
-            V=$(npm view pivot-grid version 2>/dev/null || true)
-            if [ "$V" = "$PKG_VERSION" ]; then
-              echo "pivot-grid@$V is available"
+            TAG_VALUE=$(npm view "pivot-grid" "dist-tags.$EXPECTED_TAG" 2>/dev/null || true)
+            if [ "$TAG_VALUE" = "$PKG_VERSION" ]; then
+              echo "pivot-grid@$PKG_VERSION is available under dist-tag $EXPECTED_TAG"
               exit 0
             fi
             sleep 10
           done
-          echo "pivot-grid@$PKG_VERSION not visible in registry"
+          echo "dist-tag $EXPECTED_TAG does not point to $PKG_VERSION"
           exit 1
-

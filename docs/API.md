@@ -1,5 +1,9 @@
 # API pública — `pivot-grid`
 
+> **API estável (1.0).** Superfície congelada na 0.9.0; mudanças de contrato
+> só em major. A única superfície pública é `public-api.ts` (deep imports são
+> bloqueados pelos `exports` do pacote).
+
 Referência detalhada dos tipos, inputs, outputs, métodos e tokens de tema.
 Para o comportamento esperado, consulte [`SPECIFICATION.md`](./SPECIFICATION.md).
 
@@ -33,8 +37,6 @@ export interface PivotField {
   caption?: string;
   /** Largura fixa em px (aplicada às folhas da coluna). */
   width?: number;
-  /** Alinhamento do conteúdo. Default: 'left' (linhas) / 'right' (valores). */
-  align?: 'left' | 'center' | 'right';
   /** Formata o valor bruto do cabeçalho. */
   formatter?: (value: unknown) => string;
 }
@@ -60,7 +62,6 @@ export interface PivotSort {
 }
 
 export interface ConditionalRule {
-  target?: 'cell' | 'row' | 'column';  // default 'cell'
   field?: string;
   operator: '>' | '>=' | '<' | '<=' | '=' | '!=' | 'between' | 'notBetween';
   value: number | [number, number];
@@ -80,8 +81,6 @@ export interface PivotConfig {
   showRowTotals?: boolean;             // default false
   showColumnTotals?: boolean;          // default false
   showGrandTotal?: boolean;            // default false
-  totalsPosition?: 'start' | 'end';    // default 'end'
-  alwaysShowRowTotals?: boolean;       // default false
   emptyText?: string;                  // default ''
   locale?: string;                     // default navigator.language
   sort?: { rows?: PivotSort; columns?: PivotSort };
@@ -141,8 +140,6 @@ export interface PivotResult {
   cells: ReadonlyMap<string, PivotCell>; // chave: `${rowKey}||${columnKey}||${field}`
   rowTotals: ReadonlyMap<string, PivotCell>;
   columnTotals: ReadonlyMap<string, PivotCell>;
-  grandTotal: PivotCell | null;                 // primeira medida
-  grandTotals: ReadonlyMap<string, PivotCell>;  // por campo de medida                 // primeira medida
   grandTotals: ReadonlyMap<string, PivotCell>;  // por campo de medida
   diagnostics: PivotDiagnostic[];
   config: PivotConfig;
@@ -227,7 +224,6 @@ export interface PivotExpandEvent {
 | `setState(state: PivotState)` | Aplica estado |
 | `exportCsv(options?: CsvExportOptions): void` | Exporta CSV |
 | `exportExcel(options?: XlsxExportOptions): void` | Exporta XLSX nativo (ZIP + XML, sem dependência) |
-| `refresh()` | Reprocessa a matriz (raro; inputs já reagem) |
 
 ### 4.4 Exemplo completo
 
@@ -384,19 +380,45 @@ Com `strict: true` (dev), os códigos acima lançam `PivotError`.
   colapsadas). O componente preenche `rows` automaticamente ao chamar
   `exportCsv({ mode: 'visible' })` / `exportExcel({ mode: 'visible' })`.
 
-## 10. Deprecações (0.6.0)
+## 10. Exports públicos
 
-Nenhuma remoção até a 1.0; as APIs abaixo continuam funcionando e serão
-removidas apenas em major futura.
+Superfície estável — somente o que sai de `public-api.ts`:
 
-| API | Alternativa |
-|---|---|
-| `PivotResult.grandTotal` | `grandTotals.get(valueField)` |
-| `PivotConfig.totalsPosition` | totais sempre ao final (não implementado) |
-| `PivotConfig.alwaysShowRowTotals` | — (não implementado) |
-| `PivotField.align` | CSS/`formatter` |
-| `ConditionalRule.target` (`row`/`column`) | regra por célula (`cell`) |
-| `PivotGridComponent.refresh()` | inputs são signals |
+**Componente**
+
+- `PivotGridComponent`
+
+**Funções**
+
+- `buildPivot`
+- `cellKey`
+- `toCsv`
+- `toXlsx`
+- `PivotError`
+
+**Tipos**
+
+- `Aggregator`
+- `ConditionalRule`
+- `CsvExportOptions`
+- `PivotAuxiliaryValue`
+- `PivotCell`
+- `PivotCellEvent`
+- `PivotConfig`
+- `PivotData`
+- `PivotDiagnostic`
+- `PivotDiagnosticCode`
+- `PivotExpandEvent`
+- `PivotExportRow`
+- `PivotField`
+- `PivotHeaderEvent`
+- `PivotLabels`
+- `PivotNode`
+- `PivotResult`
+- `PivotSort`
+- `PivotState`
+- `PivotValueField`
+- `XlsxExportOptions`
 
 ## 11. Exemplos
 

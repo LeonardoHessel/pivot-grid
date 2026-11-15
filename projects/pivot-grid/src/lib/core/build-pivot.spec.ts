@@ -38,7 +38,7 @@ describe('buildPivot', () => {
     expect(result.columnTotals.get(cellKey('', '2026-01', 'amount'))?.value).toBe(175);
     expect(result.columnTotals.get(cellKey('', '2026-02', 'amount'))?.value).toBe(50);
 
-    expect(result.grandTotal?.value).toBe(225);
+    expect(result.grandTotals.get('amount')?.value).toBe(225);
     expect(result.diagnostics.length).toBe(0);
   });
 
@@ -57,7 +57,7 @@ describe('buildPivot', () => {
     expect(result.cells.get(cellKey('A', '2026-01', 'amount'))?.value).toBe(15);
     expect(result.cells.get(cellKey('B', '2026-01', 'amount'))?.value).toBe(30);
     expect(result.columnTotals.get(cellKey('', '2026-01', 'amount'))?.value).toBe(20);
-    expect(result.grandTotal?.value).toBe(20);
+    expect(result.grandTotals.get('amount')?.value).toBe(20);
   });
 
   it('supports min, max, count and countDistinct', () => {
@@ -72,10 +72,10 @@ describe('buildPivot', () => {
     const count = buildPivot(rows, config({ values: [{ field: 'amount', aggregator: 'count' }] }));
     const distinct = buildPivot(rows, config({ values: [{ field: 'amount', aggregator: 'countDistinct' }] }));
 
-    expect(min.grandTotal?.value).toBe(5);
-    expect(max.grandTotal?.value).toBe(9);
-    expect(count.grandTotal?.value).toBe(3);
-    expect(distinct.grandTotal?.value).toBe(2);
+    expect(min.grandTotals.get('amount')?.value).toBe(5);
+    expect(max.grandTotals.get('amount')?.value).toBe(9);
+    expect(count.grandTotals.get('amount')?.value).toBe(3);
+    expect(distinct.grandTotals.get('amount')?.value).toBe(2);
   });
 
   it('builds multi-level rows with unique keys per path', () => {
@@ -175,7 +175,7 @@ describe('buildPivot', () => {
     expect(result.cells.get(cellKey('A', '2026-01', 'qty'))?.value).toBe(5);
     expect(result.rowTotals.get(cellKey('A', '', 'qty'))?.value).toBe(5);
     expect(result.grandTotals.get('qty')?.value).toBe(5);
-    expect(result.grandTotal?.field).toBe('amount');
+    expect(result.grandTotals.has('amount')).toBeTrue();
     expect(result.diagnostics.length).toBe(0);
   });
 
@@ -227,7 +227,7 @@ describe('buildPivot', () => {
     const result = buildPivot(data, config({ values: [] }));
 
     expect(result.rows.length).toBe(0);
-    expect(result.grandTotal).toBeNull();
+    expect(result.grandTotals.size).toBe(0);
     expect(result.diagnostics.some((diagnostic) => diagnostic.code === 'invalid-config')).toBeTrue();
   });
 
@@ -241,12 +241,12 @@ describe('buildPivot', () => {
 
     expect(result.cells.get(cellKey('Sul', '2026-01', 'amount'))?.className).toBe('high');
     expect(result.cells.get(cellKey('Sul', '2026-02', 'amount'))?.className).toBe('low');
-    expect(result.grandTotal?.className).toBeUndefined();
+    expect(result.grandTotals.get('amount')?.className).toBeUndefined();
 
     const withTotals = buildPivot(data, config({
       conditionalRules: [{ operator: '>', value: 0, className: 'all', applyToTotals: true }],
     }));
-    expect(withTotals.grandTotal?.className).toBe('all');
+    expect(withTotals.grandTotals.get('amount')?.className).toBe('all');
   });
 
   it('formats values with Intl and locale', () => {
@@ -268,7 +268,7 @@ describe('buildPivot', () => {
     const second = buildPivot(data, config());
 
     expect(Array.from(first.cells.keys())).toEqual(Array.from(second.cells.keys()));
-    expect(first.grandTotal?.value).toBe(second.grandTotal?.value);
+    expect(first.grandTotals.get('amount')?.value).toBe(second.grandTotals.get('amount')?.value);
   });
 
   it('throws PivotError in strict mode when diagnostics exist', () => {
@@ -315,8 +315,8 @@ describe('buildPivot', () => {
     expect(cellB?.auxiliary?.['goal']).toBe(1.4);
     expect(cellB?.className).toBeUndefined();
 
-    expect(result.grandTotal?.auxiliary?.['goal']).toBeCloseTo(0.9333, 3);
-    expect(result.grandTotal?.className).toBe('good');
+    expect(result.grandTotals.get('amount')?.auxiliary?.['goal']).toBeCloseTo(0.9333, 3);
+    expect(result.grandTotals.get('amount')?.className).toBe('good');
   });
 
   it('exports only visible rows when mode is visible', () => {
@@ -364,6 +364,7 @@ describe('buildPivot', () => {
     expect(csv.split('\r\n').length).toBeGreaterThan(2);
   });
 });
+
 
 
 

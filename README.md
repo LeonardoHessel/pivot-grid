@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** v0.6.0 (hardening: a11y, compatibilidade 18/19/20, performance).
+> **Status:** v0.9.0 **RC** (`next`); `latest` permanece 0.6.0 até a validação do RC.
 
 ## Funcionalidades
 
@@ -43,6 +43,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | [Integração](docs/INTEGRATION.md) | Checklist de adoção no app consumidor |
 | [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, commits e release |
 | [Releases](docs/RELEASES.md) | Regras, gate e passo a passo de publicação |
+| [Migração](docs/MIGRATION.md) | Rename e remoções da 0.9.0 |
 | [Compatibilidade](docs/COMPATIBILITY.md) | Angular 18/19/20 e toolchain |
 | [Performance](docs/PERFORMANCE.md) | Orçamentos de 10k/50k no CI |
 | [Exemplos](docs/examples/README.md) | Um exemplo por funcionalidade (sticky/teclado) |
@@ -50,8 +51,10 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 ## Uso
 
 ```bash
-npm install pivot-grid
+npm install --save-exact pivot-grid@next
 ```
+
+> `@next` aponta para o RC 0.9.0; a estável atual é `pivot-grid@0.6.0`.
 
 ```ts
 import { PivotGridComponent, PivotConfig } from 'pivot-grid';
@@ -90,7 +93,8 @@ export class ReportComponent {
 
 - Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
 - Publicação **somente no npm**, com versão pinada no consumidor
-  (`npm install pivot-grid@0.6.0`); sem URL de git.
+  (`npm install --save-exact pivot-grid@0.6.0` para estável ou
+  `pivot-grid@next` para o RC); sem URL de git.
 - Release por tag `vX.Y.Z` (workflow `publish.yml`), com
   `publishConfig.access = public` e checagem de versão da tag.
 - Licença MIT (`LICENSE` na raiz e no pacote).

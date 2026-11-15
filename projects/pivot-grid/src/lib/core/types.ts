@@ -23,8 +23,6 @@ export interface PivotField {
   /** Fixed width in pixels for leaf columns. */
   width?: number;
   /** Content alignment. */
-  /** @deprecated Não é aplicado pelo renderer; use `formatter`/CSS. */
-  align?: 'left' | 'center' | 'right';
   /** Formats the raw header value. */
   formatter?: (value: unknown) => string;
 }
@@ -50,8 +48,6 @@ export interface PivotSort {
 }
 
 export interface ConditionalRule {
-  /** @deprecated Somente `cell` é avaliado; `row`/`column` são ignorados. */
-  target?: 'cell' | 'row' | 'column';
   field?: string;
   operator:
     | '>'
@@ -79,10 +75,6 @@ export interface PivotConfig {
   showRowTotals?: boolean;
   showColumnTotals?: boolean;
   showGrandTotal?: boolean;
-  /** @deprecated Ainda não implementado; totais são sempre renderizados ao final. */
-  totalsPosition?: 'start' | 'end';
-  /** @deprecated Ainda não implementado. */
-  alwaysShowRowTotals?: boolean;
   emptyText?: string;
   locale?: string;
   sort?: {
@@ -143,8 +135,6 @@ export interface PivotResult {
   nodeCells: ReadonlyMap<string, PivotCell>;
   rowTotals: ReadonlyMap<string, PivotCell>;
   columnTotals: ReadonlyMap<string, PivotCell>;
-  /** @deprecated Use `grandTotals.get(valueField)`. */
-  grandTotal: PivotCell | null;
   grandTotals: ReadonlyMap<string, PivotCell>;
   diagnostics: PivotDiagnostic[];
   config: PivotConfig;

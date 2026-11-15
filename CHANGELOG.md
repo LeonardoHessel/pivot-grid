@@ -6,6 +6,25 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-14
+
+Release Candidate (sem feature nova).
+
+### Removed
+
+- `PivotResult.grandTotal` (usar `grandTotals`).
+- `PivotConfig.totalsPosition` e `alwaysShowRowTotals`.
+- `PivotField.align`.
+- `ConditionalRule.target`.
+- `PivotGridComponent.refresh()`.
+
+### Changed
+
+- API pública congelada para a 1.0; `public-api.ts` é a única superfície.
+- `docs/API.md` marca a API como estável e lista os exports.
+- `docs/MIGRATION.md` com o guia 0.6.0 → 0.9.0.
+- Publicação do RC com dist-tag `next`; `latest` permanece na 0.6.0.
+
 ## [0.6.0] - 2026-11-14
 
 ### Added
