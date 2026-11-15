@@ -17,6 +17,9 @@ na demo.
 - Templates: <https://leonardohessel.github.io/pivot-grid/templates>
 - Colunas: <https://leonardohessel.github.io/pivot-grid/colunas>
 - Row header tree: <https://leonardohessel.github.io/pivot-grid/row-header>
+- Tema: <https://leonardohessel.github.io/pivot-grid/tema>
+- Detalhes: <https://leonardohessel.github.io/pivot-grid/detalhes>
+
 
 
 

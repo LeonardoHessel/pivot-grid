@@ -516,6 +516,7 @@ const emptyResult = (
   grandTotals: new Map(),
   diagnostics,
   config,
+  recordsForCell: () => [],
 });
 
 export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
@@ -600,6 +601,19 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
     }
   };
   collectNodes(rowTree.roots);
+
+  const allColumnNodes: InternalNode[] = [];
+  const collectColumnNodes = (nodes: InternalNode[]): void => {
+    for (const node of nodes) {
+      allColumnNodes.push(node);
+      collectColumnNodes(Array.from(node.children.values()));
+    }
+  };
+  collectColumnNodes(columnTree.roots);
+
+  const pathKey = (path: readonly string[]): string => path.join('\\u0000');
+  const rowPathMap = new Map(allRowNodes.map((node) => [pathKey(node.path), node]));
+  const columnPathMap = new Map(allColumnNodes.map((node) => [pathKey(node.path), node]));
 
   const cells = new Map<string, PivotCell>();
   const nodeCells = new Map<string, PivotCell>();
@@ -737,6 +751,32 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
     throw new PivotError(diagnostics);
   }
 
+  const recordsForCell = (
+    rowPath: readonly string[],
+    columnPath: readonly string[],
+  ): readonly Record<string, unknown>[] => {
+    const rowNode = rowPath.length > 0 ? rowPathMap.get(pathKey(rowPath)) : undefined;
+    const columnNode =
+      columnPath.length > 0 ? columnPathMap.get(pathKey(columnPath)) : undefined;
+
+    if ((rowPath.length > 0 && !rowNode) || (columnPath.length > 0 && !columnNode)) {
+      return [];
+    }
+
+    let indexes: readonly number[];
+    if (rowNode && columnNode) {
+      const columnSet = new Set(columnNode.records);
+      indexes = rowNode.records.filter((index) => columnSet.has(index));
+    } else if (rowNode) {
+      indexes = rowNode.records;
+    } else if (columnNode) {
+      indexes = columnNode.records;
+    } else {
+      indexes = data.map((_record, index) => index);
+    }
+
+    return indexes.map((index) => data[index] ?? {});
+  };
   return {
     rowTree: rowTree.roots.map(toPublicNode),
     columnTree: columnTree.roots.map(toPublicNode),
@@ -749,6 +789,7 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
     grandTotals,
     diagnostics,
     config: normalized.config,
+    recordsForCell,
   };
 }
 
@@ -759,5 +800,7 @@ export class PivotError extends Error {
     this.name = 'PivotError';
   }
 }
+
+
 
 

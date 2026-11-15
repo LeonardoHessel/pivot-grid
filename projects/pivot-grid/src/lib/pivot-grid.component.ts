@@ -11,6 +11,7 @@ import {
   output,
   OnDestroy,
   TemplateRef,
+  viewChild,
   signal,
 } from '@angular/core';
 import { buildPivot, cellKey } from './core/build-pivot';
@@ -22,6 +23,7 @@ import type {
   CsvExportOptions,
   XlsxExportOptions,
   PivotCell,
+  PivotCellDetailsContext,
   PivotCellEvent,
   PivotCellTemplateContext,
   PivotHeaderTemplateContext,
@@ -30,6 +32,7 @@ import type {
   PivotExpandEvent,
   PivotExportRow,
   PivotFilter,
+  PivotField,
   PivotHeaderEvent,
   PivotLabels,
   PivotNode,
@@ -51,6 +54,9 @@ const DEFAULT_LABELS: PivotLabels = {
   clearFilters: 'Clear filters',
   resizeColumn: 'Resize column',
   resetColumnWidth: 'Reset column width',
+  detailsTitle: 'Cell details',
+  detailsClose: 'Close',
+  detailsEmpty: 'No records for this cell.',
 };
 
 interface Entry {
@@ -101,6 +107,9 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly indentSize = input(16);
   readonly rowHeaderWidth = input(200);
   readonly showValueHeader = input(true);
+  readonly cellDetails = input(false);
+  readonly detailsColumns = input<PivotField[] | string[]>([]);
+  readonly detailsTemplate = input<TemplateRef<PivotCellDetailsContext> | null>(null);
 
   readonly cellClick = output<PivotCellEvent>();
   readonly headerClick = output<PivotHeaderEvent>();
@@ -108,6 +117,8 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly sortChange = output<{ rows?: PivotSort; columns?: PivotSort }>();
   readonly stateChange = output<PivotState>();
   readonly columnStateChange = output<Record<string, number>>();
+  readonly cellDetailsOpen = output<PivotCellDetailsContext>();
+  readonly cellDetailsClose = output<void>();
   readonly filters = input<PivotFilter[] | null>(null);
   readonly minColumnWidth = input(60);
   readonly maxColumnWidth = input(600);
@@ -120,6 +131,10 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   private readonly internalExpanded = signal<Record<string, boolean>>({});
   private readonly internalFilters = signal<PivotFilter[]>([]);
   private readonly internalColumnWidths = signal<Record<string, number>>({});
+  private readonly details = signal<PivotCellDetailsContext | null>(null);
+  readonly detailsContext = this.details.asReadonly();
+  readonly detailsDialog = viewChild<ElementRef<HTMLElement>>('detailsDialog');
+  private detailsTrigger: HTMLElement | null = null;
   private filtersInitialized = false;
   private readonly scrollTop = signal(0);
   private readonly viewportHeight = signal(0);
@@ -225,9 +240,13 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     return lefts;
   });
 
-  readonly rowHeaderTotalWidth = computed(() =>
+  readonly treeHeaderWidth = computed(() =>
+    this.rowHeaderWidth() === 200 ? null : this.rowHeaderWidth(),
+  );
+
+  readonly rowHeaderTotalWidth = computed<number | null>(() =>
     this.treeMode()
-      ? this.rowHeaderWidth()
+      ? this.treeHeaderWidth()
       : this.rowHeaderWidths().reduce((total, width) => total + width, 0),
   );
   readonly columnDepth = computed(() => this.config().columns.length);
@@ -587,6 +606,15 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
       case 'PageUp':
         nextRow = Math.max(0, row - 10);
         break;
+      case 'Enter':
+      case ' ': {
+        const hit = this.cellAt(row, column);
+        if (hit && this.cellDetails()) {
+          event.preventDefault();
+          this.openCellDetails(hit.cell, cell);
+        }
+        return;
+      }
       default:
         return;
     }
@@ -639,6 +667,8 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
       cell,
       event,
     });
+    const target = (event.target as HTMLElement | null)?.closest<HTMLElement>('td');
+    this.openCellDetails(cell, target ?? null);
   }
 
   onHeaderClick(
@@ -819,6 +849,133 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.columnStateChange.emit(widths);
     this.stateChange.emit(this.getState());
   }
+
+  readonly detailsColumnsResolved = computed(() => {
+    const configured = this.detailsColumns();
+    if (configured.length > 0) {
+      return configured.map((column) =>
+        typeof column === 'string'
+          ? { field: column, caption: column }
+          : { field: column.field, caption: column.caption ?? column.field },
+      );
+    }
+    const first = this.details()?.records[0];
+    return first
+      ? Object.keys(first).map((field) => ({ field, caption: field }))
+      : [];
+  });
+
+  detailsValue(record: Record<string, unknown>, field: string): string {
+    const value = getPath(record, field);
+    if (value === null || value === undefined) {
+      return '';
+    }
+    return typeof value === 'object' ? JSON.stringify(value) : String(value);
+  }
+
+  openCellDetails(cell: PivotCell, trigger: HTMLElement | null): void {
+    if (!this.cellDetails()) {
+      return;
+    }
+    const context: PivotCellDetailsContext = {
+      cell,
+      rowPath: cell.rowPath,
+      columnPath: cell.columnPath,
+      field: cell.field,
+      value: cell.value,
+      formatted: cell.formatted,
+      records: this.result().recordsForCell(cell.rowPath, cell.columnPath),
+    };
+    this.detailsTrigger = trigger;
+    this.details.set(context);
+    this.cellDetailsOpen.emit(context);
+    setTimeout(() => this.focusDetailsDialog());
+  }
+
+  closeCellDetails(): void {
+    if (!this.details()) {
+      return;
+    }
+    this.details.set(null);
+    this.cellDetailsClose.emit();
+    const trigger = this.detailsTrigger;
+    this.detailsTrigger = null;
+    setTimeout(() => trigger?.focus());
+  }
+
+  onDetailsBackdrop(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeCellDetails();
+    }
+  }
+
+  onDetailsKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeCellDetails();
+      return;
+    }
+    if (event.key !== 'Tab') {
+      return;
+    }
+    const dialog = this.detailsDialog()?.nativeElement;
+    if (!dialog) {
+      return;
+    }
+    const focusables = Array.from(
+      dialog.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((element) => element.offsetParent !== null);
+    if (focusables.length === 0) {
+      event.preventDefault();
+      dialog.focus();
+      return;
+    }
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  private focusDetailsDialog(): void {
+    const dialog = this.detailsDialog()?.nativeElement;
+    if (!dialog) {
+      return;
+    }
+    const target = dialog.querySelector<HTMLElement>('button, [href], [tabindex]:not([tabindex="-1"])');
+    (target ?? dialog).focus();
+  }
+
+  private cellAt(
+    rowIndex: number,
+    columnIndex: number,
+  ): { cell: PivotCell; node: PivotNode } | null {
+    const columns = this.result().columns;
+    const values = this.values();
+    if (columns.length === 0 || values.length === 0) {
+      return null;
+    }
+    const column = columns[Math.floor(columnIndex / values.length)];
+    const value = values[columnIndex % values.length];
+    if (!column || !value) {
+      return null;
+    }
+    if (this.treeMode()) {
+      const row = this.treeRows()[rowIndex];
+      const cell = row ? this.treeCellFor(row.node, column, value.field) : undefined;
+      return row && cell ? { cell, node: row.node } : null;
+    }
+    const entry = this.entries()[rowIndex];
+    const cell = entry ? this.cellFor(entry, column, value.field) : undefined;
+    return entry && cell ? { cell, node: entry.node } : null;
+  }
+
   exportRows(): PivotExportRow[] {
     return this.entries().map((entry) => ({
       key: entry.node.key,
@@ -872,6 +1029,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.stateChange.emit({ expanded: { ...expanded }, sort: this.config().sort });
   }
 }
+
 
 
 

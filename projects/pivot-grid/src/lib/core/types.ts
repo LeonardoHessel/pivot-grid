@@ -47,6 +47,8 @@ export interface PivotAuxiliaryValue {
 export interface PivotValueField {
   field: string;
   caption?: string;
+  /** Alinhamento das células desta medida. Default: token --pg-cell-align. */
+  align?: 'left' | 'center' | 'right';
   aggregator?: Aggregator;
   format?: Intl.NumberFormatOptions | ((value: number) => string);
   emptyText?: string;
@@ -123,6 +125,16 @@ export interface PivotCellTemplateContext {
   cell: PivotCell;
 }
 
+export interface PivotCellDetailsContext {
+  cell: PivotCell;
+  rowPath: string[];
+  columnPath: string[];
+  field: string;
+  value: number | null;
+  formatted: string;
+  records: readonly Record<string, unknown>[];
+}
+
 export interface PivotHeaderTemplateContext {
   $implicit: PivotNode;
   axis: 'row' | 'column';
@@ -171,6 +183,11 @@ export interface PivotResult {
   grandTotals: ReadonlyMap<string, PivotCell>;
   diagnostics: PivotDiagnostic[];
   config: PivotConfig;
+  /** Registros de origem de uma célula/total, sob demanda. */
+  recordsForCell(
+    rowPath: readonly string[],
+    columnPath: readonly string[],
+  ): readonly Record<string, unknown>[];
 }
 
 export interface PivotState {
@@ -195,6 +212,9 @@ export interface PivotLabels {
   export: string;
   /** Optional; default 'Clear filters'. */
   clearFilters?: string;
+  detailsTitle?: string;
+  detailsClose?: string;
+  detailsEmpty?: string;
   /** Optional; default 'Resize column'. */
   resizeColumn?: string;
   /** Optional; default 'Reset column width'. */
@@ -245,6 +265,7 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
 
 
 

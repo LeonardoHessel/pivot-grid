@@ -7,6 +7,8 @@ import { FiltersComponent } from './examples/filters.component';
 import { TemplatesComponent } from './examples/templates.component';
 import { ColumnsComponent } from './examples/columns.component';
 import { RowHeaderComponent } from './examples/row-header.component';
+import { ThemingComponent } from './examples/theming.component';
+import { CellDetailsComponent } from './examples/cell-details.component';
 
 export const routes: Routes = [
   { path: '', component: BasicComponent },
@@ -17,8 +19,11 @@ export const routes: Routes = [
   { path: 'templates', component: TemplatesComponent },
   { path: 'colunas', component: ColumnsComponent },
   { path: 'row-header', component: RowHeaderComponent },
+  { path: 'tema', component: ThemingComponent },
+  { path: 'detalhes', component: CellDetailsComponent },
   { path: '**', redirectTo: '' },
 ];
+
 
 
 

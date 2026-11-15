@@ -60,7 +60,30 @@ describe('PivotGridComponent accessibility', () => {
     await expectNoViolations('tree', false);
   });
 
+  it('has no axe violations with cell details open', async () => {
+    const fixture = TestBed.createComponent(PivotGridComponent);
+    fixture.componentRef.setInput('data', data);
+    fixture.componentRef.setInput('config', config);
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.detectChanges();
+    fixture.componentInstance.openCellDetails(
+      Array.from(fixture.componentInstance.result().cells.values())[0],
+      null,
+    );
+    fixture.detectChanges();
+    document.body.appendChild(fixture.nativeElement);
+
+    const results = await axe.run(fixture.nativeElement, {
+      rules: { 'color-contrast': { enabled: false } },
+    });
+
+    fixture.nativeElement.remove();
+    expect(
+      results.violations.map((violation) => `${violation.id}: ${violation.nodes.length}`),
+    ).toEqual([]);
+  });
   it('has no axe violations with tree layout and value header hidden', async () => {
     await expectNoViolations('tree', true);
   });
 });
+

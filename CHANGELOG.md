@@ -6,6 +6,28 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-11-15
+
+### Added
+
+- Contrato completo de tema: `--pg-cell-align`, `--pg-rowheader-align`,
+  `--pg-cell-font-weight`, `--pg-header-font-weight`,
+  `--pg-rowheader-font-weight`, `--pg-total-font-weight`,
+  `--pg-chevron-color`, `--pg-chevron-size`, `--pg-rowheader-bg`,
+  `--pg-group-bg`, `--pg-rowheader-width`.
+- `PivotValueField.align` para alinhamento semântico por medida.
+- Drill-down: `cellDetails`, `detailsColumns`, `detailsTemplate`,
+  `cellDetailsOpen`/`cellDetailsClose`, `PivotCellDetailsContext` e
+  `PivotResult.recordsForCell`.
+- Diálogo acessível com `role="dialog"`, `aria-modal`, foco preso, `Esc` e
+  retorno de foco.
+- Tokens em `src/lib/theme/_tokens.scss`; estilos sem `!important` e sem
+  `::ng-deep`.
+- Exemplos `docs/examples/theming.md` e `docs/examples/cell-details.md`, com
+  rotas `/tema` e `/detalhes` e capturas de evidência.
+- Testes de computed styles, drill-down em totais/tree, teclado e axe com
+  diálogo.
+
 ## [2.2.0] - 2026-11-15
 
 ### Added

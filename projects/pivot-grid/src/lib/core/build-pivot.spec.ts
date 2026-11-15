@@ -319,6 +319,36 @@ describe('buildPivot', () => {
     expect(result.grandTotals.get('amount')?.className).toBe('good');
   });
 
+
+  it('returns source records for cells and totals on demand', () => {
+    const result = buildPivot(
+      [
+        { region: 'Sul', city: 'A', month: '2026-01', amount: 100 },
+        { region: 'Sul', city: 'A', month: '2026-01', amount: 50 },
+        { region: 'Norte', city: 'B', month: '2026-01', amount: 30 },
+      ],
+      config({
+        rows: [
+          { field: 'region' },
+          { field: 'city' },
+        ],
+        columns: [{ field: 'month' }],
+        values: [{ field: 'amount' }],
+        showRowTotals: true,
+      }),
+    );
+
+    const leaf = result.recordsForCell(['Sul', 'A'], ['2026-01']);
+    expect(leaf.length).toBe(2);
+    expect(leaf.reduce((sum, record) => sum + Number(record['amount']), 0)).toBe(150);
+
+    const rowTotal = result.recordsForCell(['Sul', 'A'], []);
+    expect(rowTotal.length).toBe(2);
+
+    const columnTotal = result.recordsForCell([], ['2026-01']);
+    expect(columnTotal.length).toBe(3);
+  });
+
   it('expands a date hierarchy into multiple levels', () => {
     const rows = [
       { region: 'A', date: '2026-01-15', amount: 1 },

@@ -18,8 +18,11 @@ export class AppComponent {
     { path: '/templates', label: 'Templates', exact: false },
     { path: '/colunas', label: 'Colunas', exact: false },
     { path: '/row-header', label: 'Row header', exact: false },
+    { path: '/tema', label: 'Tema', exact: false },
+    { path: '/detalhes', label: 'Detalhes', exact: false },
   ];
 }
+
 
 
 

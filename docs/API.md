@@ -49,6 +49,8 @@ export interface PivotField {
   width?: number;
   /** Formata o valor bruto do cabeçalho. */
   formatter?: (value: unknown) => string;
+  /** Alinhamento das células desta medida. */
+  align?: 'left' | 'center' | 'right';
   /** Expande um campo de data em níveis. */
   dateHierarchy?: boolean | DateLevel[];
   /** Habilita o campo na barra de filtros. */
@@ -65,6 +67,8 @@ export interface PivotValueField {
   caption?: string;
   aggregator?: Aggregator;             // default 'sum'
   format?: Intl.NumberFormatOptions | ((value: number) => string);
+  /** Alinhamento desta medida (sobrescreve --pg-cell-align). */
+  align?: 'left' | 'center' | 'right';
   emptyText?: string;
 }
 
@@ -165,6 +169,11 @@ export interface PivotResult {
   grandTotals: ReadonlyMap<string, PivotCell>;  // por campo de medida
   diagnostics: PivotDiagnostic[];
   config: PivotConfig;
+  /** Registros de origem da célula/total, sob demanda. */
+  recordsForCell(
+    rowPath: readonly string[],
+    columnPath: readonly string[],
+  ): readonly Record<string, unknown>[];
 }
 
 export function buildPivot(data: PivotData, config: PivotConfig): PivotResult;
@@ -206,6 +215,9 @@ export class PivotGridComponent {}
 | `indentSize` | `number` | não | `16` | Indentação por nível no modo tree (px) |
 | `rowHeaderWidth` | `number` | não | `200` | Largura da coluna tree (px) |
 | `showValueHeader` | `boolean` | não | `true` | Cabeçalho da medida (uma medida) |
+| `cellDetails` | `boolean` | não | `false` | Abre o painel de detalhes ao clicar |
+| `detailsColumns` | `PivotField[] \| string[]` | não | `[]` | Colunas do painel (default: campos do registro) |
+| `detailsTemplate` | `TemplateRef<PivotCellDetailsContext> \| null` | não | `null` | Substitui o corpo do painel |
 | `headerTemplate` | `TemplateRef<PivotHeaderTemplateContext> \| null` | não | `null` | Template do cabeçalho |
 
 ### 4.2 Outputs
@@ -219,6 +231,8 @@ export class PivotGridComponent {}
 | `stateChange` | `PivotState` |
 | `filtersChange` | `PivotFilter[]` |
 | `columnStateChange` | `Record<string, number>` (larguras por coluna) |
+| `cellDetailsOpen` | `PivotCellDetailsContext` |
+| `cellDetailsClose` | `void` |
 | `exportComplete` | `{ format: 'csv' \| 'xlsx'; filename: string }` |
 
 ```ts
@@ -417,6 +431,32 @@ const config: PivotConfig = {
 };
 ```
 
+## 4.8 Detalhes da célula (drill-down)
+
+Com `cellDetails: true`, clicar (ou `Enter`/`Espaço`) em uma célula abre um
+diálogo com o resumo agregado e os registros de origem. Funciona em células
+normais, totais e no modo tree.
+
+```ts
+cellDetails?: boolean;                     // default false
+detailsColumns?: PivotField[] | string[]; // default: campos do registro
+detailsTemplate?: TemplateRef<PivotCellDetailsContext>;
+```
+
+```html
+<pg-pivot-grid
+  [data]="rows"
+  [config]="config"
+  [cellDetails]="true"
+  [detailsColumns]="['region', 'city', 'month', 'amount']"
+  [labels]="{ detailsTitle: 'Detalhes da célula', detailsClose: 'Fechar' }">
+</pg-pivot-grid>
+```
+
+O engine expõe `PivotResult.recordsForCell(rowPath, columnPath)` sob demanda,
+sem copiar a base. O diálogo tem `role="dialog"`, `aria-modal`, foco preso,
+fecha com `Esc` e devolve o foco ao gatilho.
+
 ## 5. Exportação
 
 ```ts
@@ -452,6 +492,17 @@ export interface XlsxExportOptions {
 | `--pg-header-font-size` | `12px` | Tipografia dos cabeçalhos |
 | `--pg-cell-font-size` | `13px` | Tipografia das células |
 | `--pg-row-height` | `auto` | Altura base de células/cabeçalhos |
+| `--pg-cell-align` | `right` | Alinhamento das células de valor |
+| `--pg-rowheader-align` | `left` | Alinhamento do cabeçalho de linha |
+| `--pg-cell-font-weight` | `400` | Peso das células |
+| `--pg-header-font-weight` | `600` | Peso dos cabeçalhos de coluna |
+| `--pg-rowheader-font-weight` | `600` | Peso dos rótulos de linha |
+| `--pg-total-font-weight` | `600` | Peso das células de total |
+| `--pg-chevron-color` | `var(--pg-color-muted)` | Cor da seta |
+| `--pg-chevron-size` | `18px` | Glifo e hit area (`size × 1.5`) |
+| `--pg-rowheader-bg` | `#fff` | Fundo do cabeçalho de linha |
+| `--pg-group-bg` | `var(--pg-color-total-bg)` | Fundo de linhas de grupo |
+| `--pg-rowheader-width` | `200px` | Largura no modo tree |
 | `--pg-color-text` | `#1f2937` | Texto |
 | `--pg-color-muted` | `#6b7280` | Texto secundário |
 | `--pg-color-border` | `#e5e7eb` | Bordas |
@@ -478,6 +529,16 @@ export interface PivotCellTemplateContext {
   value: number | null;
   formatted: string;
   cell: PivotCell;
+}
+
+export interface PivotCellDetailsContext {
+  cell: PivotCell;
+  rowPath: string[];
+  columnPath: string[];
+  field: string;
+  value: number | null;
+  formatted: string;
+  records: readonly Record<string, unknown>[];
 }
 
 export interface PivotHeaderTemplateContext {
@@ -561,6 +622,7 @@ Superfície estável — somente o que sai de `public-api.ts`:
 - `DateLevel`
 - `PivotFilter`
 - `PivotRowHeaderLayout`
+- `PivotCellDetailsContext`
 - `PivotCellTemplateContext`
 - `PivotHeaderTemplateContext`
 
@@ -568,6 +630,7 @@ Superfície estável — somente o que sai de `public-api.ts`:
 
 - [docs/examples/sticky-keyboard.md](./examples/sticky-keyboard.md) — row headers fixos e teclado.
 - [docs/examples/](./examples/README.md) — índice por funcionalidade.
+
 
 
 

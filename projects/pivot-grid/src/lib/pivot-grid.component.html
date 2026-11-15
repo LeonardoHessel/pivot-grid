@@ -51,7 +51,7 @@
             <tr class="pg-header-row">
               @if ($index === 0) {
                 <th
-                  class="pg-corner"
+                  class="pg-corner" [class.pg-tree-corner]="treeMode()"
                   aria-hidden="true"
                   [class.pg-sticky-col]="stickyRowHeaders()"
                   [style.left.px]="0"
@@ -94,7 +94,7 @@
           <tr class="pg-header-row pg-value-row">
             @if (columnDepth() === 0) {
               <th
-                class="pg-corner"
+                class="pg-corner" [class.pg-tree-corner]="treeMode()"
                 aria-hidden="true"
                 [class.pg-sticky-col]="stickyRowHeaders()"
                 [style.left.px]="0"
@@ -104,7 +104,7 @@
               ></th>
             }
             @for (column of result().columns; track column.key) {
-              @for (value of values(); track value.field; let valueIndex = $index) {
+              @for (value of values(); track $index; let valueIndex = $index) {
                 <th
                   class="pg-header-cell pg-value-header"
                   scope="col"
@@ -134,7 +134,7 @@
               }
             }
             @if (showRowTotals()) {
-              @for (value of values(); track value.field) {
+              @for (value of values(); track $index) {
                 <th class="pg-header-cell pg-total-header">
                   {{ columnDepth() === 0 ? resolvedLabels().rowTotal : (value.caption ?? value.field) }}
                 </th>
@@ -164,7 +164,7 @@
                   class="pg-rowheader pg-tree-rowheader"
                   [class.pg-sticky-col]="stickyRowHeaders()"
                   [style.left.px]="stickyRowHeaders() ? 0 : null"
-                  [style.width.px]="rowHeaderWidth()"
+                  [style.width.px]="treeHeaderWidth()"
                   scope="row"
                 >
                   <span class="pg-rowheader-content" [style.padding-left.px]="row.level * indentSize()">
@@ -193,7 +193,7 @@
                 </th>
 
                 @for (column of result().columns; track column.key; let columnIndex = $index) {
-                  @for (value of values(); track value.field; let valueIndex = $index) {
+                  @for (value of values(); track $index; let valueIndex = $index) {
                     @let cell = treeCellFor(row.node, column, value.field);
                     <td
                       class="pg-cell"
@@ -205,7 +205,7 @@
                       [style.width.px]="columnWidth(column.key)"
                       [style.min-width.px]="columnWidth(column.key) ? minColumnWidth() : null"
                       [style.max-width.px]="columnWidth(column.key) ? maxColumnWidth() : null"
-                      [ngClass]="cell?.className"
+                      [style.text-align]="value.align" [ngClass]="cell?.className"
                       [style]="cell?.style"
                       (click)="onCellClick(row.node, column, cell, $event)"
                     >
@@ -222,9 +222,9 @@
                 }
 
                 @if (showRowTotals()) {
-                  @for (value of values(); track value.field) {
+                  @for (value of values(); track $index) {
                     @let total = treeRowTotalFor(row.node, value.field);
-                    <td class="pg-cell pg-total" [ngClass]="total?.className" [style]="total?.style">
+                    <td class="pg-cell pg-total" [style.text-align]="value.align" [ngClass]="total?.className" [style]="total?.style">
                       @if (cellTemplate() && total) {
                         <ng-container
                           [ngTemplateOutlet]="cellTemplate()"
@@ -324,7 +324,7 @@
               }
 
               @for (column of result().columns; track column.key; let columnIndex = $index) {
-                @for (value of values(); track value.field; let valueIndex = $index) {
+                @for (value of values(); track $index; let valueIndex = $index) {
                   @let cell = cellFor(entry.entry, column, value.field);
                   <td
                     class="pg-cell"
@@ -336,7 +336,7 @@
                     [style.width.px]="columnWidth(column.key)"
                     [style.min-width.px]="columnWidth(column.key) ? minColumnWidth() : null"
                     [style.max-width.px]="columnWidth(column.key) ? maxColumnWidth() : null"
-                    [ngClass]="cell?.className"
+                    [style.text-align]="value.align" [ngClass]="cell?.className"
                     [style]="cell?.style"
                     (click)="onCellClick(entry.entry, column, cell, $event)"
                   >
@@ -353,11 +353,11 @@
               }
 
               @if (showRowTotals()) {
-                @for (value of values(); track value.field) {
+                @for (value of values(); track $index) {
                   @let total = rowTotalFor(entry.entry, value.field);
                   <td
                     class="pg-cell pg-total"
-                    [ngClass]="total?.className"
+                    [style.text-align]="value.align" [ngClass]="total?.className"
                     [style]="total?.style"
                   >
                     @if (cellTemplate() && total) {
@@ -388,14 +388,14 @@
                 {{ resolvedLabels().columnTotal }}
               </th>
               @for (column of result().columns; track column.key) {
-                @for (value of values(); track value.field) {
+                @for (value of values(); track $index) {
                   @let total = columnTotalFor(column, value.field);
                   <td
                     class="pg-cell pg-total"
                     [style.width.px]="columnWidth(column.key)"
                     [style.min-width.px]="columnWidth(column.key) ? minColumnWidth() : null"
                     [style.max-width.px]="columnWidth(column.key) ? maxColumnWidth() : null"
-                    [ngClass]="total?.className"
+                    [style.text-align]="value.align" [ngClass]="total?.className"
                     [style]="total?.style"
                   >
                     @if (cellTemplate() && total) {
@@ -410,9 +410,9 @@
                 }
               }
               @if (showRowTotals()) {
-                @for (value of values(); track value.field) {
+                @for (value of values(); track $index) {
                   @let total = grandTotalFor(value.field);
-                  <td class="pg-cell pg-total pg-grand-total">
+                  <td class="pg-cell pg-total pg-grand-total" [style.text-align]="value.align">
                     @if (cellTemplate() && total) {
                       <ng-container
                         [ngTemplateOutlet]="cellTemplate()"
@@ -430,7 +430,7 @@
               <th class="pg-rowheader pg-total" [attr.colspan]="rowFieldCount()">
                 {{ resolvedLabels().grandTotal }}
               </th>
-              @for (value of values(); track value.field) {
+              @for (value of values(); track $index) {
                 @let total = grandTotalFor(value.field);
                 <td
                   class="pg-cell pg-total pg-grand-total"
@@ -452,7 +452,81 @@
       </table>
     </div>
   }
+
+  @if (detailsContext(); as details) {
+    <div class="pg-details-backdrop" (click)="onDetailsBackdrop($event)">
+      <div
+        #detailsDialog
+        class="pg-details-dialog"
+        role="dialog"
+        aria-modal="true"
+        [attr.aria-label]="resolvedLabels().detailsTitle"
+        tabindex="-1"
+        (keydown)="onDetailsKeydown($event)"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="pg-details-header">
+          <div>
+            <h2 class="pg-details-title">{{ resolvedLabels().detailsTitle }}</h2>
+            <p class="pg-details-summary">
+              <strong>{{ details.formatted }}</strong>
+              @if (details.rowPath.length > 0) {
+                <span>{{ details.rowPath.join(' / ') }}</span>
+              }
+              @if (details.columnPath.length > 0) {
+                <span>{{ details.columnPath.join(' / ') }}</span>
+              }
+              <span class="pg-details-field">{{ details.field }}</span>
+            </p>
+          </div>
+          <button
+            type="button"
+            class="pg-details-close"
+            [attr.aria-label]="resolvedLabels().detailsClose"
+            (click)="closeCellDetails()"
+          >
+            ×
+          </button>
+        </header>
+
+        <div class="pg-details-body">
+          @if (detailsTemplate()) {
+            <ng-container
+              [ngTemplateOutlet]="detailsTemplate()"
+              [ngTemplateOutletContext]="details"
+            />
+          } @else if (details.records.length === 0) {
+            <p class="pg-details-empty">{{ resolvedLabels().detailsEmpty }}</p>
+          } @else {
+            <div class="pg-details-table-wrap">
+              <table class="pg-details-table">
+                <thead>
+                  <tr>
+                    @for (column of detailsColumnsResolved(); track column.field) {
+                      <th scope="col">{{ column.caption }}</th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (record of details.records; track $index) {
+                    <tr>
+                      @for (column of detailsColumnsResolved(); track column.field) {
+                        <td>{{ detailsValue(record, column.field) }}</td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
 </div>
+
+
+
 
 
 

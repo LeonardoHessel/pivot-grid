@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Estado |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.2.0** (`latest`) | ativa; tree header + showValueHeader |
+| **2.x** | 21, 22 | **2.3.0** (`latest`) | ativa; tema + drill-down |
 | **1.x** | 18, 19, 20 | **1.2.0** | congelada; manutenção |
 
 - Novas features entram **somente na 2.x**, uma funcionalidade-título por minor.
@@ -29,6 +29,7 @@
 | 2.1.0 | Colunas redimensionáveis |
 | 2.1.1 | Documentação (sem código) |
 | 2.2.0 | Cabeçalho de linha em árvore + showValueHeader |
+| 2.3.0 | Contrato de tema + drill-down |
 
 ## 2.x — próximas minors (aditivas)
 
@@ -36,8 +37,7 @@ Uma funcionalidade-título por minor; sem quebrar a API existente:
 
 | Versão | Funcionalidade |
 |---|---|
-| **2.3** | Reordenar e fixar colunas (`PivotState.columnOrder`/`pinned`, eventos) |
-| **2.4** | Drill-down (evento + callback de detalhe) |
+| **2.4** | Reordenar e fixar colunas (`PivotState.columnOrder`/`pinned`, eventos) |
 | **2.5** | Campos calculados (fórmulas declarativas) |
 | **2.6** | Pivot chart |
 | **2.7** | Exportação PDF |
@@ -60,3 +60,4 @@ minor.
 
 - Novas features na 1.x.
 - Mudanças de API na 2.x que quebrem consumidores existentes.
+

@@ -405,6 +405,30 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
 - Com **duas ou mais** medidas, a linha é mantida e um diagnóstico
   `ignored-option` é adicionado a `PivotResult.diagnostics`.
 
+### 8.25 Contrato de tema (2.3)
+
+- Tokens documentados em `theme/_tokens.scss`, com defaults no `:host`.
+- O consumidor altera alinhamento, pesos, chevron, fundos e largura do tree
+  apenas com CSS variables no host; sem `::ng-deep`, `ViewEncapsulation.None`
+  ou `!important`.
+- `PivotValueField.align` sobrescreve o alinhamento daquela medida.
+- `text-align` fica apenas em `.pg-cell`/`.pg-rowheader`, nunca no seletor de
+  tabela.
+
+### 8.26 Detalhes da célula (2.3)
+
+- `cellDetails: true` abre o diálogo ao clicar ou `Enter`/`Espaço` em uma
+  célula.
+- O contexto inclui célula, caminhos, campo, valor, formatado e registros.
+- `detailsColumns` aceita `PivotField[]` ou `string[]`; default são os campos
+  do primeiro registro.
+- `detailsTemplate` substitui o corpo; `cellDetailsOpen`/`cellDetailsClose`
+  são emitidos.
+- Registros vêm de `PivotResult.recordsForCell` sob demanda; funciona em
+  células normais, totais e tree.
+- Acessibilidade: `role="dialog"`, `aria-modal`, foco preso, `Esc` fecha,
+  foco retorna ao gatilho.
+
 ## 9. API do componente (resumo)
 
 Detalhes em [`API.md`](./API.md).

@@ -429,11 +429,164 @@ describe('PivotGridComponent', () => {
     expect(diagnostics.some((diagnostic) => diagnostic.code === 'ignored-option')).toBeTrue();
   });
 
+
+  it('honors theme CSS variables without !important', () => {
+    const fixture = create();
+    const element: HTMLElement = fixture.nativeElement;
+    element.style.setProperty('--pg-cell-align', 'left');
+    element.style.setProperty('--pg-cell-font-weight', '700');
+    element.style.setProperty('--pg-header-font-weight', '800');
+    element.style.setProperty('--pg-rowheader-font-weight', '500');
+    element.style.setProperty('--pg-rowheader-align', 'center');
+    element.style.setProperty('--pg-total-font-weight', '900');
+    element.style.setProperty('--pg-chevron-color', 'rgb(255, 0, 0)');
+    element.style.setProperty('--pg-chevron-size', '20px');
+    element.style.setProperty('--pg-rowheader-bg', 'rgb(240, 240, 240)');
+    element.style.setProperty('--pg-group-bg', 'rgb(255, 238, 204)');
+    fixture.detectChanges();
+
+    const cell = element.querySelector<HTMLElement>('td.pg-cell') as HTMLElement;
+    const header = element.querySelector<HTMLElement>('th.pg-header-cell') as HTMLElement;
+    const rowHeader = element.querySelector<HTMLElement>('th.pg-rowheader') as HTMLElement;
+    const expander = element.querySelector<HTMLElement>('button.pg-expander') as HTMLElement;
+    const total = element.querySelector<HTMLElement>('td.pg-total') as HTMLElement;
+
+    expect(getComputedStyle(cell).textAlign).toBe('left');
+    expect(getComputedStyle(cell).fontWeight).toBe('700');
+    expect(getComputedStyle(header).fontWeight).toBe('800');
+    expect(getComputedStyle(rowHeader).fontWeight).toBe('500');
+    expect(getComputedStyle(rowHeader).textAlign).toBe('center');
+    expect(getComputedStyle(rowHeader).backgroundColor).toBe('rgb(240, 240, 240)');
+    expect(getComputedStyle(total).fontWeight).toBe('900');
+    expect(getComputedStyle(expander).color).toBe('rgb(255, 0, 0)');
+    expect(getComputedStyle(expander).width).toBe('30px');
+    expect(getComputedStyle(expander).height).toBe('30px');
+
+    const collapsed = create({ ...config, defaultExpandDepth: 0 });
+    collapsed.nativeElement.style.setProperty('--pg-group-bg', 'rgb(255, 238, 204)');
+    collapsed.detectChanges();
+    const groupHeader = collapsed.nativeElement.querySelector(
+      'tr.pg-group-row > th.pg-rowheader',
+    ) as HTMLElement;
+    expect(getComputedStyle(groupHeader).backgroundColor).toBe('rgb(255, 238, 204)');
+  });
+
+  it('supports per-value alignment', () => {
+    const aligned = create({
+      ...config,
+      values: [{ field: 'amount', caption: 'Total', align: 'left' }],
+    });
+    const cell = aligned.nativeElement.querySelector('td.pg-cell') as HTMLElement;
+    expect(getComputedStyle(cell).textAlign).toBe('left');
+  });
+
+  it('uses --pg-rowheader-width in tree layout', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('rowHeaderLayout', 'tree');
+    fixture.nativeElement.style.setProperty('--pg-rowheader-width', '260px');
+    fixture.detectChanges();
+    const header = fixture.nativeElement.querySelector(
+      'th.pg-tree-rowheader',
+    ) as HTMLElement;
+    expect(getComputedStyle(header).width).toBe('260px');
+  });
+
+  it('opens cell details with the source records and closes on Escape', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const cell = Array.from(component.result().rowTotals.values()).find(
+      (candidate) =>
+        candidate.value === 150 && candidate.rowPath.length === 2,
+    );
+    expect(cell).toBeTruthy();
+
+    const opened: unknown[] = [];
+    const closed: unknown[] = [];
+    component.cellDetailsOpen.subscribe((context) => opened.push(context));
+    component.cellDetailsClose.subscribe(() => closed.push(true));
+    component.openCellDetails(cell!, null);
+    fixture.detectChanges();
+
+    const dialog = fixture.nativeElement.querySelector(
+      '.pg-details-dialog',
+    ) as HTMLElement;
+    expect(dialog).toBeTruthy();
+    expect(dialog.getAttribute('role')).toBe('dialog');
+    expect(dialog.getAttribute('aria-modal')).toBe('true');
+    expect(dialog.querySelectorAll('tbody tr').length).toBe(cell!.counts);
+    expect(opened.length).toBe(1);
+
+    dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.pg-details-dialog')).toBeNull();
+    expect(closed.length).toBe(1);
+  });
+
+  it('opens details when a cell is clicked', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const cell = element.querySelector('td.pg-cell[data-r="0"]') as HTMLElement;
+    cell.click();
+    fixture.detectChanges();
+
+    expect(element.querySelector('.pg-details-dialog')).toBeTruthy();
+  });
+  it('drills down into tree parent cells', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('rowHeaderLayout', 'tree');
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const parent = component
+      .treeRows()
+      .find((row) => row.node.caption === 'Sul');
+    expect(parent).toBeTruthy();
+    const column = component
+      .result()
+      .columns.find((candidate) => candidate.path[0] === '2026-01')!;
+    const cell = component.treeCellFor(parent!.node, column, 'amount');
+    expect(cell).toBeTruthy();
+
+    component.openCellDetails(cell!, null);
+    fixture.detectChanges();
+
+    const context = component.detailsContext();
+    expect(context?.records.length).toBe(2);
+    expect(context?.records.reduce((sum, record) => sum + Number(record['amount']), 0)).toBe(
+      Number(cell!.value),
+    );
+  });
+
+  it('shows configured detail columns and the empty state', () => {
+    const fixture = create();
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.componentRef.setInput('detailsColumns', ['region', 'amount']);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const cell = Array.from(component.result().cells.values())[0];
+    component.openCellDetails(cell, null);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const headers = Array.from(
+      element.querySelectorAll<HTMLElement>('.pg-details-table th'),
+    ).map((header) => header.textContent?.trim());
+    expect(headers).toEqual(['region', 'amount']);
+  });
+
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
+
+
+
 
 
 
