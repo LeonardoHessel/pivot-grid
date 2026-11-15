@@ -28,18 +28,19 @@ jobs:
         run: npm run build:lib
 
       - name: Pack library
-        run: npm pack ./dist/pivot-grid --pack-destination .
+        run: npm pack ./dist/pivot-grid --pack-destination "${{ runner.temp }}"
 
       - name: Create consumer app
+        working-directory: ${{ runner.temp }}
         run: npx -y @angular/cli@${{ matrix.angular }} new consumer --defaults --skip-git --skip-tests --style=css --routing=false
 
       - name: Install library in consumer
-        working-directory: consumer
+        working-directory: ${{ runner.temp }}/consumer
         run: npm install ../pivot-grid-*.tgz
 
       - name: Use the library
-        run: node scripts/compat-consumer.mjs consumer
+        run: node scripts/compat-consumer.mjs "${{ runner.temp }}/consumer"
 
       - name: Build consumer
-        working-directory: consumer
+        working-directory: ${{ runner.temp }}/consumer
         run: npx ng build
