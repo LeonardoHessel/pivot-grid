@@ -10,12 +10,12 @@
 | **19** | suportado | app consumidor criado no CI (`compat.yml` na `main`) |
 | **20** | suportado | app consumidor criado no CI (`compat.yml` na `main`) |
 
-## Linha 2.x (RC)
+## Linha 2.x (estável)
 
 | Angular | Situação | Como é validado |
 |---|---|---|
-| **21** | RC | app consumidor no CI (`compat.yml` na branch `2.x`) |
-| **22** | RC | app consumidor no CI (`compat.yml` na branch `2.x`) |
+| **21** | estável | app consumidor no CI (`compat.yml` na branch `2.x`) |
+| **22** | estável | app consumidor no CI + validação do consumidor |
 
 `peerDependencies` da 1.x: `>=18.0.0 <21.0.0`.
 `peerDependencies` da 2.x: `>=21.0.0 <23.0.0`.

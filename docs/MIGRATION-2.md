@@ -1,7 +1,7 @@
 # Migração 1.x → 2.x (Angular 21+)
 
-> **Status:** `2.0.0-rc.1` publicado em `next`. A 2.0.0 estável só sai após a
-> validação do consumidor no Angular 22.
+> **Status:** **2.0.0 estável** (`latest`), validada pelo consumidor no
+> Angular 22. A 1.2.0 permanece disponível para Angular 18–20.
 
 ## O que muda
 
@@ -19,12 +19,10 @@ têm a mesma API e comportamento da 1.2.0.
 ## Instalação do RC
 
 ```bash
-npm install --save-exact pivot-grid@next
-# ou
-npm install --save-exact pivot-grid@2.0.0-rc.1
+npm install --save-exact pivot-grid@2.0.0
 ```
 
-O `latest` continua apontando para a 1.x estável durante a validação.
+O `latest` aponta para a 2.0.0; a 1.x segue publicada e suportada para Angular 18–20.
 
 ## Zoneless
 
@@ -62,8 +60,8 @@ A demo 2.x tem `@angular/ssr` configurado (`outputMode: server`), com
 5. validar matriz, totais, regras, filtros, templates, virtualização e XLSX;
 6. reportar o resultado para o release estável 2.0.0.
 
-## Gatilho da 2.0.0 estável
+## Validação do estável
 
 - consumidor validado no **Angular 22**;
-- `latest` só é promovido após essa validação;
+- `latest` promovido para 2.0.0;
 - a 1.x continua publicada e suportada para Angular 18–20.

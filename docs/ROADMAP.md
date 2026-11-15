@@ -24,7 +24,7 @@
 | **1.1.0** | Filtros + datas ✅ | filtros por eixo e hierarquia de datas |
 | **1.2.0** | Templates ✅ | templates de célula e cabeçalho |
 | **1.x** | Pós-1.0 | um por minor: templates, redimensionar/reordenar, drill-down, campos calculados, chart, PDF |
-| **2.0.0-rc.1** | Angular 21+ 🧪 | `>=21 <23`, zoneless, SSR/hydration, `next` |
+| **2.0.0** | Angular 21+ ✅ | `>=21 <23`, zoneless, SSR/hydration, `latest` |
 
 ## Escopo fechado da 1.0
 
@@ -56,10 +56,9 @@ remover ou alterar contratos existentes):
 Nenhum tipo/input especulativo é criado antes da implementação da respectiva
 minor.
 
-## 2.0.0 — Angular 21+
+## 2.0.0 — Angular 21+ (estável)
 
-**Pré-requisito** para consumidores que forem para o Angular 21. O gatilho é
-coordenado com o consumidor; a 2.0 não sai antes da validação da 1.x.
+Publicada após a validação do RC pelo consumidor no Angular 22.
 
 - peerDependencies >=21 <22;
 - **zoneless** por padrão, sem dependência de NgZone;

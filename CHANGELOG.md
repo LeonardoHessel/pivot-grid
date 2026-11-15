@@ -6,6 +6,17 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-15
+
+Primeira versão estável da linha Angular 21+. Sem feature nova em relação ao
+RC 2.0.0-rc.1.
+
+### Changed
+
+- RC validado pelo consumidor no **Angular 22** (matriz, totais, regras,
+  células vazias, pt-BR, sticky, XLSX e zero erros de console).
+- Publicação como `latest`; a 1.2.0 permanece disponível para Angular 18–20.
+
 ## [2.0.0-rc.1] - 2026-11-15
 
 Release Candidate da linha Angular 21+, sem feature nova em relação à 1.2.0.
