@@ -339,6 +339,22 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
 - Formatação usa `locale` explícito quando SSR.
 - `loading` e estados são determinísticos no servidor.
 
+### 8.20 Filtros
+
+- `PivotField.filterable` habilita o campo na barra de filtros do componente.
+- `PivotFilter { field, values }` é aplicado **antes** da agregação; `values`
+  vazio significa sem restrição.
+- O componente mantém o estado internamente quando `filters` não é fornecido e
+  emite `filtersChange`.
+
+### 8.21 Hierarquia de datas
+
+- `dateHierarchy: true` expande em ano + mês; um array escolhe os níveis
+  (`year`, `quarter`, `month`, `day`).
+- Aceita `Date`, ISO ou string parseável; valores derivados são strings
+  (`2026`, `Q1`, `01`).
+- Cada nível vira um nível do eixo, mantendo a ordem configurada.
+
 ### 8.18 Virtualização
 
 - `virtualScroll: true` renderiza apenas a janela visível de linhas.

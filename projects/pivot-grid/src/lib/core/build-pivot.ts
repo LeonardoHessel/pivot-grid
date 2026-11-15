@@ -6,7 +6,9 @@ import {
   PivotConfig,
   PivotData,
   PivotDiagnostic,
+  DateLevel,
   PivotField,
+  PivotFilter,
   PivotNode,
   PivotResult,
   PivotSort,
@@ -114,13 +116,88 @@ function normalizeConfig(config: PivotConfig): Normalized {
   };
 }
 
+interface AxisField {
+  field: string;
+  get(record: Record<string, unknown>): unknown;
+  formatter?: (value: unknown) => string;
+}
+
+function parseDate(value: unknown): Date | null {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value;
+  }
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+  return null;
+}
+
+function datePart(value: unknown, level: DateLevel): string | null {
+  const date = parseDate(value);
+  if (!date) {
+    return null;
+  }
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth() + 1;
+  switch (level) {
+    case 'year':
+      return String(year);
+    case 'quarter':
+      return `Q${Math.floor((month - 1) / 3) + 1}`;
+    case 'month':
+      return String(month).padStart(2, '0');
+    case 'day':
+      return String(date.getUTCDate()).padStart(2, '0');
+  }
+}
+
+function toAxisFields(fields: PivotField[]): AxisField[] {
+  const resolved: AxisField[] = [];
+  for (const field of fields) {
+    if (!field.dateHierarchy) {
+      resolved.push({
+        field: field.field,
+        get: (record) => getPath(record, field.field),
+        formatter: field.formatter,
+      });
+      continue;
+    }
+    const levels: DateLevel[] =
+      field.dateHierarchy === true ? ['year', 'month'] : field.dateHierarchy;
+    for (const level of levels) {
+      resolved.push({
+        field: field.field,
+        get: (record) => datePart(getPath(record, field.field), level),
+        formatter: field.formatter,
+      });
+    }
+  }
+  return resolved;
+}
+
+function applyFilters(
+  data: PivotData,
+  filters: PivotFilter[] | undefined,
+): PivotData {
+  if (!filters || filters.length === 0) {
+    return data;
+  }
+  return data.filter((record) =>
+    filters.every(
+      (filter) =>
+        !filter.values?.length ||
+        filter.values.includes(toKey(getPath(record, filter.field))),
+    ),
+  );
+}
 function isExpandedByDefault(level: number, depth: number | 'all'): boolean {
   return depth === 'all' ? true : level < depth;
 }
 
 function buildTree(
   data: PivotData,
-  fields: PivotField[],
+  fields: AxisField[],
   depth: number | 'all',
   diagnostics: PivotDiagnostic[],
 ): Tree {
@@ -151,7 +228,7 @@ function buildTree(
     const path: string[] = [];
 
     fields.forEach((field, level) => {
-      const raw = getPath(record, field.field);
+      const raw = field.get(record);
       if (raw === undefined && !reportedMissing.has(field.field)) {
         reportedMissing.add(field.field);
         diagnostics.push({
@@ -453,6 +530,7 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
   }
 
   const values = normalized.config.values;
+  data = applyFilters(data, normalized.config.filters);
 
   for (const value of values) {
     let invalidCount = 0;
@@ -489,13 +567,13 @@ export function buildPivot(data: PivotData, config: PivotConfig): PivotResult {
 
   const rowTree = buildTree(
     data,
-    normalized.config.rows,
+    toAxisFields(normalized.config.rows),
     normalized.config.defaultExpandDepth ?? 1,
     diagnostics,
   );
   const columnTree = buildTree(
     data,
-    normalized.config.columns,
+    toAxisFields(normalized.config.columns),
     normalized.config.defaultExpandDepth ?? 1,
     diagnostics,
   );
@@ -681,4 +759,5 @@ export class PivotError extends Error {
     this.name = 'PivotError';
   }
 }
+
 

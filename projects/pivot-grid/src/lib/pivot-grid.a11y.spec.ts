@@ -11,7 +11,7 @@ const data: PivotData = [
 
 const config: PivotConfig = {
   rows: [
-    { field: 'region', caption: 'Região' },
+    { field: 'region', caption: 'Região', filterable: true },
     { field: 'city', caption: 'Cidade' },
   ],
   columns: [{ field: 'month', caption: 'Mês' }],
@@ -49,3 +49,4 @@ describe('PivotGridComponent accessibility', () => {
     expect(violations).toEqual([]);
   });
 });
+

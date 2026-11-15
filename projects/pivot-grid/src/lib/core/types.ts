@@ -15,6 +15,13 @@ export type Aggregator =
   | 'count'
   | 'countDistinct';
 
+export type DateLevel = 'year' | 'quarter' | 'month' | 'day';
+
+export interface PivotFilter {
+  field: string;
+  values: string[];
+}
+
 export interface PivotField {
   /** Field name on the record; dotted paths are supported ("customer.region"). */
   field: string;
@@ -22,9 +29,12 @@ export interface PivotField {
   caption?: string;
   /** Fixed width in pixels for leaf columns. */
   width?: number;
-  /** Content alignment. */
   /** Formats the raw header value. */
   formatter?: (value: unknown) => string;
+  /** Expands a date field into levels (e.g. ['year','quarter','month']). */
+  dateHierarchy?: boolean | DateLevel[];
+  /** Enables this field in the component filter bar. */
+  filterable?: boolean;
 }
 
 export interface PivotAuxiliaryValue {
@@ -81,6 +91,8 @@ export interface PivotConfig {
     rows?: PivotSort;
     columns?: PivotSort;
   };
+  /** Filtros aplicados antes da agregação (interseção). */
+  filters?: PivotFilter[];
   conditionalRules?: ConditionalRule[];
   /** Measures aggregated per cell but not rendered (used by rules). */
   auxiliaryValues?: PivotAuxiliaryValue[];
@@ -158,6 +170,8 @@ export interface PivotLabels {
   expand: string;
   collapse: string;
   export: string;
+  /** Optional; default 'Clear filters'. */
+  clearFilters?: string;
 }
 
 export interface PivotExportRow {
@@ -204,6 +218,9 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
+
+
 
 
 

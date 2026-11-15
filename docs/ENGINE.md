@@ -81,6 +81,12 @@ for rowLeaf of rowLeaves:
 Complexidade no pior caso: `O(N × |rows| × |columns|)`; no caso comum
 (hierarquias balanceadas) próxima de `O(N × |columns|)`.
 
+## 4.1 Filtros e hierarquia de datas
+
+- `filters` são aplicados antes de qualquer agregação (interseção dos valores).
+- `dateHierarchy` expande um campo em níveis derivados (ano, trimestre, mês,
+  dia), reaproveitando o mesmo pipeline de agrupamento.
+
 ## 5. Múltiplos valores
 
 Cada item de `values` tem seu próprio acumulador por célula e por total. A

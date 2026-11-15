@@ -6,6 +6,18 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-14
+
+### Added
+
+- Filtros por eixo: `PivotField.filterable`, `PivotConfig.filters`,
+  `PivotFilter`, input `filters` e output `filtersChange`, com barra de filtros
+  no componente.
+- Hierarquia de datas: `PivotField.dateHierarchy` (`year`, `quarter`, `month`,
+  `day`) derivando níveis de um único campo.
+- Exemplo `docs/examples/filtros.md` e rota `/filtros` na demo.
+- Testes de engine e componente para filtros e hierarquia.
+
 ## [1.0.0] - 2026-11-14
 
 Primeira versão estável. Sem feature nova em relação ao RC.

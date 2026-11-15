@@ -319,6 +319,39 @@ describe('buildPivot', () => {
     expect(result.grandTotals.get('amount')?.className).toBe('good');
   });
 
+  it('expands a date hierarchy into multiple levels', () => {
+    const rows = [
+      { region: 'A', date: '2026-01-15', amount: 1 },
+      { region: 'A', date: '2026-04-10', amount: 2 },
+      { region: 'A', date: '2027-02-01', amount: 3 },
+    ];
+    const result = buildPivot(rows, config({
+      rows: [{ field: 'region' }],
+      columns: [{ field: 'date', dateHierarchy: ['year', 'quarter', 'month'] }],
+      values: [{ field: 'amount' }],
+    }));
+
+    expect(result.columnTree.map((node) => node.caption)).toEqual(['2026', '2027']);
+    expect(result.columnTree[0].children.map((node) => node.caption)).toEqual(['Q1', 'Q2']);
+    expect(result.columnTree[0].children[0].children.map((node) => node.caption)).toEqual(['01']);
+    expect(result.columns.length).toBe(3);
+  });
+
+  it('filters records before aggregation', () => {
+    const rows = [
+      { region: 'A', month: '2026-01', amount: 10 },
+      { region: 'B', month: '2026-01', amount: 90 },
+    ];
+    const result = buildPivot(rows, config({
+      rows: [{ field: 'region' }],
+      columns: [{ field: 'month' }],
+      values: [{ field: 'amount' }],
+      filters: [{ field: 'region', values: ['A'] }],
+    }));
+
+    expect(result.rows.map((node) => node.caption)).toEqual(['A']);
+    expect(result.grandTotals.get('amount')?.value).toBe(10);
+  });
   it('exports only visible rows when mode is visible', () => {
     const result = buildPivot(data, config({
       rows: [{ field: 'region' }],
@@ -364,6 +397,7 @@ describe('buildPivot', () => {
     expect(csv.split('\r\n').length).toBeGreaterThan(2);
   });
 });
+
 
 
 

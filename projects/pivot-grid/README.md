@@ -14,7 +14,7 @@ Excel.
 ## Instalação
 
 ```bash
-npm install --save-exact pivot-grid@1.0.0
+npm install --save-exact pivot-grid@1.1.0
 ```
 
 ## Uso

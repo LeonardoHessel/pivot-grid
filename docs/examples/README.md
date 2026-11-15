@@ -13,5 +13,7 @@ na demo.
 - Sticky + teclado: <https://leonardohessel.github.io/pivot-grid/sticky-keyboard>
 - Multi-medida: <https://leonardohessel.github.io/pivot-grid/multi-medida>
 - Virtualização: <https://leonardohessel.github.io/pivot-grid/virtualizacao>
+- Filtros + datas: <https://leonardohessel.github.io/pivot-grid/filtros>
+
 
 

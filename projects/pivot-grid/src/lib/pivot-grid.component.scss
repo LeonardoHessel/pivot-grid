@@ -187,3 +187,44 @@
   overflow: hidden;
 }
 
+
+.pg-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  padding: 8px;
+  border-bottom: 1px solid var(--pg-color-border, #e5e7eb);
+  background: #f8fafc;
+}
+
+.pg-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.pg-filter-label {
+  color: var(--pg-color-muted, #6b7280);
+  font-weight: 600;
+}
+
+.pg-filter-select {
+  min-width: 140px;
+  min-height: 64px;
+  padding: 4px;
+  border: 1px solid var(--pg-color-border, #e5e7eb);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.pg-filter-clear {
+  padding: 6px 10px;
+  border: 1px solid var(--pg-color-border, #e5e7eb);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+

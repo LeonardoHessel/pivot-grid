@@ -15,6 +15,8 @@ import {
 import { buildPivot, cellKey } from './core/build-pivot';
 import { toCsv } from './core/csv';
 import { toXlsx } from './core/xlsx';
+import { getPath } from './core/util';
+import { toKey } from './core/util';
 import type {
   CsvExportOptions,
   XlsxExportOptions,
@@ -24,6 +26,7 @@ import type {
   PivotData,
   PivotExpandEvent,
   PivotExportRow,
+  PivotFilter,
   PivotHeaderEvent,
   PivotLabels,
   PivotNode,
@@ -41,6 +44,7 @@ const DEFAULT_LABELS: PivotLabels = {
   expand: 'Expand',
   collapse: 'Collapse',
   export: 'Export',
+  clearFilters: 'Clear filters',
 };
 
 interface Entry {
@@ -93,10 +97,14 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly expandChange = output<PivotExpandEvent>();
   readonly sortChange = output<{ rows?: PivotSort; columns?: PivotSort }>();
   readonly stateChange = output<PivotState>();
+  readonly filters = input<PivotFilter[] | null>(null);
+  readonly filtersChange = output<PivotFilter[]>();
   readonly exportComplete = output<{ format: 'csv' | 'xlsx'; filename: string }>();
 
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly internalExpanded = signal<Record<string, boolean>>({});
+  private readonly internalFilters = signal<PivotFilter[]>([]);
+  private filtersInitialized = false;
   private readonly scrollTop = signal(0);
   private readonly viewportHeight = signal(0);
   private resizeObserver?: ResizeObserver;
@@ -106,6 +114,14 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
       const state = this.state();
       if (state) {
         this.internalExpanded.set(state.expanded ?? {});
+      }
+    });
+
+    effect(() => {
+      const configFilters = this.config().filters ?? [];
+      if (!this.filtersInitialized) {
+        this.internalFilters.set(configFilters);
+        this.filtersInitialized = true;
       }
     });
   }
@@ -137,7 +153,13 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  readonly result = computed(() => buildPivot(this.data(), this.config()));
+  readonly effectiveFilters = computed(
+    () => this.filters() ?? this.internalFilters(),
+  );
+
+  readonly result = computed(() =>
+    buildPivot(this.data(), { ...this.config(), filters: this.effectiveFilters() }),
+  );
 
   readonly resolvedLabels = computed<PivotLabels>(() => ({
     ...DEFAULT_LABELS,
@@ -527,6 +549,60 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.headerClick.emit({ axis, path: node.path, field: node.field, event });
   }
 
+  readonly filterFields = computed(() =>
+    [...this.config().rows, ...this.config().columns].filter(
+      (field) => field.filterable,
+    ),
+  );
+
+  readonly filterOptions = computed(() =>
+    this.filterFields().map((field) => {
+      const seen = new Set<string>();
+      for (const record of this.data()) {
+        const value = toKey(getPath(record, field.field));
+        if (value !== '') {
+          seen.add(value);
+        }
+      }
+      const values = Array.from(seen)
+        .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }))
+        .slice(0, 500);
+      return {
+        field: field.field,
+        caption: field.caption ?? field.field,
+        values,
+      };
+    }),
+  );
+
+  isFilterValueSelected(field: string, value: string): boolean {
+    return (
+      this.effectiveFilters()
+        .find((filter) => filter.field === field)
+        ?.values.includes(value) ?? false
+    );
+  }
+
+  onFilterChange(field: string, event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const values = Array.from(select.selectedOptions).map((option) => option.value);
+    const next = this.effectiveFilters().filter(
+      (filter) => filter.field !== field && filter.values.length > 0,
+    );
+    if (values.length > 0) {
+      next.push({ field, values });
+    }
+    this.applyFilters(next);
+  }
+
+  clearFilters(): void {
+    this.applyFilters([]);
+  }
+
+  private applyFilters(next: PivotFilter[]): void {
+    this.internalFilters.set(next);
+    this.filtersChange.emit(next);
+  }
   exportRows(): PivotExportRow[] {
     return this.entries().map((entry) => ({
       key: entry.node.key,
@@ -580,6 +656,8 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.stateChange.emit({ expanded: { ...expanded }, sort: this.config().sort });
   }
 }
+
+
 
 
 

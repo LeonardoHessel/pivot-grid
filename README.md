@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** **1.0.0 estável** (`latest`). A linha 2.x será para Angular 21+.
+> **Status:** **1.1.0 estável** (`latest`) — filtros + hierarquia de datas. A linha 2.x será para Angular 21+.
 
 ## Funcionalidades
 
@@ -29,6 +29,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | Exportação Excel (XLSX mínimo) | ✅ implementado |
 | Virtualização (`virtualScroll`, 50k) | ✅ 0.5.0 |
 | Hardening (a11y axe, matriz 18/19/20, orçamentos) | ✅ 0.6.0 |
+| Filtros por eixo + hierarquia de datas | ✅ 1.1.0 |
 | Múltiplos valores (`values[]`) | ✅ 0.4.0 |
 | Painel de campos / filtros | ⏳ v1.2 |
 
@@ -44,6 +45,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, commits e release |
 | [Releases](docs/RELEASES.md) | Regras, gate e passo a passo de publicação |
 | [Migração](docs/MIGRATION.md) | Rename e remoções da 0.9.0 |
+| [Migração 2.x](docs/MIGRATION-2.md) | Plano 1.x → 2.x (Angular 21+) |
 | [Compatibilidade](docs/COMPATIBILITY.md) | Angular 18/19/20 e toolchain |
 | [Performance](docs/PERFORMANCE.md) | Orçamentos de 10k/50k no CI |
 | [Exemplos](docs/examples/README.md) | Um exemplo por funcionalidade (sticky/teclado) |
@@ -51,7 +53,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 ## Uso
 
 ```bash
-npm install --save-exact pivot-grid@1.0.0
+npm install --save-exact pivot-grid@1.1.0
 ```
 
 > `latest` aponta para a 1.0.0 estável; `next` permanece no RC 0.9.0.
@@ -88,12 +90,13 @@ export class ReportComponent {
 - Sticky + teclado: <https://leonardohessel.github.io/pivot-grid/sticky-keyboard>
 - Multi-medida: <https://leonardohessel.github.io/pivot-grid/multi-medida>
 - Virtualização: <https://leonardohessel.github.io/pivot-grid/virtualizacao>
+- Filtros + datas: <https://leonardohessel.github.io/pivot-grid/filtros>
 
 ## Distribuição
 
 - Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
 - Publicação **somente no npm**, com versão pinada no consumidor
-  (`npm install --save-exact pivot-grid@1.0.0`); sem URL de git.
+  (`npm install --save-exact pivot-grid@1.1.0`); sem URL de git.
 - Release por tag `vX.Y.Z` (workflow `publish.yml`), com
   `publishConfig.access = public` e checagem de versão da tag.
 - Licença MIT (`LICENSE` na raiz e no pacote).
@@ -117,6 +120,7 @@ npm test               # testes
 ## Licença
 
 MIT © Leonardo Hessel
+
 
 
 

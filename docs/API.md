@@ -30,6 +30,13 @@ export type PivotData = readonly Record<string, unknown>[];
 export type Aggregator =
   | 'sum' | 'avg' | 'min' | 'max' | 'count' | 'countDistinct';
 
+export type DateLevel = 'year' | 'quarter' | 'month' | 'day';
+
+export interface PivotFilter {
+  field: string;
+  values: string[];
+}
+
 export interface PivotField {
   /** Campo no registro; aceita caminho com ponto: "customer.region". */
   field: string;
@@ -39,6 +46,10 @@ export interface PivotField {
   width?: number;
   /** Formata o valor bruto do cabeçalho. */
   formatter?: (value: unknown) => string;
+  /** Expande um campo de data em níveis. */
+  dateHierarchy?: boolean | DateLevel[];
+  /** Habilita o campo na barra de filtros. */
+  filterable?: boolean;
 }
 
 export interface PivotAuxiliaryValue {
@@ -84,6 +95,8 @@ export interface PivotConfig {
   emptyText?: string;                  // default ''
   locale?: string;                     // default navigator.language
   sort?: { rows?: PivotSort; columns?: PivotSort };
+  /** Filtros aplicados antes da agregação. */
+  filters?: PivotFilter[];
   conditionalRules?: ConditionalRule[];
   /** Medidas agregadas por célula mas não renderizadas (usadas por `measure`). */
   auxiliaryValues?: PivotAuxiliaryValue[];
@@ -176,6 +189,7 @@ export class PivotGridComponent {}
 | `virtualOverscan` | `number` | não | `5` | Linhas extras acima/abaixo da janela |
 | `density` | `'compact' \| 'default' \| 'comfortable'` | não | `'default'` | Densidade visual |
 | `labels` | `Partial<PivotLabels>` | não | `{}` | Textos/i18n |
+| `filters` | `PivotFilter[] \| null` | não | `null` | Filtros controlados (barra) |
 
 ### 4.2 Outputs
 
@@ -186,6 +200,7 @@ export class PivotGridComponent {}
 | `expandChange` | `PivotExpandEvent` |
 | `sortChange` | `{ rows?: PivotSort; columns?: PivotSort }` |
 | `stateChange` | `PivotState` |
+| `filtersChange` | `PivotFilter[]` |
 | `exportComplete` | `{ format: 'csv' \| 'xlsx'; filename: string }` |
 
 ```ts
@@ -419,6 +434,8 @@ Superfície estável — somente o que sai de `public-api.ts`:
 - `PivotState`
 - `PivotValueField`
 - `XlsxExportOptions`
+- `DateLevel`
+- `PivotFilter`
 
 ## 11. Exemplos
 

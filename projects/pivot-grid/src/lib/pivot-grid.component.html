@@ -11,6 +11,29 @@
     </div>
   }
 
+  @if (filterFields().length > 0) {
+    <div class="pg-filters">
+      @for (option of filterOptions(); track option.field) {
+        <label class="pg-filter">
+          <span class="pg-filter-label">{{ option.caption }}</span>
+          <select
+            class="pg-filter-select"
+            multiple
+            (change)="onFilterChange(option.field, $event)"
+          >
+            @for (value of option.values; track value) {
+              <option [value]="value" [selected]="isFilterValueSelected(option.field, value)">
+                {{ value }}
+              </option>
+            }
+          </select>
+        </label>
+      }
+      <button type="button" class="pg-filter-clear" (click)="clearFilters()">
+        {{ resolvedLabels().clearFilters }}
+      </button>
+    </div>
+  }
   @if (result().rows.length === 0 && !loading()) {
     <div class="pg-empty">{{ resolvedLabels().noData }}</div>
   } @else {
@@ -251,4 +274,5 @@
     </div>
   }
 </div>
+
 

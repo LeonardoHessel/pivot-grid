@@ -193,11 +193,39 @@ describe('PivotGridComponent', () => {
     expect(element.querySelectorAll('tr.pg-spacer').length).toBeGreaterThan(0);
     expect(fixture.componentInstance.exportRows().length).toBe(200);
   });
+  it('renders the filter bar and filters by a row field', () => {
+    const fixture = create({
+      ...config,
+      rows: [{ field: 'region', caption: 'Região', filterable: true }],
+      columns: [{ field: 'month', caption: 'Mês' }],
+      values: [{ field: 'amount', caption: 'Total' }],
+    });
+    const element: HTMLElement = fixture.nativeElement;
+    const select = element.querySelector('.pg-filter-select') as HTMLSelectElement;
+    const emitted: unknown[] = [];
+    fixture.componentInstance.filtersChange.subscribe((filters) => emitted.push(filters));
+
+    expect(select).toBeTruthy();
+    const sul = Array.from(select.options).find((option) => option.value === 'Sul');
+    expect(sul).toBeTruthy();
+    if (sul) {
+      sul.selected = true;
+    }
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(emitted.length).toBe(1);
+    expect(fixture.componentInstance.entries().map((entry) => entry.node.caption)).toEqual([
+      'Sul',
+    ]);
+  });
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
+
 
 
 
