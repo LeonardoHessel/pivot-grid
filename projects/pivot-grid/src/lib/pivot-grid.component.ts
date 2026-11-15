@@ -1,4 +1,4 @@
-import { NgClass } from '@angular/common';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -10,6 +10,7 @@ import {
   input,
   output,
   OnDestroy,
+  TemplateRef,
   signal,
 } from '@angular/core';
 import { buildPivot, cellKey } from './core/build-pivot';
@@ -22,6 +23,8 @@ import type {
   XlsxExportOptions,
   PivotCell,
   PivotCellEvent,
+  PivotCellTemplateContext,
+  PivotHeaderTemplateContext,
   PivotConfig,
   PivotData,
   PivotExpandEvent,
@@ -72,7 +75,7 @@ function toCssSize(value: string | number): string {
 @Component({
   selector: 'pg-pivot-grid',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './pivot-grid.component.html',
   styleUrl: './pivot-grid.component.scss',
@@ -98,6 +101,8 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly sortChange = output<{ rows?: PivotSort; columns?: PivotSort }>();
   readonly stateChange = output<PivotState>();
   readonly filters = input<PivotFilter[] | null>(null);
+  readonly cellTemplate = input<TemplateRef<PivotCellTemplateContext> | null>(null);
+  readonly headerTemplate = input<TemplateRef<PivotHeaderTemplateContext> | null>(null);
   readonly filtersChange = output<PivotFilter[]>();
   readonly exportComplete = output<{ format: 'csv' | 'xlsx'; filename: string }>();
 
@@ -603,6 +608,36 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.internalFilters.set(next);
     this.filtersChange.emit(next);
   }
+  cellContext(
+    rowPath: string[],
+    columnPath: string[],
+    field: string,
+    cell: PivotCell,
+  ): PivotCellTemplateContext {
+    return {
+      $implicit: cell,
+      rowPath,
+      columnPath,
+      field,
+      value: cell.value,
+      formatted: cell.formatted,
+      cell,
+    };
+  }
+
+  headerContext(
+    axis: 'row' | 'column',
+    node: PivotNode,
+  ): PivotHeaderTemplateContext {
+    return {
+      $implicit: node,
+      axis,
+      path: node.path,
+      field: node.field,
+      label: node.caption,
+      node,
+    };
+  }
   exportRows(): PivotExportRow[] {
     return this.entries().map((entry) => ({
       key: entry.node.key,
@@ -656,6 +691,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.stateChange.emit({ expanded: { ...expanded }, sort: this.config().sort });
   }
 }
+
 
 
 

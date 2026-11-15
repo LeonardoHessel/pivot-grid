@@ -67,7 +67,14 @@
                   [attr.colspan]="cell.colspan * values().length"
                   (click)="onHeaderClick('column', cell.node, $event)"
                 >
-                  {{ cell.node.caption }}
+                  @if (headerTemplate()) {
+                    <ng-container
+                      [ngTemplateOutlet]="headerTemplate()"
+                      [ngTemplateOutletContext]="headerContext('column', cell.node)"
+                    />
+                  } @else {
+                    {{ cell.node.caption }}
+                  }
                 </th>
               }
               @if ($index === 0 && showRowTotals()) {
@@ -154,7 +161,14 @@
                         } @else {
                           <span class="pg-expander-spacer"></span>
                         }
-                        <span class="pg-rowheader-label">{{ node.caption }}</span>
+                        @if (headerTemplate()) {
+                          <ng-container
+                            [ngTemplateOutlet]="headerTemplate()"
+                            [ngTemplateOutletContext]="headerContext('row', node)"
+                          />
+                        } @else {
+                          <span class="pg-rowheader-label">{{ node.caption }}</span>
+                        }
                       </span>
                     }
                   </th>
@@ -185,7 +199,14 @@
                         } @else {
                           <span class="pg-expander-spacer"></span>
                         }
-                        <span class="pg-rowheader-label">{{ cell.node.caption }}</span>
+                        @if (headerTemplate()) {
+                          <ng-container
+                            [ngTemplateOutlet]="headerTemplate()"
+                            [ngTemplateOutletContext]="headerContext('row', cell.node)"
+                          />
+                        } @else {
+                          <span class="pg-rowheader-label">{{ cell.node.caption }}</span>
+                        }
                       </span>
                     </th>
                   }
@@ -194,6 +215,7 @@
 
               @for (column of result().columns; track column.key; let columnIndex = $index) {
                 @for (value of values(); track value.field; let valueIndex = $index) {
+                  @let cell = cellFor(entry.entry, column, value.field);
                   <td
                     class="pg-cell"
                     [attr.data-r]="rowIndex"
@@ -201,23 +223,38 @@
                     [attr.tabindex]="rowIndex === 0 && columnIndex === 0 && valueIndex === 0 ? 0 : -1"
                     [attr.aria-colindex]="rowFieldCount() + columnIndex * values().length + valueIndex + 1"
                     [attr.aria-rowindex]="rowIndex + 2"
-                    [ngClass]="cellFor(entry.entry, column, value.field)?.className"
-                    [style]="cellFor(entry.entry, column, value.field)?.style"
-                    (click)="onCellClick(entry.entry, column, cellFor(entry.entry, column, value.field), $event)"
+                    [ngClass]="cell?.className"
+                    [style]="cell?.style"
+                    (click)="onCellClick(entry.entry, column, cell, $event)"
                   >
-                    {{ cellFor(entry.entry, column, value.field)?.formatted ?? '' }}
+                    @if (cellTemplate() && cell) {
+                      <ng-container
+                        [ngTemplateOutlet]="cellTemplate()"
+                        [ngTemplateOutletContext]="cellContext(entry.entry.node.path, column.path, value.field, cell)"
+                      />
+                    } @else {
+                      {{ cell?.formatted ?? '' }}
+                    }
                   </td>
                 }
               }
 
               @if (showRowTotals()) {
                 @for (value of values(); track value.field) {
+                  @let total = rowTotalFor(entry.entry, value.field);
                   <td
                     class="pg-cell pg-total"
-                    [ngClass]="rowTotalFor(entry.entry, value.field)?.className"
-                    [style]="rowTotalFor(entry.entry, value.field)?.style"
+                    [ngClass]="total?.className"
+                    [style]="total?.style"
                   >
-                    {{ rowTotalFor(entry.entry, value.field)?.formatted ?? '' }}
+                    @if (cellTemplate() && total) {
+                      <ng-container
+                        [ngTemplateOutlet]="cellTemplate()"
+                        [ngTemplateOutletContext]="cellContext(entry.entry.node.path, [], value.field, total)"
+                      />
+                    } @else {
+                      {{ total?.formatted ?? '' }}
+                    }
                   </td>
                 }
               }
@@ -237,19 +274,35 @@
               </th>
               @for (column of result().columns; track column.key) {
                 @for (value of values(); track value.field) {
+                  @let total = columnTotalFor(column, value.field);
                   <td
                     class="pg-cell pg-total"
-                    [ngClass]="columnTotalFor(column, value.field)?.className"
-                    [style]="columnTotalFor(column, value.field)?.style"
+                    [ngClass]="total?.className"
+                    [style]="total?.style"
                   >
-                    {{ columnTotalFor(column, value.field)?.formatted ?? '' }}
+                    @if (cellTemplate() && total) {
+                      <ng-container
+                        [ngTemplateOutlet]="cellTemplate()"
+                        [ngTemplateOutletContext]="cellContext([], column.path, value.field, total)"
+                      />
+                    } @else {
+                      {{ total?.formatted ?? '' }}
+                    }
                   </td>
                 }
               }
               @if (showRowTotals()) {
                 @for (value of values(); track value.field) {
+                  @let total = grandTotalFor(value.field);
                   <td class="pg-cell pg-total pg-grand-total">
-                    {{ grandTotalFor(value.field)?.formatted ?? '' }}
+                    @if (cellTemplate() && total) {
+                      <ng-container
+                        [ngTemplateOutlet]="cellTemplate()"
+                        [ngTemplateOutletContext]="cellContext([], [], value.field, total)"
+                      />
+                    } @else {
+                      {{ total?.formatted ?? '' }}
+                    }
                   </td>
                 }
               }
@@ -260,11 +313,19 @@
                 {{ resolvedLabels().grandTotal }}
               </th>
               @for (value of values(); track value.field) {
+                @let total = grandTotalFor(value.field);
                 <td
                   class="pg-cell pg-total pg-grand-total"
                   [attr.colspan]="result().columns.length"
                 >
-                  {{ grandTotalFor(value.field)?.formatted ?? '' }}
+                  @if (cellTemplate() && total) {
+                    <ng-container
+                      [ngTemplateOutlet]="cellTemplate()"
+                      [ngTemplateOutletContext]="cellContext([], [], value.field, total)"
+                    />
+                  } @else {
+                    {{ total?.formatted ?? '' }}
+                  }
                 </td>
               }
             </tr>
@@ -274,5 +335,8 @@
     </div>
   }
 </div>
+
+
+
 
 

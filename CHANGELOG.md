@@ -6,6 +6,16 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-14
+
+### Added
+
+- `cellTemplate` e `headerTemplate` opcionais, com contexto tipado
+  (`PivotCellTemplateContext` / `PivotHeaderTemplateContext`).
+- Templates aplicados a células de dados e totais; cabeçalhos de linha e coluna.
+- Exemplo `docs/examples/templates.md` e rota `/templates` na demo.
+- Teste de componente com templates customizados.
+
 ## [1.1.0] - 2026-11-14
 
 ### Added

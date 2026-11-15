@@ -111,6 +111,24 @@ export interface PivotNode {
   aggregates: Record<string, number | null>;
 }
 
+export interface PivotCellTemplateContext {
+  $implicit: PivotCell;
+  rowPath: string[];
+  columnPath: string[];
+  field: string;
+  value: number | null;
+  formatted: string;
+  cell: PivotCell;
+}
+
+export interface PivotHeaderTemplateContext {
+  $implicit: PivotNode;
+  axis: 'row' | 'column';
+  path: string[];
+  field: string;
+  label: string;
+  node: PivotNode;
+}
 export interface PivotCell {
   rowPath: string[];
   columnPath: string[];
@@ -218,6 +236,7 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
 
 
 

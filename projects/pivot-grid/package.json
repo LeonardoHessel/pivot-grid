@@ -1,6 +1,6 @@
 {
   "name": "pivot-grid",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Angular pivot grid component: multi-level rows, dynamic columns, aggregation, totals and export.",
   "keywords": [
     "angular",

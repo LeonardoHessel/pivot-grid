@@ -4,6 +4,7 @@ import { StickyKeyboardComponent } from './examples/sticky-keyboard.component';
 import { MultiMeasureComponent } from './examples/multi-measure.component';
 import { VirtualizationComponent } from './examples/virtualization.component';
 import { FiltersComponent } from './examples/filters.component';
+import { TemplatesComponent } from './examples/templates.component';
 
 export const routes: Routes = [
   { path: '', component: BasicComponent },
@@ -11,8 +12,10 @@ export const routes: Routes = [
   { path: 'multi-medida', component: MultiMeasureComponent },
   { path: 'virtualizacao', component: VirtualizationComponent },
   { path: 'filtros', component: FiltersComponent },
+  { path: 'templates', component: TemplatesComponent },
   { path: '**', redirectTo: '' },
 ];
+
 
 
 

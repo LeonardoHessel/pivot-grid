@@ -190,6 +190,8 @@ export class PivotGridComponent {}
 | `density` | `'compact' \| 'default' \| 'comfortable'` | não | `'default'` | Densidade visual |
 | `labels` | `Partial<PivotLabels>` | não | `{}` | Textos/i18n |
 | `filters` | `PivotFilter[] \| null` | não | `null` | Filtros controlados (barra) |
+| `cellTemplate` | `TemplateRef<PivotCellTemplateContext> \| null` | não | `null` | Template da célula |
+| `headerTemplate` | `TemplateRef<PivotHeaderTemplateContext> \| null` | não | `null` | Template do cabeçalho |
 
 ### 4.2 Outputs
 
@@ -314,6 +316,29 @@ export class ReportComponent {
 }
 ```
 
+## 4.5 Templates
+
+`cellTemplate` recebe `PivotCellTemplateContext` e `headerTemplate` recebe
+`PivotHeaderTemplateContext`. Sem template, o layout padrão é mantido. Os
+templates de célula também valem para totais (linha, coluna e geral).
+
+```html
+<pg-pivot-grid
+  [data]="rows"
+  [config]="config"
+  [cellTemplate]="cellTpl"
+  [headerTemplate]="headerTpl">
+</pg-pivot-grid>
+
+<ng-template #cellTpl let-formatted="formatted" let-value="value">
+  <strong [class.high]="value !== null && value > 180">{{ formatted }}</strong>
+</ng-template>
+
+<ng-template #headerTpl let-label="label" let-axis="axis">
+  {{ axis }}: {{ label }}
+</ng-template>
+```
+
 ## 5. Exportação
 
 ```ts
@@ -364,6 +389,24 @@ Classes estáveis: `.pg-root`, `.pg-table`, `.pg-header`, `.pg-header-cell`,
 ## 7. Rótulos
 
 ```ts
+export interface PivotCellTemplateContext {
+  $implicit: PivotCell;
+  rowPath: string[];
+  columnPath: string[];
+  field: string;
+  value: number | null;
+  formatted: string;
+  cell: PivotCell;
+}
+
+export interface PivotHeaderTemplateContext {
+  $implicit: PivotNode;
+  axis: 'row' | 'column';
+  path: string[];
+  field: string;
+  label: string;
+  node: PivotNode;
+}
 export interface PivotLabels {
   grandTotal: string;   // 'Grand total'
   rowTotal: string;     // 'Row total'
@@ -436,10 +479,13 @@ Superfície estável — somente o que sai de `public-api.ts`:
 - `XlsxExportOptions`
 - `DateLevel`
 - `PivotFilter`
+- `PivotCellTemplateContext`
+- `PivotHeaderTemplateContext`
 
 ## 11. Exemplos
 
 - [docs/examples/sticky-keyboard.md](./examples/sticky-keyboard.md) — row headers fixos e teclado.
 - [docs/examples/](./examples/README.md) — índice por funcionalidade.
+
 
 

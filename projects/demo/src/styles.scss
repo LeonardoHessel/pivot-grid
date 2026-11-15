@@ -92,3 +92,32 @@ main {
   border-radius: 8px;
   padding: 12px;
 }
+
+.tpl-cell {
+  font-variant-numeric: tabular-nums;
+}
+
+.tpl-cell--high {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.tpl-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tpl-header-axis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: #2563eb;
+}
+

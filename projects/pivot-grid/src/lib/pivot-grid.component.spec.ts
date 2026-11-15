@@ -1,3 +1,4 @@
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { PivotGridComponent } from './pivot-grid.component';
 import { PivotConfig, PivotData } from './core/types';
@@ -23,6 +24,31 @@ const config: PivotConfig = {
   locale: 'pt-BR',
 };
 
+@Component({
+  selector: 'app-template-host',
+  standalone: true,
+  imports: [PivotGridComponent],
+  template: `
+    <pg-pivot-grid
+      [data]="data"
+      [config]="config"
+      [cellTemplate]="cellTpl"
+      [headerTemplate]="headerTpl">
+    </pg-pivot-grid>
+
+    <ng-template #cellTpl let-formatted="formatted" let-value="value" let-field="field">
+      <span class="custom-cell" [attr.data-field]="field">{{ formatted }}|{{ value }}</span>
+    </ng-template>
+
+    <ng-template #headerTpl let-label="label" let-axis="axis">
+      <span class="custom-header" [attr.data-axis]="axis">{{ axis }}:{{ label }}</span>
+    </ng-template>
+  `,
+})
+class TemplateHostComponent {
+  readonly data = data;
+  readonly config = config;
+}
 describe('PivotGridComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -219,11 +245,27 @@ describe('PivotGridComponent', () => {
       'Sul',
     ]);
   });
+  it('renders custom cell and header templates', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ imports: [TemplateHostComponent] });
+    const fixture = TestBed.createComponent(TemplateHostComponent);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+
+    expect(element.querySelectorAll('.custom-cell').length).toBeGreaterThan(0);
+    expect(element.querySelectorAll('.custom-header').length).toBeGreaterThan(0);
+    expect(element.querySelector('.custom-header')?.getAttribute('data-axis')).toMatch(
+      /row|column/,
+    );
+    expect(element.querySelector('.custom-cell')?.textContent).toContain('|');
+  });
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
+
 
 
 
