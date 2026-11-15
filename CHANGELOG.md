@@ -6,6 +6,19 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.0.0-rc.1] - 2026-11-15
+
+Release Candidate da linha Angular 21+, sem feature nova em relação à 1.2.0.
+
+### Changed
+
+- `peerDependencies` para `>=21 <23`.
+- Demo **zoneless** por padrão (`provideZonelessChangeDetection`, sem `zone.js`).
+- Demo com **SSR/hydration** (`@angular/ssr`, `outputMode: server`,
+  prerender de rotas estáticas e `provideClientHydration`).
+- Matriz de compatibilidade testada em Angular **21 e 22**.
+- Guia de migração 1.x → 2.x em `docs/MIGRATION-2.md`.
+
 ## [1.2.0] - 2026-11-14
 
 ### Added

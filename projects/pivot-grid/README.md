@@ -4,7 +4,7 @@ Componente de **tabela dinâmica (pivot)** para Angular: linhas multi-nível,
 colunas dinâmicas, agregação, totais, formatação condicional, exportação CSV e
 Excel.
 
-- Angular **18, 19 ou 20**
+- Angular **21 ou 22** (linha 2.x RC); Angular 18–20 na linha 1.x
 - Sem dependências de runtime (além de `tslib`)
 - Standalone component, `OnPush`, API baseada em signals
 - Acessível (roles ARIA, `aria-sort`, expandir/colapsar via botão)
@@ -14,7 +14,7 @@ Excel.
 ## Instalação
 
 ```bash
-npm install --save-exact pivot-grid@1.2.0
+npm install --save-exact pivot-grid@next
 ```
 
 ## Uso

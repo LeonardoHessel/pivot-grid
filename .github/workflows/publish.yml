@@ -44,14 +44,14 @@ jobs:
       - name: Publish (trusted publishing / OIDC)
         run: |
           TAG=latest
-          case "$GITHUB_REF_NAME" in v0.9.*) TAG=next ;; esac
+          case "$GITHUB_REF_NAME" in *-rc.*|v0.9.*) TAG=next ;; esac
           npm publish ./dist/pivot-grid --access public --provenance --tag "$TAG"
 
       - name: Verify published version
         run: |
           PKG_VERSION=$(node -p "require('./dist/pivot-grid/package.json').version")
           EXPECTED_TAG=latest
-          case "$GITHUB_REF_NAME" in v0.9.*) EXPECTED_TAG=next ;; esac
+          case "$GITHUB_REF_NAME" in *-rc.*|v0.9.*) EXPECTED_TAG=next ;; esac
           for i in $(seq 1 30); do
             TAG_VALUE=$(npm view "pivot-grid" "dist-tags.$EXPECTED_TAG" 2>/dev/null || true)
             if [ "$TAG_VALUE" = "$PKG_VERSION" ]; then
@@ -62,3 +62,4 @@ jobs:
           done
           echo "dist-tag $EXPECTED_TAG does not point to $PKG_VERSION"
           exit 1
+

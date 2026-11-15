@@ -1,45 +1,69 @@
 # Migração 1.x → 2.x (Angular 21+)
 
-> **Status:** planejamento. A 2.0.0 só é publicada quando o consumidor estiver
-> pronto para o Angular 21; o gatilho é coordenado com o consumidor.
+> **Status:** `2.0.0-rc.1` publicado em `next`. A 2.0.0 estável só sai após a
+> validação do consumidor no Angular 22.
 
-## Objetivo
-
-Suportar Angular **21+** com peer `>=21 <22`, mantendo a API pública estável da
-1.x sempre que possível. Mudanças de contrato só entram em 2.0 e são listadas
-aqui.
-
-## Escopo planejado
-
-- `peerDependencies` de `@angular/core`/`@angular/common` para `>=21 <22`.
-- **Zoneless** como modo padrão; remover dependência de `NgZone`.
-- SSR/hydration: nenhum acesso a `window`/`document` em tempo de construção,
-  medições somente no browser, `afterNextRender` onde necessário.
-- Revisão de APIs modernas do Angular 21 (control flow, signals, standalone).
-- Limpeza de APIs internas que não fazem mais sentido.
-- Matriz de compatibilidade 21+ no CI.
-
-## Passos previstos
-
-1. validar a 1.x com o consumidor no Angular 20 (linha atual);
-2. quando o consumidor planejar o Angular 21, cortar a branch `2.x`;
-3. subir peers/toolchain para Angular 21, rodar matriz de CI;
-4. substituir `NgZone` por estratégias zoneless e validar eventos/scroll;
-5. habilitar SSR/hydration no demo e validar;
-6. congelar API 2.0, publicar RC com `next` e depois `latest`;
-7. atualizar este guia com o diff final 1.x → 2.x.
-
-## Compatibilidade
+## O que muda
 
 | Item | 1.x | 2.x |
 |---|---|---|
-| Angular | `>=18 <21` | `>=21 <22` |
-| Zoneless | opcional | padrão |
-| SSR/hydration | não suportado oficialmente | suportado |
-| API | congelada na 1.0 | congelada na 2.0 |
+| Angular | `>=18 <21` | **`>=21 <23`** |
+| Zoneless | opcional | **padrão** |
+| SSR/hydration | não suportado oficialmente | **suportado** |
+| API pública | congelada na 1.0 | **sem mudanças** |
 
-## O que não muda
+Não há feature nova na 2.0: linhas, colunas, agregadores, múltiplos valores,
+totais, filtros, hierarquia de datas, templates, virtualização e exports CSV/XLSX
+têm a mesma API e comportamento da 1.2.0.
 
-- Nome do pacote (`pivot-grid`), licença MIT e formato de distribuição.
-- Modelo de dados (`PivotConfig`, `PivotResult`) e exports públicos, salvo
-  remoções explicitamente documentadas na 2.0.
+## Instalação do RC
+
+```bash
+npm install --save-exact pivot-grid@next
+# ou
+npm install --save-exact pivot-grid@2.0.0-rc.1
+```
+
+O `latest` continua apontando para a 1.x estável durante a validação.
+
+## Zoneless
+
+A demo 2.x usa `provideZonelessChangeDetection()` e não inclui `zone.js` no
+bundle da aplicação. O componente não depende de `NgZone`.
+
+Para migrar um app existente:
+
+```diff
+- bootstrapApplication(AppComponent, {
+-   providers: [provideZoneChangeDetection({ eventCoalescing: true })],
+- });
++ bootstrapApplication(AppComponent, {
++   providers: [provideZonelessChangeDetection()],
++ });
+```
+
+Remova `zone.js` dos polyfills da aplicação.
+
+## SSR/hydration
+
+A demo 2.x tem `@angular/ssr` configurado (`outputMode: server`), com
+`provideClientHydration(withEventReplay())` e prerender das rotas estáticas.
+
+- o componente não acessa `window`/`document` na construção;
+- medições de viewport usam `ResizeObserver` apenas no browser;
+- SSR/hydration não exige mudanças de API no consumidor.
+
+## Passos de upgrade
+
+1. atualizar o app para **Angular 21** (ou 22);
+2. instalar `pivot-grid@next` com versão exata;
+3. remover `zone.js` e usar `provideZonelessChangeDetection`;
+4. se usar SSR, configurar `@angular/ssr` + `provideClientHydration`;
+5. validar matriz, totais, regras, filtros, templates, virtualização e XLSX;
+6. reportar o resultado para o release estável 2.0.0.
+
+## Gatilho da 2.0.0 estável
+
+- consumidor validado no **Angular 22**;
+- `latest` só é promovido após essa validação;
+- a 1.x continua publicada e suportada para Angular 18–20.

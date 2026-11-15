@@ -2,14 +2,23 @@
 
 ## Versões suportadas
 
+## Linha 1.x (estável)
+
 | Angular | Situação | Como é validado |
 |---|---|---|
-| **18** | suportado | app consumidor criado no CI (`compat.yml`) |
-| **19** | suportado | app consumidor criado no CI (`compat.yml`) |
-| **20** | suportado | app consumidor criado no CI (`compat.yml`) |
-| 21+ | planejado | linha **2.x** (sem data) |
+| **18** | suportado | app consumidor criado no CI (`compat.yml` na `main`) |
+| **19** | suportado | app consumidor criado no CI (`compat.yml` na `main`) |
+| **20** | suportado | app consumidor criado no CI (`compat.yml` na `main`) |
 
-`peerDependencies`: `@angular/core` e `@angular/common` `>=18.0.0 <21.0.0`.
+## Linha 2.x (RC)
+
+| Angular | Situação | Como é validado |
+|---|---|---|
+| **21** | RC | app consumidor no CI (`compat.yml` na branch `2.x`) |
+| **22** | RC | app consumidor no CI (`compat.yml` na branch `2.x`) |
+
+`peerDependencies` da 1.x: `>=18.0.0 <21.0.0`.
+`peerDependencies` da 2.x: `>=21.0.0 <23.0.0`.
 
 ## Toolchain de desenvolvimento
 

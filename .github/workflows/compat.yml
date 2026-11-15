@@ -2,7 +2,7 @@ name: Compatibility
 
 on:
   push:
-    branches: [main]
+    branches: [main, 2.x]
   pull_request:
   workflow_dispatch:
 
@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        angular: [18, 19, 20]
+        angular: [21, 22]
     steps:
       - uses: actions/checkout@v5
 
@@ -44,3 +44,4 @@ jobs:
       - name: Build consumer
         working-directory: ${{ runner.temp }}/consumer
         run: npx ng build
+

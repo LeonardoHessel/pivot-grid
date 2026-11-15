@@ -24,7 +24,7 @@
 | **1.1.0** | Filtros + datas ✅ | filtros por eixo e hierarquia de datas |
 | **1.2.0** | Templates ✅ | templates de célula e cabeçalho |
 | **1.x** | Pós-1.0 | um por minor: templates, redimensionar/reordenar, drill-down, campos calculados, chart, PDF |
-| **2.0.0** | Angular 21+ | base `>=21`, zoneless, SSR/hydration |
+| **2.0.0-rc.1** | Angular 21+ 🧪 | `>=21 <23`, zoneless, SSR/hydration, `next` |
 
 ## Escopo fechado da 1.0
 
