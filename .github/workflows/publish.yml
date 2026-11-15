@@ -45,7 +45,12 @@ jobs:
         run: |
           TAG=latest
           case "$GITHUB_REF_NAME" in *-rc.*|v0.9.*) TAG=next ;; esac
-          npm publish ./dist/pivot-grid --access public --provenance --tag "$TAG"
+          PKG_VERSION=$(node -p "require('./dist/pivot-grid/package.json').version")
+          if npm view "pivot-grid@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "pivot-grid@$PKG_VERSION already published; skipping publish"
+          else
+            npm publish ./dist/pivot-grid --access public --provenance --tag "$TAG"
+          fi
 
       - name: Verify published version
         run: |
@@ -62,4 +67,5 @@ jobs:
           done
           echo "dist-tag $EXPECTED_TAG does not point to $PKG_VERSION"
           exit 1
+
 
