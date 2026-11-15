@@ -2,7 +2,7 @@ name: Demo
 
 on:
   push:
-    branches: [main]
+    branches: [main, 2.x]
   workflow_dispatch:
 
 permissions:
@@ -55,6 +55,7 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
 
 
 
