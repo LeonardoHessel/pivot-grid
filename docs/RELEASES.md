@@ -82,6 +82,16 @@ npm view pivot-grid version
 - **Estável**: publicar em `latest` com a matriz da linha e docs atualizadas.
 - A `latest` só muda após o gate da versão estável.
 
+## Patch somente de documentação
+
+O npm é imutável: uma versão publicada não pode ser substituída. Quando apenas
+o README do pacote/documentação muda, é necessário publicar um **patch**. Esse
+patch não altera código, API nem comportamento e deve declarar isso no
+`CHANGELOG` e nas release notes.
+
+- **2.1.1**: exclusivamente documentação (README do pacote e docs), sem
+  mudanças de código.
+
 ## Exceção
 
 Correção de tipos urgente: publicar **patch** apenas com a correção mínima,

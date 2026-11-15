@@ -15,7 +15,7 @@ datas, templates, virtualização e exportação CSV/XLSX.
 ## Instalação
 
 ```bash
-npm install --save-exact pivot-grid@2.1.0
+npm install --save-exact pivot-grid@2.1.1
 ```
 
 ## Uso

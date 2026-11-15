@@ -6,6 +6,18 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-11-15
+
+### Documentation
+
+- Revisão completa da documentação para o estado atual (2.x Angular 21/22 e
+  linha 1.x Angular 18–20): README raiz e do pacote, política de releases,
+  compatibilidade, contribuição, integração, roadmap, especificação, API e
+  guias de migração.
+- **Versão apenas de documentação**: nenhuma mudança de código, API ou
+  comportamento. Publicada porque o README do pacote (exibido no npm) só é
+  atualizado com uma nova versão.
+
 ## [2.1.0] - 2026-11-15
 
 ### Added

@@ -15,11 +15,12 @@ datas, templates, virtualização e exportação CSV/XLSX.
 
 | Linha | Angular | Versão atual | Situação |
 |---|---|---|---|
-| **2.x** | **21 e 22** (`>=21 <23`) | **2.1.0** (`latest`) | zoneless + SSR/hydration |
+| **2.x** | **21 e 22** (`>=21 <23`) | **2.1.1** (`latest`) | zoneless + SSR/hydration |
 | **1.x** | **18, 19 e 20** (`>=18 <21`) | **1.2.0** | manutenção; sem novas features |
 
-> **Status:** **2.1.0 estável** (`latest`) para Angular 21+, com colunas
-> redimensionáveis. A 1.2.0 segue publicada para Angular 18–20.
+> **Status:** **2.1.1 estável** (`latest`) para Angular 21+, com colunas
+> redimensionáveis. A 2.1.1 é **somente documentação** (sem mudança de código).
+> A 1.2.0 segue publicada para Angular 18–20.
 
 ## Funcionalidades
 
@@ -46,7 +47,7 @@ datas, templates, virtualização e exportação CSV/XLSX.
 
 ```bash
 # Angular 21/22 (linha 2.x)
-npm install --save-exact pivot-grid@2.1.0
+npm install --save-exact pivot-grid@2.1.1
 
 # Angular 18/19/20 (linha 1.x)
 npm install --save-exact pivot-grid@1.2.0

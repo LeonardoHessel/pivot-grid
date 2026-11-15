@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Estado |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.1.0** (`latest`) | ativa; zoneless + SSR/hydration |
+| **2.x** | 21, 22 | **2.1.1** (`latest`) | ativa; 2.1.1 é só documentação |
 | **1.x** | 18, 19, 20 | **1.2.0** | congelada; manutenção |
 
 - Novas features entram **somente na 2.x**, uma funcionalidade-título por minor.
@@ -27,6 +27,7 @@
 | 1.2.0 | Templates de célula/cabeçalho |
 | 2.0.0 | Angular 21+, zoneless, SSR/hydration |
 | 2.1.0 | Colunas redimensionáveis |
+| 2.1.1 | Documentação (sem código) |
 
 ## 2.x — próximas minors (aditivas)
 
