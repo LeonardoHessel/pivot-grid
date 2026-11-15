@@ -18,7 +18,7 @@
 | **0.3.0** | Sticky + teclado | row headers fixos, navegação por teclado, remoção de `CsvExportOptions.mode`, exemplo `sticky-keyboard` e rota na demo |
 | **0.4.0** | Múltiplos valores ✅ | `values[]` com cabeçalho por medida, exemplo `multi-medida` |
 | **0.5.0** | Virtualização ✅ | linhas virtualizadas + export `visible/full`, exemplo com 50k linhas |
-| **0.6.0** | Hardening | revisão de API/deprecações, a11y com axe, matriz CI 18/19/20, orçamentos de performance (sem feature nova) |
+| **0.6.0** | Hardening ✅ | revisão de API/deprecações, a11y com axe, matriz CI 18/19/20, orçamentos de performance (sem feature nova) |
 | **0.9.0** | RC | API congelada, guia de migração, dist-tag `next` |
 | **1.0.0** | Estável | sem features novas; matriz de compatibilidade e docs congeladas |
 | **1.x** | Pós-1.0 | um por minor: painel de campos/filtros, pivot chart, PDF, server-side |

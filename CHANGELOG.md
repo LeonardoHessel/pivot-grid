@@ -6,6 +6,28 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-14
+
+### Added
+
+- Auditoria de acessibilidade com `axe-core` no CI e correção do cabeçalho
+  vazio (`aria-hidden` na célula de canto).
+- Matriz de compatibilidade (`compat.yml`) com apps consumidores Angular 18,
+  19 e 20.
+- Orçamentos de performance formalizados: 10k ≤ 500 ms e 50k ≤ 2500 ms.
+- `engines` (Node) e `packageManager` (npm 11) no repositório.
+- `docs/COMPATIBILITY.md` e `docs/PERFORMANCE.md`.
+
+### Changed
+
+- Actions atualizadas para `checkout@v5` e `setup-node@v5` (Node 22).
+
+### Deprecated
+
+- `PivotResult.grandTotal` (usar `grandTotals`), `totalsPosition`,
+  `alwaysShowRowTotals`, `PivotField.align`, `ConditionalRule.target`
+  para `row`/`column` e `PivotGridComponent.refresh()`.
+
 ## [0.5.0] - 2026-11-14
 
 ### Added

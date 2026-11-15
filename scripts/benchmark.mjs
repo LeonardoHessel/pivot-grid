@@ -69,8 +69,8 @@ const large = Array.from({ length: 50_000 }, (_value, index) => ({
   amount: (index * 37) % 1000,
 }));
 
-const limit10k = Number(process.env.BENCH_MAX_MS ?? 800);
-const limit50k = Number(process.env.BENCH_MAX_50K_MS ?? 5000);
+const limit10k = Number(process.env.BENCH_MAX_MS ?? 500);
+const limit50k = Number(process.env.BENCH_MAX_50K_MS ?? 2500);
 
 const report = [
   run('10k', small, config, limit10k),
@@ -89,3 +89,4 @@ if (failed.length > 0) {
   }
   process.exit(1);
 }
+

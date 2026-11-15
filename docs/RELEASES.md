@@ -24,13 +24,15 @@
 
 Uma versão só é publicada quando **todos** os itens estiverem prontos:
 
-- [ ] testes verdes (engine + componente + benchmark);
+- [ ] testes verdes (engine + componente + a11y + benchmark);
 - [ ] `docs/API.md` atualizada;
 - [ ] exemplo em `docs/examples/` da funcionalidade;
 - [ ] demo com rota do cenário, linkada no README;
 - [ ] `CHANGELOG.md` com a seção da versão (e `[Unreleased]` vazia);
 - [ ] versão bumpada em `package.json` (raiz e lib);
 - [ ] CI da tag verde;
+- [ ] matriz de compatibilidade (Angular 18/19/20) verde;
+- [ ] orçamentos de performance (10k/50k) verdes;
 - [ ] `npm view` conferido após o publish.
 
 ## Passo a passo

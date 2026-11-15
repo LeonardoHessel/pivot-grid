@@ -10,7 +10,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 - Tema por CSS variables
 - Licença **MIT**
 
-> **Status:** v0.5.0 (virtualização + export visible/full).
+> **Status:** v0.6.0 (hardening: a11y, compatibilidade 18/19/20, performance).
 
 ## Funcionalidades
 
@@ -28,6 +28,7 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | Exportação CSV nativa | ✅ implementado |
 | Exportação Excel (XLSX mínimo) | ✅ implementado |
 | Virtualização (`virtualScroll`, 50k) | ✅ 0.5.0 |
+| Hardening (a11y axe, matriz 18/19/20, orçamentos) | ✅ 0.6.0 |
 | Múltiplos valores (`values[]`) | ✅ 0.4.0 |
 | Painel de campos / filtros | ⏳ v1.2 |
 
@@ -42,6 +43,8 @@ colunas dinâmicas, agregação, totais, formatação condicional e exportação
 | [Integração](docs/INTEGRATION.md) | Checklist de adoção no app consumidor |
 | [Contribuindo](docs/CONTRIBUTING.md) | Setup, testes, commits e release |
 | [Releases](docs/RELEASES.md) | Regras, gate e passo a passo de publicação |
+| [Compatibilidade](docs/COMPATIBILITY.md) | Angular 18/19/20 e toolchain |
+| [Performance](docs/PERFORMANCE.md) | Orçamentos de 10k/50k no CI |
 | [Exemplos](docs/examples/README.md) | Um exemplo por funcionalidade (sticky/teclado) |
 
 ## Uso
@@ -87,7 +90,7 @@ export class ReportComponent {
 
 - Demo publicada em https://leonardohessel.github.io/pivot-grid/ (GitHub Pages).
 - Publicação **somente no npm**, com versão pinada no consumidor
-  (`npm install pivot-grid@0.5.0`); sem URL de git.
+  (`npm install pivot-grid@0.6.0`); sem URL de git.
 - Release por tag `vX.Y.Z` (workflow `publish.yml`), com
   `publishConfig.access = public` e checagem de versão da tag.
 - Licença MIT (`LICENSE` na raiz e no pacote).

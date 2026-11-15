@@ -9,11 +9,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install
@@ -31,5 +31,8 @@ jobs:
       - name: Benchmark engine
         run: npm run bench
         env:
-          BENCH_MAX_MS: 800
+          BENCH_MAX_MS: 500
+          BENCH_MAX_50K_MS: 2500
+
+
 

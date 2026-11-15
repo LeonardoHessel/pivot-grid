@@ -1,6 +1,6 @@
 {
   "name": "pivot-grid-workspace",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -31,6 +31,7 @@
     "@angular/cli": "^18.2.21",
     "@angular/compiler-cli": "^18.2.0",
     "@types/jasmine": "~5.1.0",
+    "axe-core": "^4.14.0",
     "esbuild": "^0.23.0",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
@@ -57,5 +58,9 @@
   "bugs": {
     "url": "https://github.com/LeonardoHessel/pivot-grid/issues"
   },
-  "homepage": "https://github.com/LeonardoHessel/pivot-grid#readme"
+  "homepage": "https://github.com/LeonardoHessel/pivot-grid#readme",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "packageManager": "npm@11.15.0"
 }

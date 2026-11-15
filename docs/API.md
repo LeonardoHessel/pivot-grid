@@ -384,7 +384,21 @@ Com `strict: true` (dev), os códigos acima lançam `PivotError`.
   colapsadas). O componente preenche `rows` automaticamente ao chamar
   `exportCsv({ mode: 'visible' })` / `exportExcel({ mode: 'visible' })`.
 
-## 10. Exemplos
+## 10. Deprecações (0.6.0)
+
+Nenhuma remoção até a 1.0; as APIs abaixo continuam funcionando e serão
+removidas apenas em major futura.
+
+| API | Alternativa |
+|---|---|
+| `PivotResult.grandTotal` | `grandTotals.get(valueField)` |
+| `PivotConfig.totalsPosition` | totais sempre ao final (não implementado) |
+| `PivotConfig.alwaysShowRowTotals` | — (não implementado) |
+| `PivotField.align` | CSS/`formatter` |
+| `ConditionalRule.target` (`row`/`column`) | regra por célula (`cell`) |
+| `PivotGridComponent.refresh()` | inputs são signals |
+
+## 11. Exemplos
 
 - [docs/examples/sticky-keyboard.md](./examples/sticky-keyboard.md) — row headers fixos e teclado.
 - [docs/examples/](./examples/README.md) — índice por funcionalidade.

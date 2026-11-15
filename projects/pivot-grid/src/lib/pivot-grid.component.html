@@ -28,6 +28,7 @@
               @if ($index === 0) {
                 <th
                   class="pg-corner"
+                  aria-hidden="true"
                   [class.pg-sticky-col]="stickyRowHeaders()"
                   [style.left.px]="0"
                   [style.width.px]="rowHeaderTotalWidth()"
@@ -62,6 +63,7 @@
             @if (columnDepth() === 0) {
               <th
                 class="pg-corner"
+                aria-hidden="true"
                 [class.pg-sticky-col]="stickyRowHeaders()"
                 [style.left.px]="0"
                 [style.width.px]="rowHeaderTotalWidth()"
@@ -249,3 +251,4 @@
     </div>
   }
 </div>
+

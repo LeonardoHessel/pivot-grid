@@ -576,6 +576,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.exportComplete.emit({ format: 'xlsx', filename });
   }
 
+  /** @deprecated Inputs são signals; não é necessário chamar refresh. */
   refresh(): void {
     // Inputs are signals: changing data/config rebuilds the result.
   }

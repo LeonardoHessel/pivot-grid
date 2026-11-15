@@ -1,0 +1,45 @@
+name: Compatibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  angular:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        angular: [18, 19, 20]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build library
+        run: npm run build:lib
+
+      - name: Pack library
+        run: npm pack ./dist/pivot-grid --pack-destination .
+
+      - name: Create consumer app
+        run: npx -y @angular/cli@${{ matrix.angular }} new consumer --defaults --skip-git --skip-tests --style=css --routing=false
+
+      - name: Install library in consumer
+        working-directory: consumer
+        run: npm install ../pivot-grid-*.tgz
+
+      - name: Use the library
+        run: node scripts/compat-consumer.mjs consumer
+
+      - name: Build consumer
+        working-directory: consumer
+        run: npx ng build
