@@ -6,6 +6,26 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-11-15
+
+### Changed
+
+- **Mudança de comportamento padrão:** cellDetails: true agora abre um
+  **tooltip no hover** (não mais diálogo no clique). Em paridade com o
+  baseline Syncfusion 20, o conteúdo é Row:, Column: e "<Agg> of <medida>:"
+  + valor; sem registros.
+- O diálogo permanece disponível com cellDetailsMode dialog e
+  cellDetailsTrigger click.
+
+### Added
+
+- cellDetailsTrigger: hover | click (default hover).
+- cellDetailsMode: tooltip | dialog (default tooltip).
+- Tooltip acessível: role="tooltip", aria-describedby, abertura por foco de
+  teclado, Esc, reposicionamento na viewport, delay de 150 ms e sem
+  backdrop/prender foco.
+- Documentação do baseline observado, exemplos e evidências hover/diálogo.
+
 ## [2.3.1] - 2026-11-15
 
 ### Fixed

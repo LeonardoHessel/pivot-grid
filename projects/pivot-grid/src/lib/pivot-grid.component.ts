@@ -41,6 +41,8 @@ import type {
   PivotState,
 } from './core/types';
 
+let tooltipSequence = 0;
+
 const DEFAULT_LABELS: PivotLabels = {
   grandTotal: 'Grand total',
   rowTotal: 'Total',
@@ -55,6 +57,8 @@ const DEFAULT_LABELS: PivotLabels = {
   resizeColumn: 'Resize column',
   resetColumnWidth: 'Reset column width',
   detailsTitle: 'Cell details',
+  detailsRow: 'Row',
+  detailsColumn: 'Column',
   detailsClose: 'Close',
   detailsEmpty: 'No records for this cell.',
 };
@@ -108,6 +112,8 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly rowHeaderWidth = input(200);
   readonly showValueHeader = input(true);
   readonly cellDetails = input(false);
+  readonly cellDetailsTrigger = input<'hover' | 'click'>('hover');
+  readonly cellDetailsMode = input<'tooltip' | 'dialog'>('tooltip');
   readonly detailsColumns = input<PivotField[] | string[]>([]);
   readonly detailsTemplate = input<TemplateRef<PivotCellDetailsContext> | null>(null);
 
@@ -135,6 +141,13 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly detailsContext = this.details.asReadonly();
   readonly detailsDialog = viewChild<ElementRef<HTMLElement>>('detailsDialog');
   private detailsTrigger: HTMLElement | null = null;
+  private readonly tooltip = signal<PivotCellDetailsContext | null>(null);
+  readonly tooltipContext = this.tooltip.asReadonly();
+  readonly tooltipPosition = signal({ left: 0, top: 0 });
+  readonly tooltipEl = viewChild<ElementRef<HTMLElement>>('cellTooltip');
+  readonly tooltipId = `pg-tooltip-${++tooltipSequence}`;
+  private tooltipTimer: ReturnType<typeof setTimeout> | null = null;
+  private tooltipCell: HTMLElement | null = null;
   private filtersInitialized = false;
   private readonly scrollTop = signal(0);
   private readonly viewportHeight = signal(0);
@@ -180,6 +193,9 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   }
 
   onScroll(event: Event): void {
+    if (this.tooltip()) {
+      this.closeTooltip();
+    }
     this.scrollTop.set((event.target as HTMLElement).scrollTop);
   }
 
@@ -570,6 +586,11 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   }
 
   onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.tooltip()) {
+      event.preventDefault();
+      this.closeTooltip();
+      return;
+    }
     const cell = (event.target as HTMLElement | null)?.closest<HTMLElement>('td[data-r]');
     if (!cell) {
       return;
@@ -668,7 +689,12 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
       event,
     });
     const target = (event.target as HTMLElement | null)?.closest<HTMLElement>('td');
-    this.openCellDetails(cell, target ?? null);
+    if (
+      this.cellDetails() &&
+      (this.cellDetailsMode() === 'dialog' || this.cellDetailsTrigger() === 'click')
+    ) {
+      this.openCellDetails(cell, target ?? null);
+    }
   }
 
   onHeaderClick(
@@ -850,6 +876,135 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.stateChange.emit(this.getState());
   }
 
+
+  onCellHover(cell: PivotCell, event: MouseEvent): void {
+    if (
+      !this.cellDetails() ||
+      this.cellDetailsMode() !== 'tooltip' ||
+      this.cellDetailsTrigger() !== 'hover'
+    ) {
+      return;
+    }
+    const td = (event.target as HTMLElement | null)?.closest<HTMLElement>('td.pg-cell');
+    if (!td || td === this.tooltipCell) {
+      return;
+    }
+    this.clearTooltipTimer();
+    this.tooltipTimer = setTimeout(() => this.openTooltipDetails(cell, td), 150);
+  }
+
+  onCellLeave(): void {
+    this.clearTooltipTimer();
+    if (this.tooltip()) {
+      this.closeTooltip();
+    }
+  }
+
+  onGridFocus(event: FocusEvent): void {
+    if (!this.cellDetails() || this.cellDetailsMode() !== 'tooltip') {
+      return;
+    }
+    const td = (event.target as HTMLElement | null)?.closest<HTMLElement>('td.pg-cell[data-r]');
+    if (!td) {
+      return;
+    }
+    const hit = this.cellAt(Number(td.dataset['r']), Number(td.dataset['c']));
+    if (hit) {
+      this.clearTooltipTimer();
+      this.openTooltipDetails(hit.cell, td);
+    }
+  }
+
+  onGridBlur(): void {
+    if (this.tooltip()) {
+      this.closeTooltip();
+    }
+  }
+
+  openTooltipDetails(cell: PivotCell, trigger: HTMLElement | null): void {
+    if (!this.cellDetails() || this.cellDetailsMode() !== 'tooltip') {
+      return;
+    }
+    const context: PivotCellDetailsContext = {
+      cell,
+      rowPath: cell.rowPath,
+      columnPath: cell.columnPath,
+      field: cell.field,
+      value: cell.value,
+      formatted: cell.formatted,
+      records: this.detailsTemplate()
+        ? this.result().recordsForCell(cell.rowPath, cell.columnPath)
+        : [],
+    };
+    this.clearTooltipTimer();
+    this.tooltipCell?.removeAttribute('aria-describedby');
+    this.tooltipCell = trigger;
+    trigger?.setAttribute('aria-describedby', this.tooltipId);
+    this.tooltip.set(context);
+    this.cellDetailsOpen.emit(context);
+    setTimeout(() => this.positionTooltip());
+  }
+
+  closeTooltip(): void {
+    this.clearTooltipTimer();
+    if (!this.tooltip()) {
+      return;
+    }
+    this.tooltipCell?.removeAttribute('aria-describedby');
+    this.tooltipCell = null;
+    this.tooltip.set(null);
+    this.cellDetailsClose.emit();
+  }
+
+  measureText(field: string): string {
+    const value = this.values().find((candidate) => candidate.field === field);
+    const captions: Record<string, string> = {
+      sum: 'Sum',
+      avg: 'Avg',
+      min: 'Min',
+      max: 'Max',
+      count: 'Count',
+      countDistinct: 'Distinct count',
+    };
+    const aggregator = value?.aggregator ?? 'sum';
+    const caption = value?.caption ?? value?.field ?? field;
+    return `${captions[aggregator] ?? aggregator} of ${caption}:`;
+  }
+
+  private positionTooltip(): void {
+    const tooltip = this.tooltipEl()?.nativeElement;
+    const source = this.tooltipCell;
+    if (!tooltip || !source || typeof window === 'undefined') {
+      return;
+    }
+    const rect = source.getBoundingClientRect();
+    const width = tooltip.offsetWidth || 260;
+    const height = tooltip.offsetHeight || 90;
+    const margin = 8;
+    let left = rect.left;
+    let top = rect.bottom + 6;
+    if (left + width > window.innerWidth - margin) {
+      left = window.innerWidth - width - margin;
+    }
+    if (left < margin) {
+      left = margin;
+    }
+    if (top + height > window.innerHeight - margin) {
+      top = rect.top - height - 6;
+    }
+    if (top < margin) {
+      top = margin;
+    }
+    this.tooltipPosition.set({ left, top });
+  }
+
+  private clearTooltipTimer(): void {
+    if (this.tooltipTimer !== null) {
+      clearTimeout(this.tooltipTimer);
+      this.tooltipTimer = null;
+    }
+  }
+
   readonly detailsColumnsResolved = computed(() => {
     const configured = this.detailsColumns();
     if (configured.length > 0) {
@@ -877,6 +1032,14 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     if (!this.cellDetails()) {
       return;
     }
+    if (this.cellDetailsMode() === 'tooltip') {
+      this.openTooltipDetails(cell, trigger);
+      return;
+    }
+    this.openDialogDetails(cell, trigger);
+  }
+
+  private openDialogDetails(cell: PivotCell, trigger: HTMLElement | null): void {
     const context: PivotCellDetailsContext = {
       cell,
       rowPath: cell.rowPath,

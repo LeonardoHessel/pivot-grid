@@ -15,7 +15,7 @@ datas, templates, virtualização e exportação CSV/XLSX.
 ## Instalação
 
 ```bash
-npm install --save-exact pivot-grid@2.3.1
+npm install --save-exact pivot-grid@2.4.0
 ```
 
 ## Uso
@@ -103,7 +103,7 @@ export class ReportComponent {
 | Colunas redimensionáveis (`PivotState.columns`) | ✅ |
 | Cabeçalho de linha em árvore (`rowHeaderLayout="tree"`) | ✅ |
 | Tema completo por CSS variables | ✅ |
-| Drill-down de célula (`cellDetails`) | ✅ |
+| Tooltip de célula no hover (`cellDetails`, diálogo opcional) | ✅ |
 | Virtualização (`virtualScroll`) | ✅ |
 | Formatação condicional por medida auxiliar | ✅ |
 | CSV e XLSX (sem dependência) | ✅ |

@@ -18,8 +18,8 @@ datas, templates, virtualização e exportação CSV/XLSX.
 | **2.x** | **21 e 22** (`>=21 <23`) | **2.3.1** (`latest`) | zoneless + SSR/hydration |
 | **1.x** | **18, 19 e 20** (`>=18 <21`) | **1.2.0** | manutenção; sem novas features |
 
-> **Status:** **2.3.1 estável** (`latest`) para Angular 21+, com contrato
-> completo de tema e drill-down. A 1.2.0 segue publicada para Angular 18–20.
+> **Status:** **2.4.0 estável** (`latest`) para Angular 21+, com tooltip de
+> célula no hover (diálogo opcional). A 1.2.0 segue publicada para Angular 18–20.
 
 ## Funcionalidades
 
@@ -38,7 +38,7 @@ datas, templates, virtualização e exportação CSV/XLSX.
 | Colunas redimensionáveis (alça, teclado, reset) | ✅ 2.1.0 |
 | Cabeçalho de linha em árvore (paridade clássica) + showValueHeader | ✅ 2.2.0 |
 | Contrato completo de tema (CSS vars) | ✅ 2.3.0 |
-| Detalhes da célula (drill-down) | ✅ 2.3.0 |
+| Detalhes da célula: hover tooltip + diálogo opcional | ✅ 2.4.0 |
 | Virtualização de linhas (`virtualScroll`, 50k) | ✅ 0.5.0 |
 | Exportação CSV e XLSX (sem dependência) | ✅ |
 | `height`/`width`, scroll interno, headers sticky | ✅ |
@@ -49,7 +49,7 @@ datas, templates, virtualização e exportação CSV/XLSX.
 
 ```bash
 # Angular 21/22 (linha 2.x)
-npm install --save-exact pivot-grid@2.3.1
+npm install --save-exact pivot-grid@2.4.0
 
 # Angular 18/19/20 (linha 1.x)
 npm install --save-exact pivot-grid@1.2.0
@@ -147,6 +147,7 @@ npm run verify:package # valida o pacote antes do publish
 ## Licença
 
 MIT © Leonardo Hessel
+
 
 
 

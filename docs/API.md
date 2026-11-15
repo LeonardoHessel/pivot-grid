@@ -33,6 +33,9 @@ export type Aggregator =
 
 export type PivotRowHeaderLayout = 'columns' | 'tree';
 
+export type PivotCellDetailsTrigger = 'hover' | 'click';
+export type PivotCellDetailsMode = 'tooltip' | 'dialog';
+
 export type DateLevel = 'year' | 'quarter' | 'month' | 'day';
 
 export interface PivotFilter {
@@ -215,7 +218,9 @@ export class PivotGridComponent {}
 | `indentSize` | `number` | não | `16` | Indentação por nível no modo tree (px) |
 | `rowHeaderWidth` | `number` | não | `200` | Largura da coluna tree (px) |
 | `showValueHeader` | `boolean` | não | `true` | Cabeçalho da medida (uma medida) |
-| `cellDetails` | `boolean` | não | `false` | Abre o painel de detalhes ao clicar |
+| `cellDetails` | `boolean` | não | `false` | Habilita detalhes/tooltip |
+| `cellDetailsTrigger` | `'hover' \| 'click'` | não | `'hover'` | Gatilho dos detalhes |
+| `cellDetailsMode` | `'tooltip' \| 'dialog'` | não | `'tooltip'` | Tooltip (padrão) ou diálogo |
 | `detailsColumns` | `PivotField[] \| string[]` | não | `[]` | Colunas do painel (default: campos do registro) |
 | `detailsTemplate` | `TemplateRef<PivotCellDetailsContext> \| null` | não | `null` | Substitui o corpo do painel |
 | `headerTemplate` | `TemplateRef<PivotHeaderTemplateContext> \| null` | não | `null` | Template do cabeçalho |
@@ -431,31 +436,27 @@ const config: PivotConfig = {
 };
 ```
 
-## 4.8 Detalhes da célula (drill-down)
+## 4.8 Detalhes da célula (tooltip no hover)
 
-Com `cellDetails: true`, clicar (ou `Enter`/`Espaço`) em uma célula abre um
-diálogo com o resumo agregado e os registros de origem. Funciona em células
-normais, totais e no modo tree.
+Na 2.4.0 o padrão é **hover tooltip**, em paridade com o baseline. O diálogo
+continua opcional.
 
-```ts
-cellDetails?: boolean;                     // default false
-detailsColumns?: PivotField[] | string[]; // default: campos do registro
-detailsTemplate?: TemplateRef<PivotCellDetailsContext>;
-```
+- cellDetails: boolean (default false)
+- cellDetailsTrigger: hover | click (default hover)
+- cellDetailsMode: tooltip | dialog (default tooltip)
+- detailsColumns: PivotField[] | string[] (diálogo/template)
+- detailsTemplate: TemplateRef<PivotCellDetailsContext>
 
-```html
-<pg-pivot-grid
-  [data]="rows"
-  [config]="config"
-  [cellDetails]="true"
-  [detailsColumns]="['region', 'city', 'month', 'amount']"
-  [labels]="{ detailsTitle: 'Detalhes da célula', detailsClose: 'Fechar' }">
-</pg-pivot-grid>
-```
+Hover: abre após 150 ms, ancorado à célula, reposiciona para não sair da
+viewport, fecha ao sair/scroll/Esc, sem backdrop e sem prender foco.
 
-O engine expõe `PivotResult.recordsForCell(rowPath, columnPath)` sob demanda,
-sem copiar a base. O diálogo tem `role="dialog"`, `aria-modal`, foco preso,
-fecha com `Esc` e devolve o foco ao gatilho.
+Conteúdo padrão: Row: (caminho), Column: (caminho), "<Agg> of <medida>:" e o
+valor formatado. Não exibe registros (como o baseline).
+
+Teclado: foco na célula abre o tooltip com aria-describedby e role="tooltip";
+Esc fecha. cellDetailsMode="dialog" usa detailsColumns e
+PivotResult.recordsForCell para mostrar os registros; cellDetailsTrigger
+controla o clique. Saídas: cellDetailsOpen / cellDetailsClose.
 
 ## 5. Exportação
 
@@ -623,6 +624,8 @@ Superfície estável — somente o que sai de `public-api.ts`:
 - `PivotFilter`
 - `PivotRowHeaderLayout`
 - `PivotCellDetailsContext`
+- `PivotCellDetailsTrigger`
+- `PivotCellDetailsMode`
 - `PivotCellTemplateContext`
 - `PivotHeaderTemplateContext`
 

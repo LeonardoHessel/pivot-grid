@@ -60,11 +60,35 @@ describe('PivotGridComponent accessibility', () => {
     await expectNoViolations('tree', false);
   });
 
+  it('has no axe violations with the hover tooltip open', async () => {
+    const fixture = TestBed.createComponent(PivotGridComponent);
+    fixture.componentRef.setInput('data', data);
+    fixture.componentRef.setInput('config', config);
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.detectChanges();
+    const cell = fixture.nativeElement.querySelector(
+      'td.pg-cell[data-r="0"][data-c="0"]',
+    ) as HTMLElement;
+    cell.dispatchEvent(new MouseEvent('mouseenter'));
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    fixture.detectChanges();
+    document.body.appendChild(fixture.nativeElement);
+
+    const results = await axe.run(fixture.nativeElement, {
+      rules: { 'color-contrast': { enabled: false } },
+    });
+
+    fixture.nativeElement.remove();
+    expect(
+      results.violations.map((violation) => `${violation.id}: ${violation.nodes.length}`),
+    ).toEqual([]);
+  });
   it('has no axe violations with cell details open', async () => {
     const fixture = TestBed.createComponent(PivotGridComponent);
     fixture.componentRef.setInput('data', data);
     fixture.componentRef.setInput('config', config);
     fixture.componentRef.setInput('cellDetails', true);
+    fixture.componentRef.setInput('cellDetailsMode', 'dialog');
     fixture.detectChanges();
     fixture.componentInstance.openCellDetails(
       Array.from(fixture.componentInstance.result().cells.values())[0],
@@ -86,4 +110,5 @@ describe('PivotGridComponent accessibility', () => {
     await expectNoViolations('tree', true);
   });
 });
+
 

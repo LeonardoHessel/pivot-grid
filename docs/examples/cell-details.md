@@ -1,59 +1,76 @@
-# Detalhes da célula (drill-down)
+# Detalhes da célula (hover tooltip + diálogo opcional)
 
-Adicionado na 2.3.0. Ao acionar uma célula (ou total), o componente abre um
-diálogo com os registros de origem e o resumo agregado.
+Na 2.4.0 o padrão mudou de **clique/diálogo** para **hover/tooltip**, em
+paridade com o baseline Syncfusion 20. O diálogo continua disponível
+opcionalmente para clique/touch.
+
+## Baseline observado (somente leitura)
+
+O baseline foi inspecionado em `http://localhost/packreturn-green/`
+(Gerenciamento → Giro por CDP, ano 2026), via Chrome DevTools Protocol:
+
+| Aspecto | Comportamento |
+|---|---|
+| Gatilho | **hover** (não clique) |
+| Conteúdo | `Row:` caminho `" - "`, `Column:` caminho, `Avg of <medida>:` valor |
+| Registros | **não exibe** registros, somente o resumo |
+| Atraso | ~20 ms (praticamente imediato) |
+| Posição | abaixo/à direita da célula/cursor; `max-width: 350px`; largura ~160–172 px |
+| Aparência | fundo cinza `#616161`, texto branco, 12–14 px |
+| Totais | mesmo formato; subtotal de coluna mostra o caminho da coluna |
+| Tree | tooltip apenas nas células de valor; o cabeçalho de linha não tem tooltip |
+| Fechamento | ao sair da célula |
+| Teclado/touch | foco/teclado não abre no baseline; sem tooltip por toque |
+
+No pivot-grid, o conteúdo essencial é replicado e adicionamos abertura por
+**foco de teclado**, `aria-describedby`, `role="tooltip"` e fechamento com
+`Esc`.
 
 ## API
 
 ```ts
 cellDetails?: boolean;                       // default false
-detailsColumns?: PivotField[] | string[];   // default: campos do registro
+cellDetailsTrigger?: 'hover' | 'click';      // default 'hover'
+cellDetailsMode?: 'tooltip' | 'dialog';      // default 'tooltip'
+detailsColumns?: PivotField[] | string[];   // usado no diálogo/template
 detailsTemplate?: TemplateRef<PivotCellDetailsContext>;
 ```
 
-Saídas: `cellDetailsOpen` (contexto) e `cellDetailsClose`.
-
-```ts
-export interface PivotCellDetailsContext {
-  cell: PivotCell;
-  rowPath: string[];
-  columnPath: string[];
-  field: string;
-  value: number | null;
-  formatted: string;
-  records: readonly Record<string, unknown>[];
-}
-```
-
-O engine expõe `PivotResult.recordsForCell(rowPath, columnPath)` **sob
-demanda**, reutilizando os índices de registros já calculados.
-
-## Exemplo
-
 ```html
+<!-- tooltip no hover (default) -->
+<pg-pivot-grid
+  [data]="rows"
+  [config]="config"
+  [cellDetails]="true">
+</pg-pivot-grid>
+
+<!-- diálogo opcional para clique/touch -->
 <pg-pivot-grid
   [data]="rows"
   [config]="config"
   [cellDetails]="true"
-  [detailsColumns]="['region', 'city', 'month', 'amount']"
-  [labels]="{ detailsTitle: 'Detalhes da célula', detailsClose: 'Fechar' }"
-  (cellDetailsOpen)="onOpen($event)"
-  (cellDetailsClose)="onClose()">
+  cellDetailsMode="dialog"
+  cellDetailsTrigger="click">
 </pg-pivot-grid>
 ```
 
-```ts
-onOpen(context: PivotCellDetailsContext): void {
-  console.log(context.formatted, context.records.length, context.records);
-}
-```
-
-Funciona em células normais, totais de linha/coluna/geral e no modo tree. O
-diálogo tem `role="dialog"`, `aria-modal`, foco preso, fecha com `Esc` e devolve
-o foco ao gatilho.
+- Delay do tooltip: **150 ms**; fecha ao sair, no scroll e com `Esc`.
+- Posiciona abaixo da célula e reposiciona para não sair da viewport.
+- Sem backdrop e sem prender foco no tooltip.
+- `detailsTemplate` continua valendo; no modo dialog o contexto inclui
+  `records` via `PivotResult.recordsForCell`. No tooltip padrão os registros não
+  são copiados (`records: []`), como no baseline.
+- `cellDetailsOpen` / `cellDetailsClose` continuam disponíveis.
 
 ## Evidência
 
-![Detalhes da célula](cell-details.png)
+Hover (tooltip, sem modal):
 
-Rota: [`/detalhes?details=1`](https://leonardohessel.github.io/pivot-grid/detalhes?details=1)
+![Tooltip no hover](cell-details.png)
+
+Diálogo opcional (`cellDetailsMode="dialog"`):
+
+![Diálogo opcional](cell-details-dialog.png)
+
+Rotas: [`/detalhes`](https://leonardohessel.github.io/pivot-grid/detalhes) e
+[`/detalhes?dialog=1`](https://leonardohessel.github.io/pivot-grid/detalhes?dialog=1).

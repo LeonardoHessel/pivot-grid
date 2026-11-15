@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { PivotGridComponent } from './pivot-grid.component';
 import { PivotConfig, PivotData } from './core/types';
 
@@ -504,6 +504,7 @@ describe('PivotGridComponent', () => {
   it('opens cell details with the source records and closes on Escape', () => {
     const fixture = create();
     fixture.componentRef.setInput('cellDetails', true);
+    fixture.componentRef.setInput('cellDetailsMode', 'dialog');
     fixture.detectChanges();
     const component = fixture.componentInstance;
     const cell = Array.from(component.result().rowTotals.values()).find(
@@ -538,6 +539,7 @@ describe('PivotGridComponent', () => {
   it('opens details when a cell is clicked', () => {
     const fixture = create();
     fixture.componentRef.setInput('cellDetails', true);
+    fixture.componentRef.setInput('cellDetailsMode', 'dialog');
     fixture.detectChanges();
     const element: HTMLElement = fixture.nativeElement;
     const cell = element.querySelector('td.pg-cell[data-r="0"]') as HTMLElement;
@@ -550,6 +552,7 @@ describe('PivotGridComponent', () => {
     const fixture = create();
     fixture.componentRef.setInput('rowHeaderLayout', 'tree');
     fixture.componentRef.setInput('cellDetails', true);
+    fixture.componentRef.setInput('cellDetailsMode', 'dialog');
     fixture.detectChanges();
     const component = fixture.componentInstance;
     const parent = component
@@ -575,6 +578,7 @@ describe('PivotGridComponent', () => {
   it('shows configured detail columns and the empty state', () => {
     const fixture = create();
     fixture.componentRef.setInput('cellDetails', true);
+    fixture.componentRef.setInput('cellDetailsMode', 'dialog');
     fixture.componentRef.setInput('detailsColumns', ['region', 'amount']);
     fixture.detectChanges();
     const component = fixture.componentInstance;
@@ -587,6 +591,111 @@ describe('PivotGridComponent', () => {
     ).map((header) => header.textContent?.trim());
     expect(headers).toEqual(['region', 'amount']);
   });
+
+
+  it('shows a hover tooltip with baseline content and closes on leave', fakeAsync(() => {
+    const fixture = create();
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const cell = element.querySelector('td.pg-cell[data-r="0"][data-c="0"]') as HTMLElement;
+
+    cell.dispatchEvent(new MouseEvent('mouseenter'));
+    tick(150);
+    fixture.detectChanges();
+    tick(0);
+    fixture.detectChanges();
+
+    const tooltip = element.querySelector('[role="tooltip"]') as HTMLElement;
+    expect(tooltip).toBeTruthy();
+    expect(tooltip.textContent).toContain('Row:');
+    expect(tooltip.textContent).toContain('Sum of Total:');
+    expect(element.querySelector('.pg-details-dialog')).toBeNull();
+    expect(cell.getAttribute('aria-describedby')).toBe(tooltip.id);
+
+    cell.dispatchEvent(new MouseEvent('mouseleave'));
+    fixture.detectChanges();
+    expect(element.querySelector('[role="tooltip"]')).toBeNull();
+    expect(cell.hasAttribute('aria-describedby')).toBeFalse();
+  }));
+
+  it('opens the tooltip on focus and closes with Escape', fakeAsync(() => {
+    const fixture = create();
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const cell = element.querySelector('td.pg-cell[data-r="0"][data-c="0"]') as HTMLElement;
+
+    cell.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    tick(0);
+    fixture.detectChanges();
+    expect(element.querySelector('[role="tooltip"]')).toBeTruthy();
+
+    element
+      .querySelector('table')
+      ?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+    expect(element.querySelector('[role="tooltip"]')).toBeNull();
+  }));
+
+  it('shows tooltip content for totals and tree rows', fakeAsync(() => {
+    const fixture = create();
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const totalCell = element.querySelector('td.pg-total') as HTMLElement;
+    totalCell.dispatchEvent(new MouseEvent('mouseenter'));
+    tick(150);
+    fixture.detectChanges();
+    tick(0);
+    fixture.detectChanges();
+    const totalTooltip = element.querySelector('[role="tooltip"]') as HTMLElement;
+    expect(totalTooltip.textContent).toContain('Row:');
+    expect(totalTooltip.textContent).toContain('Sum of Total:');
+
+    totalCell.dispatchEvent(new MouseEvent('mouseleave'));
+    fixture.componentRef.setInput('rowHeaderLayout', 'tree');
+    fixture.detectChanges();
+    const treeCell = element.querySelector('td.pg-cell') as HTMLElement;
+    treeCell.dispatchEvent(new MouseEvent('mouseenter'));
+    tick(150);
+    fixture.detectChanges();
+    tick(0);
+    fixture.detectChanges();
+    const treeTooltip = element.querySelector('[role="tooltip"]') as HTMLElement;
+    expect(treeTooltip.textContent).toContain('Row:');
+  }));
+
+  it('positions the tooltip inside the viewport', fakeAsync(() => {
+    const fixture = create();
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const cell = element.querySelector('td.pg-cell[data-r="0"][data-c="0"]') as HTMLElement;
+    spyOn(cell, 'getBoundingClientRect').and.returnValue({
+      left: 900,
+      top: 700,
+      right: 988,
+      bottom: 730,
+      width: 88,
+      height: 30,
+      x: 900,
+      y: 700,
+      toJSON: () => ({}),
+    } as DOMRect);
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1000);
+    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(800);
+
+    cell.dispatchEvent(new MouseEvent('mouseenter'));
+    tick(150);
+    fixture.detectChanges();
+    tick(0);
+    fixture.detectChanges();
+
+    const tooltip = element.querySelector('[role="tooltip"]') as HTMLElement;
+    expect(parseFloat(tooltip.style.left)).toBeLessThanOrEqual(992);
+    expect(parseFloat(tooltip.style.top)).toBeLessThanOrEqual(792);
+  }));
 
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);

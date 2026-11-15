@@ -388,3 +388,34 @@
   margin: 0;
   color: var(--pg-color-muted, #6b7280);
 }
+
+.pg-cell-tooltip {
+  position: fixed;
+  z-index: 1000;
+  max-width: 350px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: #616161;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+  pointer-events: none;
+  white-space: normal;
+}
+
+.pg-tooltip-line {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.pg-tooltip-label {
+  color: #e5e7eb;
+}
+
+.pg-tooltip-measure {
+  margin-top: 4px;
+  font-weight: 600;
+}
+

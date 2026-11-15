@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Estado |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.3.1** (`latest`) | ativa; tema + drill-down |
+| **2.x** | 21, 22 | **2.4.0** (`latest`) | ativa; tooltip no hover |
 | **1.x** | 18, 19, 20 | **1.2.0** | congelada; manutenção |
 
 - Novas features entram **somente na 2.x**, uma funcionalidade-título por minor.
@@ -30,6 +30,7 @@
 | 2.1.1 | Documentação (sem código) |
 | 2.2.0 | Cabeçalho de linha em árvore + showValueHeader |
 | 2.3.0 | Contrato de tema + drill-down |
+| 2.4.0 | Tooltip de célula no hover (diálogo opcional) |
 
 ## 2.x — próximas minors (aditivas)
 
@@ -45,6 +46,9 @@ Uma funcionalidade-título por minor; sem quebrar a API existente:
 
 Nenhum tipo/input especulativo é criado antes da implementação da respectiva
 minor.
+
+**Backlog:** resolvedor de tooltip por célula/grupo (cellTooltip) — não
+implementado na 2.4.0.
 
 ## Escopo fechado da 1.0/2.0
 

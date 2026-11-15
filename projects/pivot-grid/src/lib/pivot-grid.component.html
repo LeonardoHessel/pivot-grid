@@ -43,6 +43,8 @@
         [class.pg-fixed]="hasColumnWidths()"
         role="grid"
         (keydown)="onKeydown($event)"
+        (focusin)="onGridFocus($event)"
+        (focusout)="onGridBlur()"
         [attr.aria-rowcount]="displayRowCount() + 1"
         [attr.aria-colcount]="columnCount()"
       >
@@ -208,6 +210,8 @@
                       [style.text-align]="value.align" [ngClass]="cell?.className"
                       [style]="cell?.style"
                       (click)="onCellClick(row.node, column, cell, $event)"
+                      (mouseenter)="cell && onCellHover(cell, $event)"
+                      (mouseleave)="onCellLeave()"
                     >
                       @if (cellTemplate() && cell) {
                         <ng-container
@@ -224,7 +228,8 @@
                 @if (showRowTotals()) {
                   @for (value of values(); track $index) {
                     @let total = treeRowTotalFor(row.node, value.field);
-                    <td class="pg-cell pg-total" [style.text-align]="value.align" [ngClass]="total?.className" [style]="total?.style">
+                    <td class="pg-cell pg-total" [style.text-align]="value.align" [ngClass]="total?.className" [style]="total?.style"
+                    (mouseenter)="total && onCellHover(total, $event)" (mouseleave)="onCellLeave()">
                       @if (cellTemplate() && total) {
                         <ng-container
                           [ngTemplateOutlet]="cellTemplate()"
@@ -339,6 +344,8 @@
                     [style.text-align]="value.align" [ngClass]="cell?.className"
                     [style]="cell?.style"
                     (click)="onCellClick(entry.entry, column, cell, $event)"
+                    (mouseenter)="cell && onCellHover(cell, $event)"
+                    (mouseleave)="onCellLeave()"
                   >
                     @if (cellTemplate() && cell) {
                       <ng-container
@@ -359,6 +366,8 @@
                     class="pg-cell pg-total"
                     [style.text-align]="value.align" [ngClass]="total?.className"
                     [style]="total?.style"
+                    (mouseenter)="total && onCellHover(total, $event)"
+                    (mouseleave)="onCellLeave()"
                   >
                     @if (cellTemplate() && total) {
                       <ng-container
@@ -397,6 +406,8 @@
                     [style.max-width.px]="columnWidth(column.key) ? maxColumnWidth() : null"
                     [style.text-align]="value.align" [ngClass]="total?.className"
                     [style]="total?.style"
+                    (mouseenter)="total && onCellHover(total, $event)"
+                    (mouseleave)="onCellLeave()"
                   >
                     @if (cellTemplate() && total) {
                       <ng-container
@@ -412,7 +423,8 @@
               @if (showRowTotals()) {
                 @for (value of values(); track $index) {
                   @let total = grandTotalFor(value.field);
-                  <td class="pg-cell pg-total pg-grand-total" [style.text-align]="value.align">
+                  <td class="pg-cell pg-total pg-grand-total" [style.text-align]="value.align"
+                  (mouseenter)="total && onCellHover(total, $event)" (mouseleave)="onCellLeave()">
                     @if (cellTemplate() && total) {
                       <ng-container
                         [ngTemplateOutlet]="cellTemplate()"
@@ -450,6 +462,42 @@
           }
         </tbody>
       </table>
+    </div>
+  }
+
+
+  @if (tooltipContext(); as tip) {
+    <div
+      #cellTooltip
+      class="pg-cell-tooltip"
+      role="tooltip"
+      [id]="tooltipId"
+      [style.left.px]="tooltipPosition().left"
+      [style.top.px]="tooltipPosition().top"
+    >
+      @if (detailsTemplate()) {
+        <ng-container
+          [ngTemplateOutlet]="detailsTemplate()"
+          [ngTemplateOutletContext]="tip"
+        />
+      } @else {
+        @if (tip.rowPath.length > 0) {
+          <div class="pg-tooltip-line">
+            <span class="pg-tooltip-label">{{ resolvedLabels().detailsRow }}:</span>
+            <span>{{ tip.rowPath.join(' - ') }}</span>
+          </div>
+        }
+        @if (tip.columnPath.length > 0) {
+          <div class="pg-tooltip-line">
+            <span class="pg-tooltip-label">{{ resolvedLabels().detailsColumn }}:</span>
+            <span>{{ tip.columnPath.join(' - ') }}</span>
+          </div>
+        }
+        <div class="pg-tooltip-line pg-tooltip-measure">
+          <span class="pg-tooltip-label">{{ measureText(tip.field) }}</span>
+          <span>{{ tip.formatted }}</span>
+        </div>
+      }
     </div>
   }
 
@@ -524,6 +572,8 @@
     </div>
   }
 </div>
+
+
 
 
 

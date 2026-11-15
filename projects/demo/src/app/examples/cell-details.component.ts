@@ -54,22 +54,37 @@ const config: PivotConfig = {
   template: `
     <header class="demo-header">
       <div>
-        <h1>Detalhes da célula (drill-down)</h1>
+        <h1>Detalhes da célula (hover tooltip)</h1>
         <p>
-          Clique em uma célula ou total para ver os registros de origem e o
-          resumo agregado. O diálogo prende o foco, fecha com <kbd>Esc</kbd> e
-          devolve o foco ao gatilho.
+          Passe o mouse sobre uma célula ou total para ver o tooltip com o
+          resumo agregado (linha, coluna e medida), como no baseline. O modo
+          diálogo continua opcional para clique/touch.
         </p>
       </div>
     </header>
 
     <section class="demo-card">
       <div class="demo-toolbar">
-        <button type="button" class="demo-toggle active" (click)="openSample()">
-          Abrir detalhes de um total
+        <button
+          type="button"
+          class="demo-toggle"
+          [class.active]="!dialogMode()"
+          (click)="useTooltip()"
+        >
+          Tooltip no hover
+        </button>
+        <button
+          type="button"
+          class="demo-toggle"
+          [class.active]="dialogMode()"
+          (click)="enableDialog()"
+        >
+          Diálogo no clique
         </button>
         <span class="demo-check">
-          <code>cellDetails=true</code> · colunas: região, cidade, mês, valor
+          <code>cellDetails=true</code> · trigger
+          {{ dialogMode() ? 'click' : 'hover' }} · mode
+          {{ dialogMode() ? 'dialog' : 'tooltip' }}
         </span>
       </div>
 
@@ -79,6 +94,8 @@ const config: PivotConfig = {
         [config]="config"
         [labels]="labels"
         [cellDetails]="true"
+        [cellDetailsMode]="dialogMode() ? 'dialog' : 'tooltip'"
+        [cellDetailsTrigger]="dialogMode() ? 'click' : 'hover'"
         [detailsColumns]="detailsColumns"
         height="420px"
         width="100%"
@@ -97,19 +114,36 @@ export class CellDetailsComponent {
   readonly config = config;
   readonly labels = labels;
   readonly detailsColumns = ['region', 'city', 'month', 'amount'];
-  readonly lastOpened = signal('Clique em uma célula para abrir o diálogo.');
+  readonly dialogMode = signal(false);
+  readonly lastOpened = signal('Passe o mouse sobre uma célula para ver o tooltip.');
 
   constructor() {
     afterNextRender(() => {
       this.grid()?.cellDetailsOpen.subscribe((context) => {
         this.lastOpened.set(
-          `${context.formatted} · ${context.records.length} registro(s)`,
+          context.records.length > 0
+            ? `${context.formatted} · ${context.records.length} registro(s)`
+            : `${context.formatted} · tooltip`,
         );
       });
-      if (this.route.snapshot.queryParamMap.get('details') === '1') {
-        setTimeout(() => this.openSample());
+      if (
+        this.route.snapshot.queryParamMap.get('dialog') === '1' ||
+        this.route.snapshot.queryParamMap.get('details') === '1'
+      ) {
+        this.enableDialog();
       }
     });
+  }
+
+  useTooltip(): void {
+    this.dialogMode.set(false);
+    this.grid()?.closeCellDetails();
+    this.lastOpened.set('Passe o mouse sobre uma célula para ver o tooltip.');
+  }
+
+  enableDialog(): void {
+    this.dialogMode.set(true);
+    setTimeout(() => this.openSample());
   }
 
   openSample(): void {
@@ -128,4 +162,5 @@ export class CellDetailsComponent {
     }
   }
 }
+
 

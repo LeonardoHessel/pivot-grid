@@ -19,6 +19,10 @@ export type DateLevel = 'year' | 'quarter' | 'month' | 'day';
 
 export type PivotRowHeaderLayout = 'columns' | 'tree';
 
+export type PivotCellDetailsTrigger = 'hover' | 'click';
+
+export type PivotCellDetailsMode = 'tooltip' | 'dialog';
+
 export interface PivotFilter {
   field: string;
   values: string[];
@@ -213,6 +217,8 @@ export interface PivotLabels {
   /** Optional; default 'Clear filters'. */
   clearFilters?: string;
   detailsTitle?: string;
+  detailsRow?: string;
+  detailsColumn?: string;
   detailsClose?: string;
   detailsEmpty?: string;
   /** Optional; default 'Resize column'. */
@@ -265,6 +271,7 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
 
 
 

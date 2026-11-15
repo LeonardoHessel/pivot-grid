@@ -415,20 +415,22 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
 - `text-align` fica apenas em `.pg-cell`/`.pg-rowheader`, nunca no seletor de
   tabela.
 
-### 8.26 Detalhes da célula (2.3)
+### 8.26 Detalhes da célula (2.4)
 
-- `cellDetails: true` abre o diálogo ao clicar ou `Enter`/`Espaço` em uma
-  célula.
-- O contexto inclui célula, caminhos, campo, valor, formatado e registros.
-- `detailsColumns` aceita `PivotField[]` ou `string[]`; default são os campos
-  do primeiro registro.
-- `detailsTemplate` substitui o corpo; `cellDetailsOpen`/`cellDetailsClose`
-  são emitidos.
-- Registros vêm de `PivotResult.recordsForCell` sob demanda; funciona em
-  células normais, totais e tree.
-- Acessibilidade: `role="dialog"`, `aria-modal`, foco preso, `Esc` fecha,
-  foco retorna ao gatilho.
+- Padrão: cellDetails true, cellDetailsTrigger hover, cellDetailsMode tooltip.
+- Hover abre após 150 ms, ancorado à célula, com reposicionamento para não sair
+  da viewport; fecha ao sair, no scroll e com Esc.
+- Conteúdo padrão: Row: caminho (join " - "), Column: caminho,
+  "<Agg> of <medida>:" valor formatado. Não exibe registros (paridade com o
+  baseline Syncfusion 20).
+- Teclado: focusin na célula abre o tooltip; aria-describedby aponta para o
+  role="tooltip"; Esc fecha. Sem backdrop/prender foco no tooltip.
+- detailsTemplate substitui o conteúdo.
+- cellDetailsMode="dialog" mantém o diálogo acessível e usa
+  detailsColumns/recordsForCell; o gatilho é cellDetailsTrigger.
+- Saídas cellDetailsOpen/cellDetailsClose em ambos os modos.
 
+## 9. API do componente
 ## 9. API do componente (resumo)
 
 Detalhes em [`API.md`](./API.md).
