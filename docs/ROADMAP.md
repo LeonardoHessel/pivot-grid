@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Estado |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.4.0** (`latest`) | ativa; tooltip no hover |
+| **2.x** | 21, 22 | **2.4.1** (`latest`) | ativa; tooltip no hover |
 | **1.x** | 18, 19, 20 | **1.2.0** | congelada; manutenção |
 
 - Novas features entram **somente na 2.x**, uma funcionalidade-título por minor.

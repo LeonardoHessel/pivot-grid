@@ -148,6 +148,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly tooltipId = `pg-tooltip-${++tooltipSequence}`;
   private tooltipTimer: ReturnType<typeof setTimeout> | null = null;
   private tooltipCell: HTMLElement | null = null;
+  private tooltipAnchor: { x: number; y: number } | null = null;
   private filtersInitialized = false;
   private readonly scrollTop = signal(0);
   private readonly viewportHeight = signal(0);
@@ -889,6 +890,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     if (!td || td === this.tooltipCell) {
       return;
     }
+    this.tooltipAnchor = { x: event.clientX, y: event.clientY };
     this.clearTooltipTimer();
     this.tooltipTimer = setTimeout(() => this.openTooltipDetails(cell, td), 150);
   }
@@ -910,9 +912,18 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     }
     const hit = this.cellAt(Number(td.dataset['r']), Number(td.dataset['c']));
     if (hit) {
+      this.tooltipAnchor = null;
       this.clearTooltipTimer();
       this.openTooltipDetails(hit.cell, td);
     }
+  }
+
+  onGridMouseMove(event: MouseEvent): void {
+    if (!this.tooltip()) {
+      return;
+    }
+    this.tooltipAnchor = { x: event.clientX, y: event.clientY };
+    this.positionTooltip();
   }
 
   onGridBlur(): void {
@@ -942,7 +953,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     trigger?.setAttribute('aria-describedby', this.tooltipId);
     this.tooltip.set(context);
     this.cellDetailsOpen.emit(context);
-    setTimeout(() => this.positionTooltip());
+    this.positionTooltip();
   }
 
   closeTooltip(): void {
@@ -952,6 +963,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     }
     this.tooltipCell?.removeAttribute('aria-describedby');
     this.tooltipCell = null;
+    this.tooltipAnchor = null;
     this.tooltip.set(null);
     this.cellDetailsClose.emit();
   }
@@ -974,15 +986,16 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   private positionTooltip(): void {
     const tooltip = this.tooltipEl()?.nativeElement;
     const source = this.tooltipCell;
-    if (!tooltip || !source || typeof window === 'undefined') {
+    if (!source || typeof window === 'undefined') {
       return;
     }
     const rect = source.getBoundingClientRect();
-    const width = tooltip.offsetWidth || 260;
-    const height = tooltip.offsetHeight || 90;
+    const width = tooltip?.offsetWidth || 260;
+    const height = tooltip?.offsetHeight || 90;
     const margin = 8;
-    let left = rect.left;
-    let top = rect.bottom + 6;
+    const anchor = this.tooltipAnchor;
+    let left = anchor ? anchor.x + 12 : rect.left;
+    let top = anchor ? anchor.y + 14 : rect.bottom + 6;
     if (left + width > window.innerWidth - margin) {
       left = window.innerWidth - width - margin;
     }
@@ -1192,6 +1205,8 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.stateChange.emit({ expanded: { ...expanded }, sort: this.config().sort });
   }
 }
+
+
 
 
 

@@ -686,13 +686,15 @@ describe('PivotGridComponent', () => {
     spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1000);
     spyOnProperty(window, 'innerHeight', 'get').and.returnValue(800);
 
-    cell.dispatchEvent(new MouseEvent('mouseenter'));
+    cell.dispatchEvent(new MouseEvent('mouseenter', { clientX: 300, clientY: 200 }));
     tick(150);
     fixture.detectChanges();
     tick(0);
     fixture.detectChanges();
 
     const tooltip = element.querySelector('[role="tooltip"]') as HTMLElement;
+    expect(parseFloat(tooltip.style.left)).toBeGreaterThanOrEqual(300);
+    expect(parseFloat(tooltip.style.top)).toBeGreaterThanOrEqual(200);
     expect(parseFloat(tooltip.style.left)).toBeLessThanOrEqual(992);
     expect(parseFloat(tooltip.style.top)).toBeLessThanOrEqual(792);
   }));

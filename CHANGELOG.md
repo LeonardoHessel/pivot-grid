@@ -6,6 +6,13 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-11-15
+
+### Fixed
+
+- Tooltip de célula agora aparece **junto ao cursor** (+12/+14), e não no
+  início da célula. No foco por teclado usa a célula como âncora.
+
 ## [2.4.0] - 2026-11-15
 
 ### Changed

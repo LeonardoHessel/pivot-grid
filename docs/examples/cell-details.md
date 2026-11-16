@@ -15,7 +15,7 @@ O baseline foi inspecionado em `http://localhost/packreturn-green/`
 | Conteúdo | `Row:` caminho `" - "`, `Column:` caminho, `Avg of <medida>:` valor |
 | Registros | **não exibe** registros, somente o resumo |
 | Atraso | ~20 ms (praticamente imediato) |
-| Posição | abaixo/à direita da célula/cursor; `max-width: 350px`; largura ~160–172 px |
+| Posição | **junto ao cursor** (+12/+14); `max-width: 350px`; largura ~160–172 px |
 | Aparência | fundo cinza `#616161`, texto branco, 12–14 px |
 | Totais | mesmo formato; subtotal de coluna mostra o caminho da coluna |
 | Tree | tooltip apenas nas células de valor; o cabeçalho de linha não tem tooltip |
@@ -55,7 +55,8 @@ detailsTemplate?: TemplateRef<PivotCellDetailsContext>;
 ```
 
 - Delay do tooltip: **150 ms**; fecha ao sair, no scroll e com `Esc`.
-- Posiciona abaixo da célula e reposiciona para não sair da viewport.
+- Posiciona **junto ao cursor** (+12/+14) e reposiciona para não sair da
+  viewport; no foco por teclado usa a célula como âncora.
 - Sem backdrop e sem prender foco no tooltip.
 - `detailsTemplate` continua valendo; no modo dialog o contexto inclui
   `records` via `PivotResult.recordsForCell`. No tooltip padrão os registros não

@@ -447,7 +447,7 @@ continua opcional.
 - detailsColumns: PivotField[] | string[] (diálogo/template)
 - detailsTemplate: TemplateRef<PivotCellDetailsContext>
 
-Hover: abre após 150 ms, ancorado à célula, reposiciona para não sair da
+Hover: abre após 150 ms, junto ao cursor (fallback à célula no foco), reposiciona para não sair da
 viewport, fecha ao sair/scroll/Esc, sem backdrop e sem prender foco.
 
 Conteúdo padrão: Row: (caminho), Column: (caminho), "<Agg> of <medida>:" e o
@@ -633,6 +633,7 @@ Superfície estável — somente o que sai de `public-api.ts`:
 
 - [docs/examples/sticky-keyboard.md](./examples/sticky-keyboard.md) — row headers fixos e teclado.
 - [docs/examples/](./examples/README.md) — índice por funcionalidade.
+
 
 
 

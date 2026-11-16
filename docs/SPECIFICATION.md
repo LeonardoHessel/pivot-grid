@@ -418,8 +418,8 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
 ### 8.26 Detalhes da célula (2.4)
 
 - Padrão: cellDetails true, cellDetailsTrigger hover, cellDetailsMode tooltip.
-- Hover abre após 150 ms, ancorado à célula, com reposicionamento para não sair
-  da viewport; fecha ao sair, no scroll e com Esc.
+- Hover abre após 150 ms, **junto ao cursor** (fallback à célula no foco), com
+  reposicionamento para não sair da viewport; fecha ao sair, no scroll e com Esc.
 - Conteúdo padrão: Row: caminho (join " - "), Column: caminho,
   "<Agg> of <medida>:" valor formatado. Não exibe registros (paridade com o
   baseline Syncfusion 20).

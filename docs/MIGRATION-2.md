@@ -1,6 +1,6 @@
 # Migração 1.x → 2.x (Angular 21+)
 
-> **Status:** **2.4.0 estável** (`latest`), com a 2.0.0 validada pelo consumidor
+> **Status:** **2.4.1 estável** (`latest`), com a 2.0.0 validada pelo consumidor
 > no Angular 22. A 1.2.0 permanece disponível para Angular 18–20.
 
 ## O que muda
@@ -19,10 +19,10 @@ têm a mesma API e comportamento da 1.2.0.
 ## Instalação do RC
 
 ```bash
-npm install --save-exact pivot-grid@2.4.0
+npm install --save-exact pivot-grid@2.4.1
 ```
 
-O `latest` aponta para a 2.4.0; a 1.x segue publicada e suportada para Angular 18–20.
+O `latest` aponta para a 2.4.1; a 1.x segue publicada e suportada para Angular 18–20.
 
 ## Zoneless
 
