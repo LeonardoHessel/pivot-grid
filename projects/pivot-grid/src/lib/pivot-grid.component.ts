@@ -59,6 +59,15 @@ const DEFAULT_LABELS: PivotLabels = {
   detailsTitle: 'Cell details',
   detailsRow: 'Row',
   detailsColumn: 'Column',
+  aggregators: {
+    sum: 'Sum',
+    avg: 'Avg',
+    min: 'Min',
+    max: 'Max',
+    count: 'Count',
+    countDistinct: 'Distinct count',
+  },
+  measureFormat: '{aggregation} of {caption}',
   detailsClose: 'Close',
   detailsEmpty: 'No records for this cell.',
 };
@@ -229,6 +238,10 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
   readonly resolvedLabels = computed<PivotLabels>(() => ({
     ...DEFAULT_LABELS,
     ...this.labels(),
+    aggregators: {
+      ...DEFAULT_LABELS.aggregators,
+      ...this.labels().aggregators,
+    },
   }));
 
   readonly values = computed(() => this.config().values);
@@ -970,17 +983,16 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
 
   measureText(field: string): string {
     const value = this.values().find((candidate) => candidate.field === field);
-    const captions: Record<string, string> = {
-      sum: 'Sum',
-      avg: 'Avg',
-      min: 'Min',
-      max: 'Max',
-      count: 'Count',
-      countDistinct: 'Distinct count',
-    };
     const aggregator = value?.aggregator ?? 'sum';
+    const aggregation =
+      this.resolvedLabels().aggregators?.[aggregator] ?? aggregator;
     const caption = value?.caption ?? value?.field ?? field;
-    return `${captions[aggregator] ?? aggregator} of ${caption}:`;
+    const format =
+      this.resolvedLabels().measureFormat ?? '{aggregation} of {caption}';
+    const text = format
+      .replace('{aggregation}', aggregation)
+      .replace('{caption}', caption);
+    return `${text}:`;
   }
 
   private positionTooltip(): void {
@@ -1205,6 +1217,7 @@ export class PivotGridComponent implements AfterViewInit, OnDestroy {
     this.stateChange.emit({ expanded: { ...expanded }, sort: this.config().sort });
   }
 }
+
 
 
 

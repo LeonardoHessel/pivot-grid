@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Situação |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.4.1** (`latest`) | estável; tooltip no hover |
+| **2.x** | 21, 22 | **2.4.2** (`latest`) | estável; tooltip localizável |
 | **1.x** | 18, 19, 20 | **1.2.0** | manutenção; sem novas features |
 
 `peerDependencies`:

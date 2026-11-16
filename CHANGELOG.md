@@ -6,6 +6,20 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [2.4.2] - 2026-11-16
+
+### Added
+
+- PivotLabels.aggregators (parcial por agregador) e PivotLabels.measureFormat
+  ({aggregation} of {caption}); defaults em inglês preservados.
+- Tooltip localizável em pt-BR: Linha/Coluna/Média de <medida>, sem strings
+  fixas em measureText.
+
+### Documentation
+
+- Comparação do texto exato do baseline Syncfusion (Row/Column/Avg of) e do
+  resultado pt-BR em docs/examples/cell-details.md.
+
 ## [2.4.1] - 2026-11-15
 
 ### Fixed

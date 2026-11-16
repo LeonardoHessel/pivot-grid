@@ -429,6 +429,9 @@ sem `ngDoCheck`, sem manipulação de DOM fora do Angular.
 - cellDetailsMode="dialog" mantém o diálogo acessível e usa
   detailsColumns/recordsForCell; o gatilho é cellDetailsTrigger.
 - Saídas cellDetailsOpen/cellDetailsClose em ambos os modos.
+- Localização: detailsRow/detailsColumn, aggregators (parcial por agregador) e
+  measureFormat com placeholders {aggregation}/{caption}; defaults em inglês
+  (Row/Column, Sum/Avg/...). O texto da medida não usa strings fixas.
 
 ## 9. API do componente
 ## 9. API do componente (resumo)

@@ -4,7 +4,7 @@ Adoção do `pivot-grid` em um app Angular. Escolha a linha conforme a versão:
 
 | App | Linha | Instalação |
 |---|---|---|
-| Angular 21/22 | 2.x | `npm install --save-exact pivot-grid@2.4.1` |
+| Angular 21/22 | 2.x | `npm install --save-exact pivot-grid@2.4.2` |
 | Angular 18/19/20 | 1.x | `npm install --save-exact pivot-grid@1.2.0` |
 
 Campos de exemplo são genéricos; adapte aos nomes da sua API.

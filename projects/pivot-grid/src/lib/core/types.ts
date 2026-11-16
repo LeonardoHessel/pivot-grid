@@ -219,6 +219,10 @@ export interface PivotLabels {
   detailsTitle?: string;
   detailsRow?: string;
   detailsColumn?: string;
+  /** Nomes dos agregadores (default inglês). */
+  aggregators?: Partial<Record<Aggregator, string>>;
+  /** Formato da medida: '{aggregation} of {caption}' (default). */
+  measureFormat?: string;
   detailsClose?: string;
   detailsEmpty?: string;
   /** Optional; default 'Resize column'. */
@@ -271,6 +275,7 @@ export interface PivotExpandEvent {
   path: string[];
   expanded: boolean;
 }
+
 
 
 

@@ -75,3 +75,31 @@ Diálogo opcional (`cellDetailsMode="dialog"`):
 
 Rotas: [`/detalhes`](https://leonardohessel.github.io/pivot-grid/detalhes) e
 [`/detalhes?dialog=1`](https://leonardohessel.github.io/pivot-grid/detalhes?dialog=1).
+
+## Localização (pt-BR)
+
+Os defaults são em inglês (paridade com o baseline: Row/Column/Avg of). Para
+pt-BR:
+
+```ts
+labels: Partial<PivotLabels> = {
+  detailsRow: 'Linha',
+  detailsColumn: 'Coluna',
+  detailsTitle: 'Detalhes da célula',
+  detailsClose: 'Fechar',
+  aggregators: { avg: 'Média' },
+  measureFormat: '{aggregation} de {caption}',
+};
+```
+
+Resultado: **Linha:**, **Coluna:** e **Média de MÉDIA POD.:**.
+
+### Baseline × pivot-grid
+
+| Baseline (Syncfusion) | pivot-grid (default) | pivot-grid (pt-BR) |
+|---|---|---|
+| Row: BELEM - BEL | Row: Norte - Alfa | Linha: Norte - Alfa |
+| Column: 2026 - 08/26 | Column: 2026-01 | Coluna: 2026-01 |
+| Avg of Média Pod.: 26 | Avg of MÉDIA POD.: 57 | Média de MÉDIA POD.: 57 |
+| sem registros | sem registros | sem registros |
+

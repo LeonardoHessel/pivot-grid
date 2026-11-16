@@ -453,10 +453,22 @@ viewport, fecha ao sair/scroll/Esc, sem backdrop e sem prender foco.
 Conteúdo padrão: Row: (caminho), Column: (caminho), "<Agg> of <medida>:" e o
 valor formatado. Não exibe registros (como o baseline).
 
-Teclado: foco na célula abre o tooltip com aria-describedby e role="tooltip";
-Esc fecha. cellDetailsMode="dialog" usa detailsColumns e
-PivotResult.recordsForCell para mostrar os registros; cellDetailsTrigger
-controla o clique. Saídas: cellDetailsOpen / cellDetailsClose.
+Localização (defaults em inglês):
+
+- `detailsRow`: `'Row'`
+- `detailsColumn`: `'Column'`
+- `aggregators`: `{ sum: 'Sum', avg: 'Avg', min: 'Min', max: 'Max', count: 'Count', countDistinct: 'Distinct count' }` (parcial; pode definir só `avg`)
+- `measureFormat`: `'{aggregation} of {caption}'`
+
+Exemplo pt-BR: `detailsRow: 'Linha'`, `detailsColumn: 'Coluna'`,
+`aggregators: { avg: 'Média' }`, `measureFormat: '{aggregation} de {caption}'`
+→ **Média de MÉDIA POD.:**.
+
+Teclado: foco na célula abre o tooltip com `aria-describedby` e
+`role="tooltip"`; `Esc` fecha. `cellDetailsMode="dialog"` usa
+`detailsColumns` e `PivotResult.recordsForCell` para mostrar os registros;
+`cellDetailsTrigger` controla o clique. Saídas: `cellDetailsOpen` /
+`cellDetailsClose`.
 
 ## 5. Exportação
 

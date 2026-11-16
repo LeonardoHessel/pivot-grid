@@ -26,7 +26,11 @@ const data: PivotData = [
 
 const labels: Partial<PivotLabels> = {
   detailsTitle: 'Detalhes da célula',
+  detailsRow: 'Linha',
+  detailsColumn: 'Coluna',
   detailsClose: 'Fechar',
+  aggregators: { avg: 'Média' },
+  measureFormat: '{aggregation} de {caption}',
   detailsEmpty: 'Nenhum registro para esta célula.',
   grandTotal: 'Total geral',
   rowTotal: 'Total',
@@ -162,5 +166,6 @@ export class CellDetailsComponent {
     }
   }
 }
+
 
 

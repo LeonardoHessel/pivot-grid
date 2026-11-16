@@ -699,11 +699,37 @@ describe('PivotGridComponent', () => {
     expect(parseFloat(tooltip.style.top)).toBeLessThanOrEqual(792);
   }));
 
+  it('localizes tooltip labels and aggregator format', fakeAsync(() => {
+    const fixture = create({
+      ...config,
+      values: [{ field: 'amount', caption: 'MÉDIA POD.', aggregator: 'avg' }],
+    });
+    fixture.componentRef.setInput('cellDetails', true);
+    fixture.componentRef.setInput('labels', {
+      detailsRow: 'Linha',
+      detailsColumn: 'Coluna',
+      aggregators: { avg: 'Média' },
+      measureFormat: '{aggregation} de {caption}',
+    });
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const cell = element.querySelector('td.pg-cell[data-r="0"][data-c="0"]') as HTMLElement;
+
+    cell.dispatchEvent(new MouseEvent('mouseenter', { clientX: 100, clientY: 100 }));
+    tick(150);
+    fixture.detectChanges();
+
+    const tooltip = element.querySelector('[role="tooltip"]') as HTMLElement;
+    expect(tooltip.textContent).toContain('Linha:');
+    expect(tooltip.textContent).toContain('Coluna:');
+    expect(tooltip.textContent).toContain('Média de MÉDIA POD.:');
+  }));
   it('shows the empty state when there is no data', () => {
     const fixture = create(config, []);
     expect(fixture.nativeElement.querySelector('.pg-empty')).toBeTruthy();
   });
 });
+
 
 
 

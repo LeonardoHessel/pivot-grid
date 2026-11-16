@@ -4,7 +4,7 @@
 
 | Linha | Angular | Versão atual | Estado |
 |---|---|---|---|
-| **2.x** | 21, 22 | **2.4.1** (`latest`) | ativa; tooltip no hover |
+| **2.x** | 21, 22 | **2.4.2** (`latest`) | ativa; tooltip localizável |
 | **1.x** | 18, 19, 20 | **1.2.0** | congelada; manutenção |
 
 - Novas features entram **somente na 2.x**, uma funcionalidade-título por minor.
@@ -31,6 +31,8 @@
 | 2.2.0 | Cabeçalho de linha em árvore + showValueHeader |
 | 2.3.0 | Contrato de tema + drill-down |
 | 2.4.0 | Tooltip de célula no hover (diálogo opcional) |
+| 2.4.1 | Tooltip junto ao cursor |
+| 2.4.2 | Tooltip localizável |
 
 ## 2.x — próximas minors (aditivas)
 
